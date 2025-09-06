@@ -48,14 +48,40 @@ Use the plugin's generator to create new projects.
 To generate a new application, use:
 
 ```sh
-npx nx g @nx/angular:app demo
+npx nx g @nx/angular:app app
 ```
 
 To generate a new library, use:
 
 ```sh
-npx nx g @nx/angular:lib mylib
+npx nx g @nx/angular:lib libs
+npx nx g @nx/angular:lib shared
 ```
+
+npx nx reset
+npm install primeng primeicons @angular/cdk --legacy-peer-dep
+npm install @jsverse/transloco --legacy-peer-dep 
+npm install primeng@latest primeicons@latest --legacy-peer-dep
+npm install @angular/animations --legacy-peer-dep
+ngx add @jsverse/transloco
+npm install primeng --legacy-peer-dep
+npm install primeicons --legacy-peer-dep
+npm install chart.js --legacy-peer-dep
+npm install @fullcalendar/angular --legacy-peer-dep 
+npm install @fullcalendar/core --legacy-peer-dep
+npm install @fullcalendar/daygrid --legacy-peer-dep
+npm install @fullcalendar/multimonth --legacy-peer-dep
+npm install file-saver --legacy-peer-dep
+npm install tippy.js --legacy-peer-dep
+npm install --save-dev jest @types/jest ts-jest --legacy-peer-dep
+npm install --save-dev --legacy-peer-deps
+npm install --legacy-peer-deps
+ "assets": [
+          // {
+          //   "glob": "**/*",
+          //   "input": "app/public"
+          // }
+        ],
 
 You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
 

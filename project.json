@@ -3,39 +3,30 @@
   "$schema": "../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "prefix": "app",
-  "sourceRoot": "app/src",
-  "tags": [],
+  "sourceRoot": ".",
   "targets": {
     "build": {
       "executor": "@angular/build:application",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/customer-portal",
-        "browser": "app/src/main.ts",
-        "polyfills": ["zone.js"],
-        "tsConfig": "app/tsconfig.app.json",
+        "browser": "main.ts",
+        "polyfills": ["polyfills.ts"],
+        "tsConfig": "tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "assets": [
           {
             "glob": "**/*",
-            "input": "app/public"
+            "input": "public"
           }
         ],
-        "styles": ["app/src/styles.scss"]
+        "styles": ["styles.scss"]
       },
       "configurations": {
         "production": {
           "budgets": [
-            {
-              "type": "initial",
-              "maximumWarning": "500kb",
-              "maximumError": "1mb"
-            },
-            {
-              "type": "anyComponentStyle",
-              "maximumWarning": "4kb",
-              "maximumError": "8kb"
-            }
+            { "type": "initial", "maximumWarning": "500kb", "maximumError": "1mb" },
+            { "type": "anyComponentStyle", "maximumWarning": "4kb", "maximumError": "8kb" }
           ],
           "outputHashing": "all"
         },
@@ -48,7 +39,6 @@
       "defaultConfiguration": "production"
     },
     "serve": {
-      "continuous": true,
       "executor": "@angular/build:dev-server",
       "configurations": {
         "production": {
@@ -69,19 +59,18 @@
     "lint": {
       "executor": "@nx/eslint:lint",
       "options": {
-        "lintFilePatterns": ["app/src"]
+        "lintFilePatterns": ["*.ts"]
       }
     },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectName}"],
       "options": {
-        "jestConfig": "app/jest.config.ts",
-        "tsConfig": "app/tsconfig.spec.json"
+        "jestConfig": "jest.config.ts",
+        "tsConfig": "tsconfig.spec.json"
       }
     },
     "serve-static": {
-      "continuous": true,
       "executor": "@nx/web:file-server",
       "options": {
         "buildTarget": "customer-portal:build",
