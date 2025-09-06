@@ -20,7 +20,13 @@
             "input": "public"
           }
         ],
-        "styles": ["styles.scss"]
+        "styles": ["styles.scss"],
+        "stylePreprocessorOptions": {
+          "includePaths": [
+            "src/styles",
+            "src/styles/pattern"
+          ]
+        }
       },
       "configurations": {
         "production": {
