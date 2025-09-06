@@ -6,6 +6,10 @@
 
 [Learn more about this workspace setup and its capabilities](https://nx.dev/getting-started/tutorials/angular-standalone-tutorial?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
 
+npx create-nx-workspace@latest customer-portal --preset=angular
+cd customer-portal
+https://github.com/iyyanar2405/customer-portal
+
 ## Finish your CI setup
 
 [Click here to finish setting up your workspace!](https://cloud.nx.app/connect/2qJf1ecX6X)
