@@ -8,7 +8,8 @@
     "lib": ["es2020", "dom"],
     "baseUrl": ".",
     "paths": {
-      "@customer-portal/libs": ["libs/src/index.ts"]
+      "@customer-portal/libs": ["libs/src/index.ts"],
+      "@customer-portal/shared": ["shared/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
