@@ -6,14 +6,15 @@
   },
   "files": [
     "main.ts",
-    "./polyfills.ts"
+    "polyfills.ts"
   ],
   "include": [
-    "./**/*.d.ts",
-    "./**/*.ts"
+    "src/**/*.d.ts",
+    "src/**/*.ts"
   ],
   "exclude": [
-    "jest.config.ts",
-    "**/*.spec.ts"
+    "src/**/*.spec.ts",
+    "src/**/__mocks__/**/*",
+    "libs/**/__mocks__/**/*"
   ]
 }

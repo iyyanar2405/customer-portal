@@ -5,19 +5,16 @@
     "types": []
   },
   "files": [
-    "./main.ts",
-    "./polyfills.ts"
+    "main.ts",
+    "polyfills.ts"
   ],
   "include": [
-    "app/**/*.ts",
-    "libs/**/*.ts",
-    "*.ts"
+    "src/**/*.d.ts",
+    "src/**/*.ts"
   ],
   "exclude": [
-    "jest.config.ts",
-    "test-setup.ts",
-    "**/*.spec.ts",
-    "**/*.test.ts",
-    "**/__mocks__/**"
+    "src/**/*.spec.ts",
+    "src/**/__mocks__/**/*",
+    "libs/**/__mocks__/**/*"
   ]
 }
