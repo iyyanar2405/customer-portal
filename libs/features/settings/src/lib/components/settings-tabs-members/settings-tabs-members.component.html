@@ -1,0 +1,41 @@
+<ng-container *transloco="let t">
+  <div class="settings-members">
+    @if (settingsCompanyDetailsStoreService.isUserAdmin()) {
+      <div class="settings-members__actions">
+        <shared-button
+          [icon]="'plus'"
+          [label]="t('settings.membersTab.addNewMember')"
+          [type]="sharedButtonType.Outline"
+          (clickEvent)="onAddMemberClick()">
+        </shared-button>
+      </div>
+    }
+
+    <div class="settings-members__admins">
+      <p>
+        {{
+          t('settings.membersTab.admins', {
+            total: settingsMembersStoreService.adminTotalFilteredRecords(),
+          })
+        }}
+      </p>
+      <lib-admin-grid
+        [shouldPersist]="
+          !settingsCoBrowsingStoreService.isDnvUser()
+        "></lib-admin-grid>
+    </div>
+    <div class="settings-members__members">
+      <p>
+        {{
+          t('settings.membersTab.members', {
+            total: settingsMembersStoreService.membersTotalFilteredRecords(),
+          })
+        }}
+      </p>
+      <lib-members-grid
+        [shouldPersist]="
+          !settingsCoBrowsingStoreService.isDnvUser()
+        "></lib-members-grid>
+    </div>
+  </div>
+</ng-container>

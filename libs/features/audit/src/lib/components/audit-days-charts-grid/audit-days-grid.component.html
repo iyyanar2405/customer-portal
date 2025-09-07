@@ -1,0 +1,12 @@
+<ng-container *transloco="let t">
+  <h3 id="audit-graph-sites">
+    {{ t('audit.auditGraphs.auditDays.bySite.title') }}
+  </h3>
+  <section class="trends-grid">
+    <shared-tree-table
+      [cols]="graphColumns"
+      [data]="auditChartsStoreService.auditDaysGridData()"
+      [isCellClickable]="true"
+      (rowClicked)="onRowClicked($event)"></shared-tree-table>
+  </section>
+</ng-container>

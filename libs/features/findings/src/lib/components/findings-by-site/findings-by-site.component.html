@@ -1,0 +1,19 @@
+<ng-container *transloco="let t">
+  <h2 id="findings-by-site">
+    {{ t('findings.findingsBySite.title') }}
+  </h2>
+
+  @if (findingGraphsStoreService.findingsBySiteList().length) {
+    <shared-tree-table
+      aria-labelledby="findings-by-site"
+      [categoriesByColumn]="
+        findingGraphsStoreService.findingsBySiteListGradient()
+      "
+      [cols]="columns"
+      [data]="findingGraphsStoreService.findingsBySiteList()"
+      [hideZeroValues]="true"
+      [isCellClickable]="true"
+      [isGlobalGradient]="false"
+      (cellClickedSendTreeNode)="onCellClick($event)"></shared-tree-table>
+  }
+</ng-container>

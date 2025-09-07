@@ -1,0 +1,17 @@
+<ng-container *transloco="let t">
+  @if (isRescheduleVisible()) {
+    <shared-button
+      [label]="t('schedules.details.reschedule')"
+      [type]="sharedButtonType.Outline"
+      (clickEvent)="onReschedule()">
+    </shared-button>
+  }
+
+  @if (isConfirmVisible()) {
+    <shared-button
+      [label]="t('schedules.details.confirm')"
+      [type]="sharedButtonType.Secondary"
+      (clickEvent)="onConfirm()">
+    </shared-button>
+  }
+</ng-container>

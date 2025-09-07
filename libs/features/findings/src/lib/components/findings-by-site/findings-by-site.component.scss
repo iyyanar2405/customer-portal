@@ -1,0 +1,16 @@
+@use 'pattern/colors';
+@use 'pattern/mixins';
+@use 'pattern/typography';
+@use 'pattern/utility';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: utility.get-rem(calc(3 * var(--dnv-gutter-base-unitless)));
+  @include mixins.gutter-for(top, right, bottom, left);
+}
+
+h2 {
+  @extend %#{typography.$heading-m-pattern};
+  color: colors.get-color('SeaBlue');
+}

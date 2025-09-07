@@ -15,6 +15,9 @@
       ],
       "@customer-portal/contracts": ["libs/data-access/contracts/src/index.ts"],
       "@customer-portal/documents": ["libs/data-access/documents/src/index.ts"],
+      "@customer-portal/external-apps": [
+        "libs/features/external-apps/src/index.ts"
+      ],
       "@customer-portal/financials": [
         "libs/data-access/financials/src/index.ts"
       ],
@@ -36,7 +39,8 @@
       "@customer-portal/router": ["libs/data-access/router/src/index.ts"],
       "@customer-portal/schedules": ["libs/data-access/schedules/src/index.ts"],
       "@customer-portal/settings": ["libs/data-access/settings/src/index.ts"],
-      "@customer-portal/shared": ["shared/src/index.ts"]
+      "@customer-portal/shared": ["shared/src/index.ts"],
+      "@customer-portal/upload": ["libs/features/upload/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

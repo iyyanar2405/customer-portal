@@ -1,0 +1,15 @@
+@use 'pattern/mixins';
+
+:host {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+shared-custom-full-calendar {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  @include mixins.gutter-for(top, right, bottom, left);
+}

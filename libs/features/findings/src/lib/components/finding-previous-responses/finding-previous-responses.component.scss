@@ -1,0 +1,28 @@
+@use 'pattern/colors';
+@use 'pattern/layout';
+@use 'pattern/mixins';
+@use 'pattern/typography';
+@use 'pattern/utility';
+
+:host {
+  @extend %#{layout.$page-base-body-subhead-pattern};
+  grid-template-columns: minmax(0, utility.get-rem(362)) minmax(
+      0,
+      utility.get-rem(630)
+    );
+  gap: utility.get-rem(calc(4 * var(--dnv-gutter-base-unitless)));
+  background-color: transparent;
+
+  @include mixins.only-for(tablet) {
+    grid-template-columns: 1fr;
+  }
+}
+
+h3 {
+  @extend %#{typography.$heading-m-pattern};
+  color: colors.get-color('SeaBlue');
+}
+
+p {
+  @extend %#{typography.$text-l-pattern};
+}

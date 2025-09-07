@@ -1,0 +1,43 @@
+<ng-container *transloco="let t">
+  <section class="filters" role="region" [attr.aria-label]="t('filters')">
+    <shared-select-date-range
+      [ariaLabel]="t('select.dateRange.custom')"
+      [isDisabled]="dateRangeIsDisabled"
+      [prefill]="timeRange.YearCurrent"
+      (changeEvent)="onFilterChange($event, chartFilterKey.TimeRange)">
+    </shared-select-date-range>
+
+    <shared-select-multiple
+      [appendTo]="'body'"
+      [ariaLabel]="t('select.multiSelect.companies')"
+      [options]="findingChartFilterStoreService.dataCompanies()"
+      [placeholder]="t('select.multiSelect.companies')"
+      [prefill]="findingChartFilterStoreService.filterCompanies()"
+      (changeEvent)="onFilterChange($event, chartFilterKey.Companies)">
+    </shared-select-multiple>
+
+    <shared-select-multiple
+      [appendTo]="'body'"
+      [ariaLabel]="t('select.multiSelect.services')"
+      [options]="findingChartFilterStoreService.dataServices()"
+      [placeholder]="t('select.multiSelect.services')"
+      [prefill]="findingChartFilterStoreService.filterServices()"
+      (changeEvent)="onFilterChange($event, chartFilterKey.Services)">
+    </shared-select-multiple>
+
+    <shared-select-tree
+      [appendTo]="'body'"
+      [ariaLabel]="t('select.treeSelect.sites')"
+      [options]="findingChartFilterStoreService.dataSites()"
+      [placeholder]="t('select.treeSelect.sites')"
+      (changeEvent)="onFilterChange($event, chartFilterKey.Sites)">
+    </shared-select-tree>
+  </section>
+
+  <section class="tabs" role="region" [attr.aria-label]="t('tabs')">
+    <lib-finding-graphs-tab-view
+      (disableFilterEvent)="
+        onDisableFilterEvent($event)
+      "></lib-finding-graphs-tab-view>
+  </section>
+</ng-container>

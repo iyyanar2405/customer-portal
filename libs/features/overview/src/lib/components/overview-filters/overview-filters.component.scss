@@ -1,0 +1,13 @@
+@use 'pattern/colors';
+@use 'pattern/mixins';
+@use 'pattern/utility';
+
+:host {
+  display: grid;
+  grid-template-columns: repeat(3, calc((100% - utility.get-rem(36)) / 3));
+  gap: utility.get-rem(12);
+
+  @include mixins.respond-to(phone) {
+    grid-template-columns: 100%;
+  }
+}

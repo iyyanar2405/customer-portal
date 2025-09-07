@@ -1,0 +1,27 @@
+<ng-container *transloco="let t">
+  <shared-select-multiple
+    [appendTo]="'body'"
+    [ariaLabel]="t('select.multiSelect.companies')"
+    [options]="overviewFilterStoreService.dataCompanies()"
+    [placeholder]="t('select.multiSelect.companies')"
+    [prefill]="overviewFilterStoreService.filterCompanies()"
+    (changeEvent)="onFilterChange($event, overviewFilterType.Companies)">
+  </shared-select-multiple>
+
+  <shared-select-multiple
+    [appendTo]="'body'"
+    [ariaLabel]="t('select.multiSelect.services')"
+    [options]="overviewFilterStoreService.dataServices()"
+    [placeholder]="t('select.multiSelect.services')"
+    [prefill]="overviewFilterStoreService.filterServices()"
+    (changeEvent)="onFilterChange($event, overviewFilterType.Services)">
+  </shared-select-multiple>
+
+  <shared-select-tree
+    [appendTo]="'body'"
+    [ariaLabel]="t('select.treeSelect.sites')"
+    [options]="overviewFilterStoreService.dataSites()"
+    [placeholder]="t('select.treeSelect.sites')"
+    (changeEvent)="onFilterChange($event, overviewFilterType.Sites)">
+  </shared-select-tree>
+</ng-container>

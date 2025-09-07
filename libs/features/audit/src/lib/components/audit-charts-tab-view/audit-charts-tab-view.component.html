@@ -1,0 +1,28 @@
+<ng-container *transloco="let t">
+  <p-tabView
+    role="tablist"
+    [scrollable]="true"
+    (onChange)="onTabChange($event)">
+    <p-tabPanel
+      id="audit-status-tab"
+      [attr.aria-label]="t('audit.auditChartsTabs.auditStatus')"
+      [header]="t('audit.auditChartsTabs.auditStatus')">
+      <ng-template pTemplate="content">
+        @if (activeTab === AuditChartsTabs.AuditStatus) {
+          <lib-audit-status-charts></lib-audit-status-charts>
+        }
+      </ng-template>
+    </p-tabPanel>
+
+    <p-tabPanel
+      id="audit-days-tab"
+      [attr.aria-label]="t('audit.auditChartsTabs.auditDays')"
+      [header]="t('audit.auditChartsTabs.auditDays')">
+      <ng-template pTemplate="content">
+        @if (activeTab === AuditChartsTabs.AuditDays) {
+          <lib-audit-days-charts></lib-audit-days-charts>
+        }
+      </ng-template>
+    </p-tabPanel>
+  </p-tabView>
+</ng-container>

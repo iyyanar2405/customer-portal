@@ -1,0 +1,21 @@
+<shared-grid
+  class="table-list"
+  dataKey="notification"
+  [columns]="cols"
+  [data]="notificationListStoreService.notificationList()"
+  [displayExportButton]="false"
+  [filterDelay]="0"
+  [hasActiveFilters]="notificationListStoreService.hasActiveFilters()"
+  [paginator]="true"
+  [preferenceData]="preferenceData()"
+  [rowHover]="true"
+  [scrollable]="true"
+  [shouldPersist]="!settingsCoBrowsingStoreService.isDnvUser()"
+  [showCurrentPageReport]="true"
+  [sortMode]="'multiple'"
+  [sortable]="true"
+  [statusStatesMap]="statusStatesMap"
+  [totalRecords]="notificationListStoreService.totalRecords()"
+  (gridConfigChangedEvent)="onGridConfigChanged($event)"
+  (triggerRedirectAction)="onNotificationRowClick($event)">
+</shared-grid>

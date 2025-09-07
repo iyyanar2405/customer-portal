@@ -1,0 +1,43 @@
+<ng-container *transloco="let t">
+  <div class="form-labels">
+    <h5>{{ t('settings.form.members.accessAreas') }}</h5>
+    <div class="form-labels__checkboxes">
+      <h5>{{ t('settings.form.members.view') }}</h5>
+      <h5>{{ t('settings.form.members.edit') }}</h5>
+    </div>
+  </div>
+  <div class="access-areas">
+    @for (area of areas(); track area.name; let index = $index) {
+      <div class="access-areas__item">
+        <p class="access-areas__name">{{ t(area.name) }}</p>
+        <div class="access-areas__checkboxes">
+          @if (area.permission.view) {
+            <p-checkbox
+              type="checkbox"
+              [binary]="true"
+              [disabled]="
+                isAdminRightsChecked() ||
+                (area.permission.edit ? area.permission.edit.isChecked : false)
+              "
+              [ngModel]="area.permission.view.isChecked"
+              (onChange)="
+                onChangeAccessAreas(index, permissionAreas.View)
+              "></p-checkbox>
+          }
+          @if (area.permission.edit) {
+            <p-checkbox
+              type="checkbox"
+              [binary]="true"
+              [disabled]="isAdminRightsChecked()"
+              [ngModel]="area.permission.edit.isChecked"
+              (onChange)="
+                onChangeAccessAreas(index, permissionAreas.Edit)
+              "></p-checkbox>
+          } @else {
+            <div class="access-areas__placeholder"></div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</ng-container>

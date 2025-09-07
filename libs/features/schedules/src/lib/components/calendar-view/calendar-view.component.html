@@ -1,0 +1,13 @@
+@if (isPreferenceInitialized | async) {
+  <lib-schedule-calendar-filters></lib-schedule-calendar-filters>
+  <shared-custom-full-calendar
+    [calendarViewType]="calendarViewType()"
+    [events]="calendarScheduleStoreService.calendarSchedule()"
+    [scheduleStatusMap]="scheduleStatusMap"
+    [selectedDate]="
+      overviewSharedStoreService.overviewUpcomingAuditSelectedDate()
+    "
+    (dateChange)="onChangeDate($event)"
+    (eventClick)="onClickEvent($event)">
+  </shared-custom-full-calendar>
+}

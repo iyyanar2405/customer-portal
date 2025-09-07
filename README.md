@@ -75,6 +75,20 @@ npx nx g @nx/angular:lib schedules
 npx nx g @nx/angular:lib settings
 
 
+
+npx nx g @nx/angular:lib actions
+npx nx g @nx/angular:lib audit
+npx nx g @nx/angular:lib certificates
+npx nx g @nx/angular:lib contracts
+npx nx g @nx/angular:lib external-apps
+npx nx g @nx/angular:lib financials
+npx nx g @nx/angular:lib findings
+npx nx g @nx/angular:lib notifications
+npx nx g @nx/angular:lib overview
+npx nx g @nx/angular:lib schedules
+npx nx g @nx/angular:lib settings
+npx nx g @nx/angular:lib upload
+
 ```
 
 npx nx reset
@@ -95,6 +109,7 @@ npm install tippy.js --legacy-peer-dep
 npm install --save-dev jest @types/jest ts-jest --legacy-peer-dep
 npm install --save-dev --legacy-peer-deps
 npm install --legacy-peer-deps
+npm install @angular/localize --legacy-peer-deps
  "assets": [
           // {
           //   "glob": "**/*",
@@ -107,9 +122,10 @@ npm install --legacy-peer-deps
   git fetch
   git pull
   git commit -m "fix install packages"
-  
 
-  npm install @angular/localize --legacy-peer-deps
+  git push --set-upstream origin feature/all_filesmerge
+
+  
 
 You can use `npx nx list` to get a list of installed plugins. Then, run `npx nx list <plugin-name>` to learn about more specific capabilities of a particular plugin. Alternatively, [install Nx Console](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) to browse plugins and generators in your IDE.
 

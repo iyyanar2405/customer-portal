@@ -1,0 +1,66 @@
+<ng-container *transloco="let t">
+  <p-tabView
+    role="tablist"
+    [scrollable]="true"
+    (onChange)="onTabChange($event)">
+    <p-tabPanel
+      id="finding-status-tab"
+      role="tabpanel"
+      [attr.aria-label]="t('findings.findingGraphsTabs.findingStatus')"
+      [header]="t('findings.findingGraphsTabs.findingStatus')">
+      <ng-template pTemplate="content">
+        @if (activeTab === FindingTabs.FindingStatus) {
+          <lib-finding-status></lib-finding-status>
+        }
+      </ng-template>
+    </p-tabPanel>
+
+    <p-tabPanel
+      id="open-findings-tab"
+      role="tabpanel"
+      [attr.aria-label]="t('findings.findingGraphsTabs.openFindings')"
+      [header]="t('findings.findingGraphsTabs.openFindings')">
+      <ng-template pTemplate="content">
+        @if (activeTab === FindingTabs.OpenFindings) {
+          <lib-open-findings></lib-open-findings>
+        }
+      </ng-template>
+    </p-tabPanel>
+
+    <p-tabPanel
+      id="findings-by-clause-tab"
+      role="tabpanel"
+      [attr.aria-label]="t('findings.findingGraphsTabs.findingsByClause')"
+      [header]="t('findings.findingGraphsTabs.findingsByClause')">
+      <ng-template pTemplate="content">
+        @if (activeTab === FindingTabs.FindingsByClause) {
+          <lib-findings-by-clause></lib-findings-by-clause>
+        }
+      </ng-template>
+    </p-tabPanel>
+
+    <p-tabPanel
+      id="findings-by-site-tab"
+      role="tabpanel"
+      [attr.aria-label]="t('findings.findingGraphsTabs.findingsBySite')"
+      [header]="t('findings.findingGraphsTabs.findingsBySite')">
+      <ng-template pTemplate="content">
+        @if (activeTab === FindingTabs.FindingsBySite) {
+          <lib-findings-by-site></lib-findings-by-site>
+        }
+      </ng-template>
+    </p-tabPanel>
+
+    <p-tabPanel
+      id="trends-tab"
+      role="tabpanel"
+      [attr.aria-label]="t('findings.findingGraphsTabs.trends')"
+      [header]="t('findings.findingGraphsTabs.trends')">
+      <ng-template pTemplate="content">
+        @if (activeTab === FindingTabs.Trends) {
+          <lib-finding-trends-graph></lib-finding-trends-graph>
+        }
+      </ng-template>
+    </p-tabPanel>
+  </p-tabView>
+</ng-container>
