@@ -54,8 +54,27 @@ npx nx g @nx/angular:app app
 To generate a new library, use:
 
 ```sh
+cd libs\data-access
 npx nx g @nx/angular:lib libs
 npx nx g @nx/angular:lib shared
+npx nx g @nx/angular:lib actions
+npx nx g @nx/angular:lib audit
+
+npx nx g @nx/angular:lib certificates
+npx nx g @nx/angular:lib contracts
+npx nx g @nx/angular:lib documents
+npx nx g @nx/angular:lib financials
+npx nx g @nx/angular:lib findings
+npx nx g @nx/angular:lib notifications
+npx nx g @nx/angular:lib overview
+npx nx g @nx/angular:lib overview-shared
+npx nx g @nx/angular:lib permissions
+npx nx g @nx/angular:lib preferences
+npx nx g @nx/angular:lib router
+npx nx g @nx/angular:lib schedules
+npx nx g @nx/angular:lib settings
+
+
 ```
 
 npx nx reset
@@ -119,3 +138,7 @@ And join the Nx community:
 - [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
 - [Our Youtube channel](https://www.youtube.com/@nxdevtools)
 - [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+
+cd libs
+cd data-access
+

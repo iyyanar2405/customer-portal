@@ -8,7 +8,34 @@
     "lib": ["es2020", "dom"],
     "baseUrl": ".",
     "paths": {
+      "@customer-portal/actions": ["libs/data-access/actions/src/index.ts"],
+      "@customer-portal/audit": ["libs/data-access/audit/src/index.ts"],
+      "@customer-portal/certificates": [
+        "libs/data-access/certificates/src/index.ts"
+      ],
+      "@customer-portal/contracts": ["libs/data-access/contracts/src/index.ts"],
+      "@customer-portal/documents": ["libs/data-access/documents/src/index.ts"],
+      "@customer-portal/financials": [
+        "libs/data-access/financials/src/index.ts"
+      ],
+      "@customer-portal/findings": ["libs/data-access/findings/src/index.ts"],
       "@customer-portal/libs": ["libs/src/index.ts"],
+      "@customer-portal/notifications": [
+        "libs/data-access/notifications/src/index.ts"
+      ],
+      "@customer-portal/overview": ["libs/data-access/overview/src/index.ts"],
+      "@customer-portal/overview-shared": [
+        "libs/data-access/overview-shared/src/index.ts"
+      ],
+      "@customer-portal/permissions": [
+        "libs/data-access/permissions/src/index.ts"
+      ],
+      "@customer-portal/preferences": [
+        "libs/data-access/preferences/src/index.ts"
+      ],
+      "@customer-portal/router": ["libs/data-access/router/src/index.ts"],
+      "@customer-portal/schedules": ["libs/data-access/schedules/src/index.ts"],
+      "@customer-portal/settings": ["libs/data-access/settings/src/index.ts"],
       "@customer-portal/shared": ["shared/src/index.ts"]
     }
   },

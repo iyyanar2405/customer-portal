@@ -1,6 +1,7 @@
 {
   "name": "customer-portal",
   "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "includedScripts": [],
   "projectType": "application",
   "prefix": "app",
   "sourceRoot": ".",
@@ -22,17 +23,22 @@
         ],
         "styles": ["styles.scss"],
         "stylePreprocessorOptions": {
-          "includePaths": [
-            "src/styles",
-            "src/styles/pattern"
-          ]
+          "includePaths": ["src/styles", "src/styles/pattern"]
         }
       },
       "configurations": {
         "production": {
           "budgets": [
-            { "type": "initial", "maximumWarning": "500kb", "maximumError": "1mb" },
-            { "type": "anyComponentStyle", "maximumWarning": "4kb", "maximumError": "8kb" }
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "4kb",
+              "maximumError": "8kb"
+            }
           ],
           "outputHashing": "all"
         },
@@ -72,7 +78,7 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectName}"],
       "options": {
-        "jestConfig": "jest.config.ts",
+        "jestConfig": "jest.config.app.ts",
         "tsConfig": "tsconfig.spec.json"
       }
     },
