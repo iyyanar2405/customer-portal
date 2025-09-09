@@ -1,7 +1,13 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./",
+  "baseUrl": "./",
+  "paths": {    
+    "@customer-portal/environments": ["libs/environments/index.ts"],
+    "@customer-portal/core": ["libs/core/index.ts"],
+    "@customer-portal/data-access/*": ["libs/data-access/*/src/index.ts"],
+    "@customer-portal/shared": ["libs/shared/src/index.ts"]
+    },
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
     "declaration": false,
@@ -18,6 +24,6 @@
     ],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "types": []
+    "types": ["jest"]
   }
 }

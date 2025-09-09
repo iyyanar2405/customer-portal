@@ -1,0 +1,34 @@
+@use 'pattern/utility';
+@use 'pattern/colors';
+
+:host {
+  display: flex;
+  flex-direction: column;
+  padding: utility.get-rem(20px);
+  border-top: utility.get-rem(1px) solid colors.get-color('SkyBlue90');
+}
+
+.footer-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: utility.get-rem(8px);
+
+  a {
+    color: colors.get-color('DarkBlue');
+    padding-right: utility.get-rem(15px);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    &:last-of-type {
+      padding-right: 0;
+    }
+  }
+
+  i {
+    font-size: 1.2rem;
+  }
+}

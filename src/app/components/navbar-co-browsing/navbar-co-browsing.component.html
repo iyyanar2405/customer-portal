@@ -1,0 +1,15 @@
+<ng-container *transloco="let t">
+    <div class="banner">
+        <p tabindex="0" 
+           [attr.aria-label]="t('cobrowsing.banner', { email: coBrowsingShareService.getCoBrowsingUserEmail() })">
+            {{ t('cobrowsing.banner', { email: coBrowsingShareService.getCoBrowsingUserEmail() }) }}
+        </p>
+
+        <shared-button
+            [label]="t('cobrowsing.endSession')"
+            [size]="'small'"
+            [type]="shareBButtonType.Outline"
+            (clickEvent)="onCoBrowsingEndModal()">
+        </shared-button>
+    </div>
+</ng-container>

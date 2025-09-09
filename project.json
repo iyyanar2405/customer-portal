@@ -4,14 +4,14 @@
   "includedScripts": [],
   "projectType": "application",
   "prefix": "app",
-  "sourceRoot": ".",
+  "sourceRoot": "./src",
   "targets": {
     "build": {
       "executor": "@angular/build:application",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/customer-portal",
-        "browser": "main.ts",
+        "browser": "./src/main.ts",
         "polyfills": ["polyfills.ts"],
         "tsConfig": "tsconfig.app.json",
         "inlineStyleLanguage": "scss",
@@ -21,7 +21,7 @@
             "input": "public"
           }
         ],
-        "styles": ["styles.scss"],
+        "styles": ["src/styles/styles.scss"],
         "stylePreprocessorOptions": {
           "includePaths": ["src/styles", "src/styles/pattern"]
         }

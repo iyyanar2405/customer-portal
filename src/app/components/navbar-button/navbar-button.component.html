@@ -1,0 +1,17 @@
+<p-button
+    [ariaLabel]="arialabel()"
+    [disabled]="isDisabled()"
+    icon="pi pi-{{ icon() }}"
+    [iconPos]="iconPosition()"
+    [label]="label()"
+    [ngClass]="{
+        'is-active': isActive(),
+        'has-mobile-text': isMobileTextVisible()
+    }"
+    [text]="true"
+    (onClick)="onClick($event)"
+>
+    @if (badgeCounter()) {
+        <span class="badge">{{ badgeCounter() }}</span>
+    }
+</p-button>

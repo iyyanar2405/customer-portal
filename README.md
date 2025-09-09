@@ -110,6 +110,15 @@ npm install --save-dev jest @types/jest ts-jest --legacy-peer-dep
 npm install --save-dev --legacy-peer-deps
 npm install --legacy-peer-deps
 npm install @angular/localize --legacy-peer-deps
+npm install @apollo/client graphql --legacy-peer-deps
+npm install apollo-angular apollo-angular-link-http --save --legacy-peer-deps
+npm install @ngxs/store @ngxs/router-plugin @ngxs/devtools-plugin @ngxs/logger-plugin @ngxs-labs/dispatch-decorator --legacy-peer-deps
+npm install @apollo/client apollo-angular graphql --legacy-peer-deps
+npm install --save-dev @types/graphql --legacy-peer-deps
+npm install @ngneat/transloco --legacy-peer-dep
+ng add @ngneat/transloco
+
+
  "assets": [
           // {
           //   "glob": "**/*",
