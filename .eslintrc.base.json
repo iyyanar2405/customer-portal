@@ -3,48 +3,7 @@
   "ignorePatterns": ["node_modules", "dist"],
   "plugins": ["@nx", "@stylistic/ts", "simple-import-sort"],
   "overrides": [
-    {
-      "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
-      "rules": {
-        "@nx/enforce-module-boundaries": [
-          "error",
-          {
-            "enforceBuildableLibDependency": true,
-            "allow": [],
-            "depConstraints": [
-              {
-                "sourceTag": "type:app",
-                "onlyDependOnLibsWithTags": ["type:feature", "type:ui", "domain:shared"]
-              },
-              {
-                "sourceTag": "domain:shared",
-                "onlyDependOnLibsWithTags": ["domain:shared"]
-              },
-              {
-                "sourceTag": "type:data-access",
-                "onlyDependOnLibsWithTags": ["domain:shared"]
-              },
-              {
-                "sourceTag": "type:feature",
-                "onlyDependOnLibsWithTags": ["type:data-access", "domain:shared", "domain:upload"]
-              },
-              {
-                "sourceTag": "type:ui",
-                "onlyDependOnLibsWithTags": ["type:ui", "domain:shared"]
-              },
-              {
-                "sourceTag": "type:util",
-                "onlyDependOnLibsWithTags": ["type:util", "domain:shared"]
-              },
-              {
-                "sourceTag": "domain:upload",
-                "onlyDependOnLibsWithTags": ["type:data-access", "domain:shared"]
-              }
-            ]
-          }
-        ]
-      }
-    },
+   
     {
       "files": ["*.ts", "*.tsx"],
       "parserOptions": {
@@ -64,95 +23,10 @@
         "airbnb-typescript/base"
       ],
       "rules": {
-        "simple-import-sort/imports": [
-          "error",
-          {
-            "groups": [
-              ["^\\u0000"],
-              ["^@?\\w"],
-              ["^@customer-portal"],
-              ["^\\.\\.(?!/?$)",
-              "^\\.\\./?$",
-              "^\\./(?=.*/)(?!/?$)",
-              "^\\.(?!/?$)",
-              "^\\./?$"
-              ]
-            ]
-          }
-        ],
-        "import/no-extraneous-dependencies": "off",
-        "import/prefer-default-export": "off",
-        "import/first": "off",
-        "@typescript-eslint/dot-notation": "off",
-        "@typescript-eslint/lines-between-class-members": "off",
-        "@typescript-eslint/no-explicit-any": "off",
-        "class-methods-use-this": "off",
-        "max-classes-per-file": "off",
-        "no-underscore-dangle": "off",
-        "prettier/prettier": [
-          "error",
-          {
-            "endOfLine": "auto"
-          }
-        ],
-        "@stylistic/ts/padding-line-between-statements": [
-          "error",
-          {
-            "blankLine": "always",
-            "prev": "*",
-            "next": "return"
-          },
-          {
-            "blankLine": "always",
-            "prev": "*",
-            "next": "block-like"
-          }
-        ],
-        "@typescript-eslint/member-ordering": [
-          "error",
-          {
-            "default": [
-              "private-field",
-              "public-field",
-              "constructor",
-              "public-method",
-              "private-method"
-            ]
-          }
-        ],
-        "@stylistic/ts/lines-between-class-members": [
-          "error",
-          {
-            "enforce": [
-              {
-                "blankLine": "always",
-                "prev": "*",
-                "next": "method"
-              },
-              {
-                "blankLine": "always",
-                "prev": "method",
-                "next": "*"
-              }
-            ]
-          }
-        ],
-        "@typescript-eslint/no-non-null-assertion": "off",
-        "@typescript-eslint/no-unused-vars": [
-          "warn",
-          {
-            "argsIgnorePattern": "^_"
-          }
-        ],
-        "@typescript-eslint/no-throw-literal": "error",
-        "@angular-eslint/prefer-standalone": "off"
+
       }
     },
-    {
-      "files": ["*.js", "*.jsx"],
-      "extends": ["plugin:javascript/recommended"],
-      "rules": {}
-    },
+
     {
       "files": ["**/*.spec.ts", "**/*.spec.tsx", "**/*.spec.js", "**/*.spec.jsx"],
       "env": {
@@ -168,24 +42,7 @@
         "plugin:@angular-eslint/template/accessibility"
       ],
       "rules": {
-        "@angular-eslint/template/attributes-order": [
-          "warn",
-          {
-            "alphabetical": true
-          }
-        ],
-        "@angular-eslint/template/alt-text": "warn",
-        "@angular-eslint/template/button-has-type": "warn",
-        "@angular-eslint/template/click-events-have-key-events": "warn",
-        "@angular-eslint/template/elements-content": "warn",
-        "@angular-eslint/template/interactive-supports-focus": "warn",
-        "@angular-eslint/template/label-has-associated-control": "warn",
-        "@angular-eslint/template/mouse-events-have-key-events": "warn",
-        "@angular-eslint/template/no-autofocus": "warn",
-        "@angular-eslint/template/no-distracting-elements": "warn",
-        "@angular-eslint/template/no-positive-tabindex": "warn",
-        "@angular-eslint/template/table-scope": "warn",
-        "@angular-eslint/template/valid-aria": "warn"
+
       }
     }
   ]

@@ -1,5 +1,5 @@
 {
-  "ignorePatterns": ["**/*", "!**/src", "!**/test-setup.ts"],
+  "ignorePatterns": ["!**/src", "!**/test-setup.ts"],
   "overrides": [
     {
       "files": ["*.ts"],
@@ -16,7 +16,7 @@
     {
       "files": ["**/*.ts"],
       "parserOptions": {
-        "project": ["tsconfig.*?.json"]
+        "project": ["tsconfig.*.json"]
       },
       "rules": {
         "@typescript-eslint/explicit-function-return-type": "error",
