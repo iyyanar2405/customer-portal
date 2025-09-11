@@ -6,6 +6,7 @@
   <section class="body" role="region" [attr.aria-label]="t('content')">
     @if (isPreferenceInitialized | async) {
       <shared-grid
+        #grid
         class="table-list"
         dataKey="invoices"
         [childIdentifier]="'invoiceId'"
@@ -18,6 +19,7 @@
         [filterOptions]="invoiceListStoreService.filterOptions()"
         [filteringConfig$]="invoiceListStoreService.filteringConfig"
         [hasActiveFilters]="invoiceListStoreService.hasActiveFilters()"
+        [isLoading]="invoiceListStoreService.isLoading()"
         [paginator]="true"
         [preferenceData]="preferenceData()"
         [rowHover]="true"
@@ -40,6 +42,7 @@
           <div class="buttons">
             @if (displayDownloadButton) {
               <shared-button
+                #bulkDownloadBtn
                 sharedDebounceClick
                 [debounceTime]="1000"
                 [icon]="'download'"

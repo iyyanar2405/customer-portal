@@ -2,6 +2,7 @@ import { importProvidersFrom } from '@angular/core';
 import { InlineLoader, provideTranslocoScope } from '@jsverse/transloco';
 import { NgxsModule } from '@ngxs/store';
 
+import { DocumentsState } from '@customer-portal/data-access/documents/state/documents.state';
 import { InvoiceListState } from '@customer-portal/data-access/financials';
 import { Language } from '@customer-portal/shared';
 
@@ -30,7 +31,9 @@ export const FINANCIALS_ROUTES = [
         scope: 'invoices',
         loader,
       }),
-      importProvidersFrom(NgxsModule.forFeature([InvoiceListState])),
+      importProvidersFrom(
+        NgxsModule.forFeature([InvoiceListState, DocumentsState]),
+      ),
     ],
   },
 ];

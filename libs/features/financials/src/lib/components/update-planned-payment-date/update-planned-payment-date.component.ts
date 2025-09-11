@@ -17,7 +17,7 @@ import {
   InvoiceListItemModel,
   InvoiceListStoreService,
 } from '@customer-portal/data-access/financials';
-import { getDateWithoutTimezone } from '@customer-portal/shared';
+import { getDateWithoutTimezone } from '@customer-portal/shared/helpers/date';
 
 @Component({
   selector: 'lib-update-planned-payment-date',

@@ -96,15 +96,6 @@ export const AUDIT_FINDING_LIST_COLUMNS: ColumnDefinition[] = [
     sticky: false,
   },
   {
-    field: 'dueDate',
-    displayName: 'audit.auditDetails.findings.dueDate',
-    type: ColumnType.DateFilter,
-    cellType: CellType.Date,
-    hidden: false,
-    fixed: false,
-    sticky: false,
-  },
-  {
     field: 'closeDate',
     displayName: 'audit.auditDetails.findings.closeDate',
     type: ColumnType.DateFilter,

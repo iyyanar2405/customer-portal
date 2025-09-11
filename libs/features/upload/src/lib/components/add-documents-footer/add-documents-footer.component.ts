@@ -2,11 +2,11 @@ import { Component, Signal } from '@angular/core';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
 
-import { DocumentsStoreService } from '@customer-portal/data-access/documents';
+import { DocumentsStoreService } from '@customer-portal/data-access/documents/state';
 import {
   SharedButtonComponent,
   SharedButtonType,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/components/button';
 
 @Component({
   selector: 'lib-add-documents-footer',

@@ -6,7 +6,7 @@ import { DynamicDialogRef } from 'primeng/dynamicdialog';
 import {
   SharedButtonComponent,
   SharedButtonType,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/components/button';
 
 @Component({
   selector: 'lib-certificate-suspension-message-modal-footer',

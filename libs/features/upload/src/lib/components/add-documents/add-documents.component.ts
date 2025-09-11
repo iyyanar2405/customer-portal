@@ -12,15 +12,17 @@ import {
 import { ProgressBarModule } from 'primeng/progressbar';
 import { ToastModule } from 'primeng/toast';
 
-import { DocumentsStoreService } from '@customer-portal/data-access/documents';
+import { DocumentsStoreService } from '@customer-portal/data-access/documents/state';
+import { ToastSeverity } from '@customer-portal/shared';
 import {
-  ErrorMessages,
-  getToastContentBySeverity,
   SharedButtonComponent,
   SharedButtonType,
-  ToastSeverity,
+} from '@customer-portal/shared/components/button';
+import { getToastContentBySeverity } from '@customer-portal/shared/helpers/custom-toast';
+import {
+  ErrorMessages,
   validateFileHelper,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/helpers/upload';
 
 @Component({
   selector: 'lib-add-documents',

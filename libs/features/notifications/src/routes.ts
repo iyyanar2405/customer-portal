@@ -4,7 +4,7 @@ import { NgxsModule } from '@ngxs/store';
 
 import { ContractsListState } from '@customer-portal/data-access/contracts';
 import { InvoiceListState } from '@customer-portal/data-access/financials';
-import { NotificationListState } from '@customer-portal/data-access/notifications';
+import { NotificationListState } from '@customer-portal/data-access/notifications/state';
 import { ScheduleListState } from '@customer-portal/data-access/schedules';
 import { Language } from '@customer-portal/shared';
 

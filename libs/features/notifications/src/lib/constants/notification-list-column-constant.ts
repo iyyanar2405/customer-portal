@@ -9,7 +9,7 @@ export const NOTIFICATION_LIST_COLUMNS: ColumnDefinition[] = [
     field: 'title',
     displayName: 'notifications.notificationList.title',
     type: ColumnType.Text,
-    cellType: CellType.TextWithIcon,
+    cellType: CellType.CustomTemplate,
     hidden: false,
     fixed: false,
     sticky: false,

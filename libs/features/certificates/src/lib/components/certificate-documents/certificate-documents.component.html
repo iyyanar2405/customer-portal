@@ -22,6 +22,8 @@
       certificateDetailsStoreService.certificateDocumentsHasActiveFilters()
     "
     [isDocumentsGrid]="true"
+    [isLoading]="certificateDetailsStoreService.isLoadingDocument()"
+    [isShowAddDocument]="false"
     [paginator]="true"
     [rowHover]="true"
     [scrollable]="true"
@@ -40,6 +42,7 @@
     <ng-template #buttonsCustomTemplate>
       @if (displayDownloadButton) {
         <shared-button
+          #bulkDownloadBtn
           [icon]="'download'"
           [label]="t('certificate.attachedDocuments.downloadButton')"
           [type]="sharedButtonType.Outline"

@@ -1,13 +1,15 @@
 import { importProvidersFrom } from '@angular/core';
+import { Routes } from '@angular/router';
 import { InlineLoader, provideTranslocoScope } from '@jsverse/transloco';
 import { NgxsModule } from '@ngxs/store';
 
 import {
   AuditDaysGridService,
   AuditDetailsState,
-  AuditGraphsState,
+  AuditListGraphState,
   AuditListState,
 } from '@customer-portal/data-access/audit';
+import { DocumentsState } from '@customer-portal/data-access/documents/state/documents.state';
 import { Language } from '@customer-portal/shared';
 
 export const loader = [Language.English, Language.Italian].reduce(
@@ -19,7 +21,7 @@ export const loader = [Language.English, Language.Italian].reduce(
   {},
 );
 
-export const AUDIT_ROUTES = [
+export const AUDIT_ROUTES: Routes = [
   {
     path: '',
     loadComponent: () =>
@@ -31,7 +33,9 @@ export const AUDIT_ROUTES = [
         scope: 'audit',
         loader,
       }),
-      importProvidersFrom(NgxsModule.forFeature([AuditListState])),
+      importProvidersFrom(
+        NgxsModule.forFeature([AuditListState, DocumentsState]),
+      ),
     ],
     title: 'Audit Overview',
     children: [
@@ -44,22 +48,43 @@ export const AUDIT_ROUTES = [
         title: 'Audit List',
       },
       {
-        path: 'graphs',
+        path: 'listgraphs',
         loadComponent: () =>
-          import('./lib/components/audit-charts/audit-charts.component').then(
-            (m) => m.AuditChartsComponent,
-          ),
+          import(
+            './lib/components/audit-list-graph/audit-list-graph.component'
+          ).then((m) => m.AuditListGraphComponent),
         providers: [
           AuditDaysGridService,
-          importProvidersFrom(NgxsModule.forFeature([AuditGraphsState])),
+          importProvidersFrom(NgxsModule.forFeature([AuditListGraphState])),
         ],
-        title: 'Audit Graphs',
+        title: 'Audit List Graphs',
         data: {
           breadcrumb: {
             i18nKey: 'breadcrumb.graphs',
             isHidden: true,
           },
         },
+        children: [
+          {
+            path: '',
+            redirectTo: 'audit-status',
+            pathMatch: 'full',
+          },
+          {
+            path: 'audit-status',
+            loadComponent: () =>
+              import(
+                './lib/components/audit-list-graph/audit-status/audit-list-status-graph.component'
+              ).then((m) => m.AuditListStatusGraphComponent),
+          },
+          {
+            path: 'audit-days',
+            loadComponent: () =>
+              import(
+                './lib/components/audit-list-graph/audit-days/audit-list-days-graph.component'
+              ).then((m) => m.AuditListDaysGraphComponent),
+          },
+        ],
       },
     ],
   },

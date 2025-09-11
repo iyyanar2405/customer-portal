@@ -1,6 +1,6 @@
 <ng-container *transloco="let t">
   <div class="settings-members">
-    @if (settingsCompanyDetailsStoreService.isUserAdmin()) {
+    @if (settingsCompanyDetailsStoreService.isUserAdmin() && !settingsCoBrowsingStoreService.isDnvUser()) {
       <div class="settings-members__actions">
         <shared-button
           [icon]="'plus'"
@@ -20,6 +20,7 @@
         }}
       </p>
       <lib-admin-grid
+        [isDnvUser]="settingsCoBrowsingStoreService.isDnvUser()"
         [shouldPersist]="
           !settingsCoBrowsingStoreService.isDnvUser()
         "></lib-admin-grid>
@@ -33,6 +34,7 @@
         }}
       </p>
       <lib-members-grid
+      [isDnvUser]="settingsCoBrowsingStoreService.isDnvUser()"
         [shouldPersist]="
           !settingsCoBrowsingStoreService.isDnvUser()
         "></lib-members-grid>

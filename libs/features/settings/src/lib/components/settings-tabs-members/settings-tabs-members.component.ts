@@ -7,13 +7,13 @@ import { take } from 'rxjs';
 import {
   SettingsCoBrowsingStoreService,
   SettingsCompanyDetailsStoreService,
-  SettingsMembersStoreService,
 } from '@customer-portal/data-access/settings';
+import { SettingsMembersStoreService } from '@customer-portal/data-access/settings/state/store-services';
 import {
-  modalBreakpoints,
   SharedButtonComponent,
   SharedButtonType,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/components/button';
+import { modalBreakpoints } from '@customer-portal/shared/constants';
 
 import { AdminGridComponent } from './admin-grid/admin-grid.component';
 import { MembersGridComponent } from './members-grid/members-grid.component';
@@ -55,52 +55,56 @@ export class SettingsTabsMembersComponent {
   }
 
   onAddMemberClick(): void {
-    this.ref = this.dialogService.open(NewMemberModalComponent, {
-      header: this.translocoService.translate('settings.membersTab.addMember'),
-      width: '50vw',
-      contentStyle: { overflow: 'auto', padding: '0' },
-      breakpoints: modalBreakpoints,
-      closable: true,
-      data: {
-        roles: this.settingsMembersStoreService.memberRoles(),
-        formData: this.settingsMembersStoreService.newMemberForm(),
-      },
-      templates: {
-        footer: NewMemberModalFooterComponent,
-      },
-    });
-
-    this.ref.onClose.pipe(take(1)).subscribe((data: boolean) => {
-      if (data) {
-        this.settingsMembersStoreService.loadMembersPermissions();
-        this.openMembersPermissionsModal();
-      } else {
-        this.settingsMembersStoreService.discardNewMemberFormInfo();
-      }
-    });
+    this.dialogService
+      .open(NewMemberModalComponent, {
+        header: this.translocoService.translate(
+          'settings.membersTab.addMember',
+        ),
+        width: '50vw',
+        contentStyle: { overflow: 'auto', padding: '0' },
+        breakpoints: modalBreakpoints,
+        closable: true,
+        data: {
+          roles: this.settingsMembersStoreService.memberRoles(),
+          formData: this.settingsMembersStoreService.newMemberForm(),
+        },
+        templates: {
+          footer: NewMemberModalFooterComponent,
+        },
+      })
+      .onClose.pipe(take(1))
+      .subscribe((data: boolean) => {
+        if (data) {
+          this.settingsMembersStoreService.loadMembersPermissions();
+          this.openMembersPermissionsModal();
+        } else {
+          this.settingsMembersStoreService.discardNewMemberFormInfo();
+        }
+      });
   }
 
   private openMembersPermissionsModal(): void {
-    this.ref = this.dialogService.open(ManagePermissionsModalComponent, {
-      width: '50vw',
-      contentStyle: { overflow: 'auto', padding: '0' },
-      breakpoints: modalBreakpoints,
-      data: {
-        showBackBtn: true,
-      },
-      templates: {
-        footer: ManagePermissionsModalFooterComponent,
-        header: ManagePermissionsModalHeaderComponent,
-      },
-    });
-
-    this.ref.onClose.pipe(take(1)).subscribe((data: boolean) => {
-      if (data) {
-        this.settingsMembersStoreService.submitNewMemberInfo();
-      } else {
-        this.settingsMembersStoreService.discardMemberPermissionsUserSelection();
-        this.onAddMemberClick();
-      }
-    });
+    this.dialogService
+      .open(ManagePermissionsModalComponent, {
+        width: '50vw',
+        contentStyle: { overflow: 'auto', padding: '0' },
+        breakpoints: modalBreakpoints,
+        data: {
+          showBackBtn: true,
+        },
+        templates: {
+          footer: ManagePermissionsModalFooterComponent,
+          header: ManagePermissionsModalHeaderComponent,
+        },
+      })
+      .onClose.pipe(take(1))
+      .subscribe((data: boolean) => {
+        if (data) {
+          this.settingsMembersStoreService.submitNewMemberInfo();
+        } else {
+          this.settingsMembersStoreService.discardMemberPermissionsUserSelection();
+          this.onAddMemberClick();
+        }
+      });
   }
 }

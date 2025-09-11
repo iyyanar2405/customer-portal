@@ -15,6 +15,15 @@ export const FINDINGS_LIST_COLUMNS: ColumnDefinition[] = [
     sticky: false,
   },
   {
+    field: 'response',
+    displayName: 'findings.findingsList.response',
+    type: ColumnType.CheckboxFilter,
+    cellType: CellType.Text,
+    hidden: false,
+    fixed: false,
+    sticky: false,
+  },
+  {
     field: 'status',
     displayName: 'findings.findingsList.status',
     type: ColumnType.CheckboxFilter,

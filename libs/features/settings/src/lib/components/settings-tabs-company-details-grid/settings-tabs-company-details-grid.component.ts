@@ -12,14 +12,13 @@ import {
   SettingsCompanyDetailsStoreService,
 } from '@customer-portal/data-access/settings';
 import { BasePreferencesComponent } from '@customer-portal/preferences';
+import { GridComponent } from '@customer-portal/shared/components/grid';
 import {
-  ColumnDefinition,
-  GridComponent,
-  GridConfig,
   ObjectName,
   ObjectType,
   PageName,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/constants';
+import { ColumnDefinition, GridConfig } from '@customer-portal/shared/models';
 
 import { SETTINGS_TABS_COMPANY_DETAILS_GRID_COLUMNS } from '../../constants';
 import { SettingsTabsCompanyDetailsInfoComponent } from '../settings-tabs-company-details-info';

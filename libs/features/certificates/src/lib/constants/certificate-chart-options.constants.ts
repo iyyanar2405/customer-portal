@@ -1,6 +1,7 @@
 import { ChartOptions } from 'chart.js';
 
-import { ChartTypeEnum, trimLabel } from '@customer-portal/shared';
+import { trimLabel } from '@customer-portal/shared/helpers/chart';
+import { ChartTypeEnum } from '@customer-portal/shared/models/chart';
 
 export const CERTIFICATES_BY_STATUS_GRAPH_OPTIONS: ChartOptions<ChartTypeEnum.Doughnut> =
   {
@@ -66,6 +67,7 @@ export const CERTIFICATES_BY_TYPE_GRAPH_OPTIONS: ChartOptions<ChartTypeEnum.Bar>
         },
         grace: '5%',
         ticks: {
+          autoSkip: false,
           callback(_value, index, _ticks) {
             const label = this.getLabelForValue(index);
 

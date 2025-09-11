@@ -21,10 +21,10 @@ import {
   CertificateDownloadDialogData,
 } from '@customer-portal/data-access/certificates';
 import {
-  LanguageOption,
   SharedButtonComponent,
   SharedButtonType,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/components/button';
+import { LanguageOption } from '@customer-portal/shared/models';
 
 import { CertificateGuidelines } from '../../constants';
 

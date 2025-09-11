@@ -121,17 +121,21 @@
           <div class="respond-to-finding__buttons">
             @if (!isDnvUser()) {
               @if (noPreviousResponses) {
-                @if (hasEditFindingPermission()) {
-                  <shared-button
-                    [isDisabled]="isAnyFormFieldEmpty"
-                    [label]="t('findings.findingDetails.sendToDNV')"
-                    [type]="sharedButtonType.Primary"
-                    (clickEvent)="onSubmitToDnv()">
-                  </shared-button>
-                }
+                <shared-button
+                  [isDisabled]="
+                    isAnyFormFieldEmpty || !hasSubmitFindingPermission()
+                  "
+                  [label]="t('findings.findingDetails.sendToDNV')"
+                  [type]="sharedButtonType.Primary"
+                  (clickEvent)="onSubmitToDnv()">
+                </shared-button>
 
                 <shared-button
-                  [isDisabled]="areAllFormFieldsEmpty"
+                  [isDisabled]="
+                    areAllFormFieldsEmpty ||
+                    (!hasEditFindingPermission() &&
+                      !hasSubmitFindingPermission())
+                  "
                   [label]="t('findings.findingDetails.saveAsDraft')"
                   [type]="sharedButtonType.Outline"
                   (clickEvent)="onSaveDraft()">
@@ -139,26 +143,34 @@
               }
               @if (isSubmitted) {
                 <shared-button
+                  [isDisabled]="
+                    (!hasEditFindingPermission() &&
+                      !hasSubmitFindingPermission())
+                  "
                   [label]="t('findings.findingDetails.editSubmittedResponse')"
                   [type]="sharedButtonType.Outline"
                   (clickEvent)="onEditSubmittedResponse()">
                 </shared-button>
               }
               @if (isDraft) {
-                @if (hasEditFindingPermission()) {
-                  <shared-button
-                    [isDisabled]="!areAllResponsesAvailable"
-                    [label]="t('findings.findingDetails.sendToDNV')"
-                    [type]="sharedButtonType.Primary"
-                    (clickEvent)="onSubmitToDnv()">
-                  </shared-button>
-                }
-
                 <shared-button
-                  [label]="t('findings.findingDetails.continueWithDraft')"
-                  [type]="sharedButtonType.Outline"
-                  (clickEvent)="onContinueWithDraft()">
+                  [isDisabled]="
+                    !areAllResponsesAvailable || !hasSubmitFindingPermission()
+                  "
+                  [label]="t('findings.findingDetails.sendToDNV')"
+                  [type]="sharedButtonType.Primary"
+                  (clickEvent)="onSubmitToDnv()">
                 </shared-button>
+
+           
+                  <shared-button
+                    [isDisabled]="(!hasEditFindingPermission() &&
+                      !hasSubmitFindingPermission())"
+                    [label]="t('findings.findingDetails.continueWithDraft')"
+                    [type]="sharedButtonType.Outline"
+                    (clickEvent)="onContinueWithDraft()">
+                  </shared-button>
+            
               }
             }
           </div>

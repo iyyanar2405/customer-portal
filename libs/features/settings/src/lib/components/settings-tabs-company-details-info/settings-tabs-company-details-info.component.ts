@@ -22,10 +22,10 @@ import {
   SettingsCompanyDetailsData,
   SettingsCompanyDetailsStoreService,
 } from '@customer-portal/data-access/settings';
-import {
-  getToastContentBySeverity,
-  ToastSeverity,
-} from '@customer-portal/shared';
+import { getToastContentBySeverity } from '@customer-portal/shared/helpers/custom-toast';
+import { ToastSeverity } from '@customer-portal/shared/models';
+
+import { AddressEntity } from '../../constants/settings-tabs-company-details.model';
 
 @Component({
   selector: 'lib-settings-tab-company-details-info',
@@ -70,14 +70,15 @@ export class SettingsTabsCompanyDetailsInfoComponent {
 
   openServiceNowCompanySettingsSupport(): void {
     try {
+      const currentEntity = this.settingsStoreService
+        .legalEntityList()
+        .find((entity) => entity.accountId === this.data()?.accountId);
       const companySettingsParams: CompanySettingsParams = {
         language: this.profileLanguageStoreService.languageLabel(),
-        accountID: this.settingsStoreService.parentCompany()?.accountId ?? 0,
-        accountName:
-          this.settingsStoreService.parentCompany()?.organizationName ?? '',
-        reportingCountry:
-          this.settingsStoreService.parentCompany()?.country ?? '',
-        projectNumber: '',
+        accountDNVId: currentEntity?.accountDNVId ?? 0,
+        accountName: currentEntity?.organizationName ?? '',
+        reportingCountry: currentEntity?.countryCode ?? '',
+        accountAddress: this.formatAddress(currentEntity),
       };
       this.serviceNowService.openCompanySettingsSupport(companySettingsParams);
     } catch (error) {
@@ -88,5 +89,21 @@ export class SettingsTabsCompanyDetailsInfoComponent {
         error instanceof Error ? error : new Error(String(error)),
       );
     }
+  }
+
+  private formatAddress(entity: AddressEntity | null | undefined): string {
+    if (!entity) return '';
+
+    const addressFields = [
+      entity.address,
+      entity.city,
+      entity.zipcode,
+      entity.country,
+    ];
+
+    return addressFields
+      .filter((field) => field?.trim())
+      .map((field) => field!.trim())
+      .join(', ');
   }
 }

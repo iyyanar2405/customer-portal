@@ -32,12 +32,14 @@ import {
   PermissionsList,
 } from '@customer-portal/permissions';
 import {
-  buttonStyleClass,
-  FindingsStatusStates,
-  FindingsTagStates,
   SharedButtonComponent,
   SharedButtonType,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/components/button';
+import { buttonStyleClass } from '@customer-portal/shared/components/custom-confirm-dialog';
+import {
+  FindingsStatusStates,
+  FindingsTagStates,
+} from '@customer-portal/shared/constants';
 
 @Component({
   selector: 'lib-finding-respond-to',
@@ -63,6 +65,11 @@ export class FindingRespondToComponent implements OnInit {
   hasEditFindingPermission = this.profileStoreService.hasPermission(
     PermissionCategories.Findings,
     PermissionsList.Edit,
+  );
+
+  hasSubmitFindingPermission = this.profileStoreService.hasPermission(
+    PermissionCategories.Findings,
+    PermissionsList.Submit,
   );
 
   isDnvUser = this.settingsCoBrowsingStoreService.isDnvUser;

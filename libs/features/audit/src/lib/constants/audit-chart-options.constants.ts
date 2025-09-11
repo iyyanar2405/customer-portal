@@ -1,6 +1,7 @@
 import { ChartOptions } from 'chart.js';
 
-import { ChartTypeEnum, trimLabel } from '@customer-portal/shared';
+import { trimLabel } from '@customer-portal/shared/helpers/chart';
+import { ChartTypeEnum } from '@customer-portal/shared/models/chart';
 
 export const AUDIT_STATUS_DOUGHNUT_GRAPH_OPTIONS: ChartOptions<ChartTypeEnum.Doughnut> =
   {
@@ -54,7 +55,7 @@ export const AUDIT_STATUS_BAR_GRAPH_OPTIONS: ChartOptions<ChartTypeEnum.Bar> = {
         },
         minRotation: 0,
         maxRotation: 0,
-        stepSize: 1,
+        // stepSize: 1,
       },
     },
     y: {
@@ -64,7 +65,8 @@ export const AUDIT_STATUS_BAR_GRAPH_OPTIONS: ChartOptions<ChartTypeEnum.Bar> = {
         display: true,
       },
       ticks: {
-        stepSize: 1,
+        autoSkip: false,
+        // stepSize: 1,
         callback(_value, index, _ticks) {
           const label = this.getLabelForValue(index);
 
@@ -92,7 +94,7 @@ export const AUDIT_DAYS_BAR_GRAPH_OPTIONS: ChartOptions<ChartTypeEnum.Bar> = {
         display: true,
       },
       ticks: {
-        stepSize: 1,
+        // stepSize: 1,
         font: {
           family: 'Nunito Sans',
         },

@@ -3,10 +3,8 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TranslocoDirective } from '@jsverse/transloco';
 
-import {
-  SharedButtonToggleDatum,
-  SharedPageToggleComponent,
-} from '@customer-portal/shared';
+import { SharedPageToggleComponent } from '@customer-portal/shared/components/page-toggle';
+import { SharedButtonToggleDatum } from '@customer-portal/shared/components/toggle';
 
 @Component({
   selector: 'lib-finding',
@@ -32,7 +30,7 @@ export class FindingComponent {
       i18nKey: 'buttons.toggle.graphs',
       icon: 'chart-pie',
       label: 'Graphs',
-      value: 'graphs',
+      value: 'listgraphs',
     },
   ];
 }

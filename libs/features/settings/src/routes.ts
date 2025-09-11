@@ -2,10 +2,8 @@ import { importProvidersFrom } from '@angular/core';
 import { InlineLoader, provideTranslocoScope } from '@jsverse/transloco';
 import { NgxsModule } from '@ngxs/store';
 
-import {
-  allowDnvUserGuard,
-  SettingsState,
-} from '@customer-portal/data-access/settings';
+import { allowDnvUserGuard } from '@customer-portal/data-access/settings/guards';
+import { SettingsState } from '@customer-portal/data-access/settings/state/settings.state';
 import { Language } from '@customer-portal/shared';
 
 export const loader = [Language.English, Language.Italian].reduce(

@@ -5,11 +5,9 @@ import { TranslocoDirective } from '@jsverse/transloco';
 import { DynamicDialogConfig } from 'primeng/dynamicdialog';
 import { InputTextModule } from 'primeng/inputtext';
 
-import { SettingsMembersStoreService } from '@customer-portal/data-access/settings';
-import {
-  SharedSelectTreeChangeEventOutput,
-  SharedSelectTreeComponent,
-} from '@customer-portal/shared';
+import { SettingsMembersStoreService } from '@customer-portal/data-access/settings/state/store-services';
+import { SharedSelectTreeComponent } from '@customer-portal/shared/components/select';
+import { SharedSelectTreeChangeEventOutput } from '@customer-portal/shared/models';
 
 import { AccessAreas } from '../../../models';
 import { AccessAreasComponent } from '../access-areas/access-areas.component';
@@ -17,7 +15,9 @@ import { AdminRightsComponent } from '../admin-rights/admin-rights.component';
 
 enum AreaTranslations {
   contracts = 'settings.form.members.contracts',
-  scheduleAuditsFindings = 'settings.form.members.scheduleAuditsFindings',
+  schedules = 'settings.form.members.schedules',
+  audits = 'settings.form.members.audits',
+  findings = 'settings.form.members.findings',
   certificates = 'settings.form.members.certificates',
   financials = 'settings.form.members.financials',
 }

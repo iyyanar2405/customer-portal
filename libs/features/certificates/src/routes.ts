@@ -1,12 +1,14 @@
 import { importProvidersFrom } from '@angular/core';
+import { Routes } from '@angular/router';
 import { InlineLoader, provideTranslocoScope } from '@jsverse/transloco';
 import { NgxsModule } from '@ngxs/store';
 
 import {
   CertificateDetailsState,
-  CertificateGraphsState,
+  CertificateListGraphState,
   CertificateListState,
 } from '@customer-portal/data-access/certificates';
+import { DocumentsState } from '@customer-portal/data-access/documents/state/documents.state';
 import { Language } from '@customer-portal/shared';
 
 export const loader = [Language.English, Language.Italian].reduce(
@@ -18,7 +20,7 @@ export const loader = [Language.English, Language.Italian].reduce(
   {},
 );
 
-export const CERTIFICATES_ROUTES = [
+export const CERTIFICATES_ROUTES: Routes = [
   {
     path: '',
     loadComponent: () =>
@@ -30,7 +32,9 @@ export const CERTIFICATES_ROUTES = [
         scope: 'certificate',
         loader,
       }),
-      importProvidersFrom(NgxsModule.forFeature([CertificateListState])),
+      importProvidersFrom(
+        NgxsModule.forFeature([CertificateListState, DocumentsState]),
+      ),
     ],
     title: 'Certificates Overview',
     children: [
@@ -43,13 +47,15 @@ export const CERTIFICATES_ROUTES = [
         title: 'Certificate List',
       },
       {
-        path: 'graphs',
+        path: 'listgraphs',
         loadComponent: () =>
           import(
-            './lib/components/certificate-chart/certificate-chart.component'
-          ).then((m) => m.CertificateChartComponent),
+            './lib/components/certificate-list-graph/certificate-list-graph.component'
+          ).then((m) => m.CertificateListGraphComponent),
         providers: [
-          importProvidersFrom(NgxsModule.forFeature([CertificateGraphsState])),
+          importProvidersFrom(
+            NgxsModule.forFeature([CertificateListGraphState]),
+          ),
         ],
         title: 'Certificate Graphs',
         data: {
@@ -58,6 +64,29 @@ export const CERTIFICATES_ROUTES = [
             isHidden: true,
           },
         },
+        children: [
+          {
+            path: '',
+            redirectTo: 'status',
+            pathMatch: 'full',
+          },
+          {
+            path: 'status',
+            loadComponent: () =>
+              import(
+                './lib/components/certificate-list-graph/certificate-status'
+              ).then((m) => m.CertificateListStatusGraphComponent),
+            title: 'Certificate Status Graph',
+          },
+          {
+            path: 'site',
+            loadComponent: () =>
+              import(
+                './lib/components/certificate-list-graph/certificate-site'
+              ).then((m) => m.CertificateListSiteGraphComponent),
+            title: 'Certificate Site Graph',
+          },
+        ],
       },
     ],
   },

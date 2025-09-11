@@ -1,16 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { ConfirmationService } from 'primeng/api';
 
 import { SpinnerService } from '@customer-portal/core';
 import { FindingDetailsStoreService } from '@customer-portal/data-access/findings';
-import {
-  CustomDatePipe,
-  FINDINGS_STATUS_STATES_MAP,
-  StatusComponent,
-} from '@customer-portal/shared';
+import { StatusComponent } from '@customer-portal/shared/components/grid';
+import { FINDINGS_STATUS_STATES_MAP } from '@customer-portal/shared/constants';
+import { CustomDatePipe } from '@customer-portal/shared/pipes/custom-date.pipe';
 
 import { FindingTabViewComponent } from '../finding-tab-view/finding-tab-view.component';
 
@@ -27,6 +25,7 @@ import { FindingTabViewComponent } from '../finding-tab-view/finding-tab-view.co
   providers: [FindingDetailsStoreService],
   templateUrl: './finding-details.component.html',
   styleUrls: ['./finding-details.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FindingDetailsComponent implements OnDestroy {
   findingDetails = this.findingDetailsStoreService.findingDetails;

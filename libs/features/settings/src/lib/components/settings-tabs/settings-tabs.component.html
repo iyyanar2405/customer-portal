@@ -1,7 +1,7 @@
 <ng-container *transloco="let t">
   <p-tabView
     role="tablist"
-    [activeIndex]="tabIndex"
+    [activeIndex]="(tabIndex$ | async) ?? 0"
     [scrollable]="true"
     (onChange)="onTabChange($event)">
     <p-tabPanel

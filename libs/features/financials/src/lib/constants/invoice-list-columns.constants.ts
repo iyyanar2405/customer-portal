@@ -2,7 +2,7 @@ import {
   CellType,
   ColumnDefinition,
   ColumnType,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/models';
 
 export const INVOICE_LIST_COLUMNS: ColumnDefinition[] = [
   {
@@ -61,15 +61,6 @@ export const INVOICE_LIST_COLUMNS: ColumnDefinition[] = [
     sticky: false,
   },
   {
-    field: 'plannedPaymentDate',
-    displayName: 'invoices.invoicesList.paymentDate',
-    type: ColumnType.DateFilter,
-    cellType: CellType.Date,
-    hidden: false,
-    fixed: false,
-    sticky: false,
-  },
-  {
     field: 'issueDate',
     displayName: 'invoices.invoicesList.issueDate',
     type: ColumnType.DateFilter,
@@ -92,6 +83,15 @@ export const INVOICE_LIST_COLUMNS: ColumnDefinition[] = [
     displayName: 'invoices.invoicesList.company',
     type: ColumnType.SearchCheckboxFilter,
     cellType: CellType.Text,
+    hidden: false,
+    fixed: false,
+    sticky: false,
+  },
+  {
+    field: 'plannedPaymentDate',
+    displayName: 'invoices.invoicesList.paymentDate',
+    type: ColumnType.DateFilter,
+    cellType: CellType.Date,
     hidden: false,
     fixed: false,
     sticky: false,

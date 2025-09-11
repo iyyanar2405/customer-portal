@@ -8,7 +8,7 @@ import {
 import { TranslocoService } from '@jsverse/transloco';
 import { Observable, of, switchMap, take } from 'rxjs';
 
-import { FindingDetailsComponent } from '../components';
+import { FindingDetailsComponent } from '../components/details-index';
 
 export const findingDetailsDeactivationGuard: CanDeactivateFn<
   FindingDetailsComponent

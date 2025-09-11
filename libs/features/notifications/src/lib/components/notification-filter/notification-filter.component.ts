@@ -1,15 +1,18 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 import { TranslocoDirective } from '@jsverse/transloco';
 
-import {
-  NotificationFilterKey,
-  NotificationListStoreService,
-} from '@customer-portal/data-access/notifications';
+import { NotificationFilterKey } from '@customer-portal/data-access/notifications';
+import { NotificationListStoreService } from '@customer-portal/data-access/notifications/state/store-services';
 import {
   SharedSelectMultipleComponent,
   SharedSelectTreeComponent,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/components/select';
 
 @Component({
   selector: 'lib-notification-filter',
@@ -23,6 +26,7 @@ import {
   providers: [NotificationListStoreService],
   templateUrl: './notification-filter.component.html',
   styleUrl: './notification-filter.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotificationFilterComponent implements OnInit, OnDestroy {
   public filterTypes = NotificationFilterKey;

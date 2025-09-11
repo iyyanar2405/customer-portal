@@ -1,9 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 import { MessageService } from 'primeng/api';
 import { DialogService } from 'primeng/dynamicdialog';
-import { filter, tap } from 'rxjs';
+import { catchError, filter, map, Observable, tap } from 'rxjs';
 
 import {
   InvoiceParams,
@@ -11,34 +18,52 @@ import {
   ServiceNowService,
 } from '@customer-portal/core';
 import {
+  DownloadFileNames,
+  DownloadType,
+  DownloadTypeName,
+} from '@customer-portal/data-access/documents';
+import { DocumentQueueService } from '@customer-portal/data-access/documents/services';
+import {
   InvoiceListItemModel,
+  InvoiceListMapperService,
+  InvoiceListService,
   InvoiceListStoreService,
   isInvoiceOverdueOrUnpaid,
 } from '@customer-portal/data-access/financials';
 import {
   ProfileLanguageStoreService,
   SettingsCoBrowsingStoreService,
-} from '@customer-portal/data-access/settings';
+} from '@customer-portal/data-access/settings/state/store-services';
 import { OverviewSharedStoreService } from '@customer-portal/overview-shared';
-import { BasePreferencesComponent } from '@customer-portal/preferences';
+import { BasePreferencesComponent } from '@customer-portal/preferences/helpers';
+import {
+  SharedButtonComponent,
+  SharedButtonType,
+} from '@customer-portal/shared/components/button';
+import { GridComponent } from '@customer-portal/shared/components/grid';
+import {
+  INVOICES_STATUS_MAP,
+  ObjectName,
+  ObjectType,
+  PageName,
+} from '@customer-portal/shared/constants';
+import { DebounceClickDirective } from '@customer-portal/shared/directives/debounce-click';
+import {
+  animateFlyToDownload,
+  getContentType,
+  getToastContentBySeverity,
+} from '@customer-portal/shared/helpers';
 import {
   ColumnDefinition,
-  DebounceClickDirective,
-  getToastContentBySeverity,
-  GridComponent,
+  ToastSeverity,
+} from '@customer-portal/shared/models';
+import {
   GridConfig,
   GridEventAction,
   GridEventActionType,
   GridFileActionEvent,
   GridFileActionType,
-  INVOICES_STATUS_MAP,
-  ObjectName,
-  ObjectType,
-  PageName,
-  SharedButtonComponent,
-  SharedButtonType,
-  ToastSeverity,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/models/grid';
 
 import { INVOICE_LIST_COLUMNS } from '../../constants';
 import { InvoiceEventService } from '../../services';
@@ -55,14 +80,17 @@ import { InvoiceEventService } from '../../services';
   providers: [DialogService, InvoiceEventService, InvoiceListStoreService],
   templateUrl: './invoice-list.component.html',
   styleUrl: './invoice-list.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class InvoiceListComponent
   extends BasePreferencesComponent
-  implements OnDestroy
+  implements OnDestroy, OnInit
 {
   private selectedOverdueOrUnpaidIds: (string | number)[] = [];
   private selectedInvoiceIds: string[] = [];
-
+  @ViewChild('grid') gridComponent!: GridComponent;
+  @ViewChild('bulkDownloadBtn', { read: ElementRef })
+  bulkDownloadBtn!: ElementRef;
   statusMap = INVOICES_STATUS_MAP;
   cols: ColumnDefinition[] = INVOICE_LIST_COLUMNS;
   displayDownloadButton = false;
@@ -86,6 +114,8 @@ export class InvoiceListComponent
     private messageService: MessageService,
     private loggingService: LoggingService,
     private profileLanguageStoreService: ProfileLanguageStoreService,
+    private documentQueueService: DocumentQueueService,
+    private invoiceListService: InvoiceListService,
   ) {
     super();
 
@@ -97,6 +127,10 @@ export class InvoiceListComponent
     const financialStatus =
       this.overviewSharedStoreService.overviewFinancialStatus();
     this.invoiceListStoreService.applyNavigationFilters(financialStatus);
+  }
+
+  ngOnInit(): void {
+    this.registerDownloadHandlers();
   }
 
   onSavePreference(data: any): void {
@@ -133,7 +167,16 @@ export class InvoiceListComponent
     rowData?: any;
   }): void {
     if (event.actionType === GridFileActionType.Download) {
-      this.invoiceListStoreService.downloadInvoices([rowData.invoiceId]);
+      this.documentQueueService.addDownloadTask(
+        DownloadType.Invoice,
+        DownloadTypeName.Invoice,
+        `${rowData?.invoiceId ?? ''}.pdf`,
+        { invoiceId: rowData.invoiceId },
+      );
+
+      if (event.element) {
+        animateFlyToDownload(event.element);
+      }
     }
   }
 
@@ -157,10 +200,16 @@ export class InvoiceListComponent
   }
 
   downloadSelectedInvoices() {
-    this.invoiceListStoreService.downloadInvoices(
-      this.selectedInvoiceIds,
-      true,
+    this.documentQueueService.addDownloadTask(
+      DownloadType.InvoiceBulk,
+      DownloadTypeName.InvoiceBulk,
+      'invoices.zip',
+      { invoiceIds: this.selectedInvoiceIds },
     );
+
+    if (this.bulkDownloadBtn?.nativeElement) {
+      animateFlyToDownload(this.bulkDownloadBtn.nativeElement);
+    }
   }
 
   updateMultiplePlannedPaymentDate(): void {
@@ -170,11 +219,112 @@ export class InvoiceListComponent
   }
 
   onExportExcelClick() {
-    this.invoiceListStoreService.exportInvoicesExcel();
+    const filterConfig = {
+      ...this.invoiceListStoreService.filteringConfigSignal(),
+    };
+    const payload =
+      InvoiceListMapperService.mapToInvoiceExcelPayloadDto(filterConfig);
+
+    this.documentQueueService.addDownloadTask(
+      DownloadType.InvoiceExcel,
+      DownloadTypeName.InvoiceExcel,
+      DownloadFileNames.InvoiceExcel,
+      { payload },
+    );
+
+    const exportBtnEl = this.gridComponent.getExportButtonElement();
+
+    if (exportBtnEl) {
+      animateFlyToDownload(exportBtnEl);
+    }
   }
 
   ngOnDestroy(): void {
     this.invoiceListStoreService.resetInvoiceListState();
+  }
+
+  private registerDownloadHandlers(): void {
+    this.documentQueueService.registerDownloadHandler(
+      DownloadType.Invoice,
+      this.createInvoiceDownloadHandlerGeneric(),
+    );
+    this.documentQueueService.registerDownloadHandler(
+      DownloadType.InvoiceBulk,
+      this.createInvoiceDownloadHandlerGeneric(),
+    );
+    this.documentQueueService.registerDownloadHandler(
+      DownloadType.InvoiceExcel,
+      this.createInvoiceExcelExportHandler(),
+    );
+  }
+
+  private createInvoiceDownloadHandlerGeneric(): (
+    data: any,
+    fileName: string,
+  ) => Observable<{ blob: Blob; fileName: string }> {
+    return (data, _) => {
+      const invoiceIds = data.invoiceIds ?? [data.invoiceId];
+
+      return this.invoiceListService.downloadInvoices(invoiceIds, true).pipe(
+        map((result) => {
+          if (!result || !result.fileName || !result.content) {
+            throw new Error('Download failed');
+          }
+
+          const { fileName } = result;
+          this.loggingService.logEvent('Invoice_Download_Success', {
+            fileName,
+            invoiceIds,
+            timestamp: new Date().toISOString(),
+          });
+
+          return {
+            blob: new Blob([new Uint8Array(result.content)], {
+              type: getContentType(result.fileName),
+            }),
+            fileName,
+          };
+        }),
+        catchError((error) => {
+          this.loggingService.logEvent('Invoice_Download_Failed', {
+            invoiceIds,
+            error: error?.message || error,
+            timestamp: new Date().toISOString(),
+          });
+          throw error;
+        }),
+      );
+    };
+  }
+
+  private createInvoiceExcelExportHandler(): (
+    data: any,
+    fileName: string,
+  ) => Observable<{ blob: Blob; fileName: string }> {
+    return (data, fileName) =>
+      this.invoiceListService.exportInvoices(data.payload, true).pipe(
+        map((input) => {
+          const result = {
+            blob: new Blob([new Uint8Array(input)], {
+              type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            }),
+            fileName: fileName || DownloadFileNames.InvoiceExcel,
+          };
+          this.loggingService.logEvent('Invoice_Export_Excel_Success', {
+            fileName: result.fileName,
+            timestamp: new Date().toISOString(),
+          });
+
+          return result;
+        }),
+        catchError((error) => {
+          this.loggingService.logEvent('Invoice_Export_Excel_Failed', {
+            error: error?.message || error,
+            timestamp: new Date().toISOString(),
+          });
+          throw error;
+        }),
+      );
   }
 
   private openInvoiceServiceNowSupport(invoiceId: number | string): void {
@@ -193,6 +343,7 @@ export class InvoiceListComponent
         reportingCountry: invoice.reportingCountry,
         projectNumber: invoice.projectNumber,
         language: this.profileLanguageStoreService.languageLabel(),
+        accountDNVId: invoice.accountDNVId,
       };
       this.serviceNowService.openInvoiceSupport(invoiceServiceNowParams);
     } catch (error) {

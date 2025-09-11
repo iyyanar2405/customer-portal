@@ -2,7 +2,7 @@
   <h3>{{ t('findings.findingDetails.documents') }}</h3>
 
   <shared-grid
-    dataKey="findingDetails"
+    dataKey="findingDetails"  
     [columns]="cols"
     [data]="documentsList()"
     [displayClearButton]="
@@ -18,6 +18,8 @@
       findingDetailsStoreService.documentsListHasActiveFilters()
     "
     [isDocumentsGrid]="true"
+    [isLoading]="findingDetailsStoreService.isLoading()"
+    [isShowAddDocument]="canAddDocument()"
     [paginator]="true"
     [rowHover]="true"
     [scrollable]="true"
@@ -43,6 +45,7 @@
       }
       @if (displayDownloadButton) {
         <shared-button
+          #bulkDownloadBtn
           [icon]="'download'"
           [label]="t('findings.attachedDocuments.downloadButton')"
           [type]="sharedButtonType.Outline"

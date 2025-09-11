@@ -3,8 +3,11 @@ import {
   Component,
   computed,
   DestroyRef,
+  ElementRef,
   inject,
   OnDestroy,
+  OnInit,
+  ViewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
@@ -16,12 +19,21 @@ import {
   DynamicDialogRef,
 } from 'primeng/dynamicdialog';
 import { MessagesModule } from 'primeng/messages';
+import { map, Observable, take } from 'rxjs';
 
 import {
   DocType,
+  DownloadType,
+  DownloadTypeName,
+} from '@customer-portal/data-access/documents';
+import {
+  DocumentQueueService,
+  DocumentsService,
+} from '@customer-portal/data-access/documents/services';
+import {
   DocumentsStoreService,
   UploadDocumentsSuccess,
-} from '@customer-portal/data-access/documents';
+} from '@customer-portal/data-access/documents/state';
 import {
   FindingDetailsStoreService,
   FindingDocumentListItemModel,
@@ -40,17 +52,20 @@ import {
   PermissionsList,
 } from '@customer-portal/permissions';
 import {
-  buttonStyleClass,
+  SharedButtonComponent,
+  SharedButtonType,
+} from '@customer-portal/shared/components/button';
+import { buttonStyleClass } from '@customer-portal/shared/components/custom-confirm-dialog';
+import { GridComponent } from '@customer-portal/shared/components/grid';
+import { modalBreakpoints } from '@customer-portal/shared/constants';
+import { animateFlyToDownload } from '@customer-portal/shared/helpers/download';
+import { ErrorMessages } from '@customer-portal/shared/helpers/upload';
+import {
   ColumnDefinition,
-  ErrorMessages,
-  GridComponent,
   GridConfig,
   GridFileActionEvent,
   GridFileActionType,
-  modalBreakpoints,
-  SharedButtonComponent,
-  SharedButtonType,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/models';
 
 import { FINDINGS_DOCUMENTS_COLUMNS } from '../../constants';
 
@@ -78,10 +93,11 @@ const FILE_UPLOAD_SUCCESS = 'findings.fileUpload.fileUploadSuccess';
   templateUrl: './finding-documents.component.html',
   styleUrl: './finding-documents.component.scss',
 })
-export class FindingDocumentsComponent implements OnDestroy {
+export class FindingDocumentsComponent implements OnDestroy, OnInit {
   private actions$ = inject(Actions);
   private destroyRef = inject(DestroyRef);
-
+  @ViewChild('bulkDownloadBtn', { read: ElementRef })
+  bulkDownloadBtn!: ElementRef;
   findingId = this.findingDetailsStoreService.findingId();
   cols: ColumnDefinition[] = FINDINGS_DOCUMENTS_COLUMNS;
   ref: DynamicDialogRef | undefined;
@@ -114,6 +130,8 @@ export class FindingDocumentsComponent implements OnDestroy {
     private documentsStoreService: DocumentsStoreService,
     private profileStoreService: ProfileStoreService,
     private settingsCoBrowsingStoreService: SettingsCoBrowsingStoreService,
+    private documentQueueService: DocumentQueueService,
+    private documentsService: DocumentsService,
   ) {
     this.findingDetailsStoreService.loadFindingDocumentsList();
 
@@ -134,6 +152,10 @@ export class FindingDocumentsComponent implements OnDestroy {
       });
   }
 
+  ngOnInit(): void {
+    this.registerDownloadHandlers();
+  }
+
   ngOnDestroy(): void {
     if (this.ref) {
       this.ref.close();
@@ -145,24 +167,31 @@ export class FindingDocumentsComponent implements OnDestroy {
   }
 
   openAddDocumentsDialog(): void {
-    this.ref = this.dialogService.open(AddDocumentsComponent, {
-      header: this.ts.translate('findings.attachedDocuments.addDocument'),
-      width: '50vw',
-      contentStyle: { overflow: 'auto' },
-      breakpoints: modalBreakpoints,
-      data: {
-        canUploadData: false,
-        errorMessages: {
-          wrongFileSize: 'findings.fileUpload.fileUploadWrongSize',
-          wrongFileType: 'findings.fileUpload.fileUploadWrongType',
-          wrongFileNameLength: 'findings.fileUpload.fileUploadWrongNameLength',
-          wrongTotalFileSize: 'findings.fileUpload.fileUploadWrongSize',
-        } as ErrorMessages,
-      },
-      templates: {
-        footer: AddDocumentsFooterComponent,
-      },
-    });
+    this.dialogService
+      .open(AddDocumentsComponent, {
+        header: this.ts.translate('findings.attachedDocuments.addDocument'),
+        width: '50vw',
+        contentStyle: { overflow: 'auto' },
+        breakpoints: modalBreakpoints,
+        data: {
+          canUploadData: false,
+          errorMessages: {
+            wrongFileSize: 'findings.fileUpload.fileUploadWrongSize',
+            wrongFileType: 'findings.fileUpload.fileUploadWrongType',
+            wrongFileNameLength:
+              'findings.fileUpload.fileUploadWrongNameLength',
+            wrongTotalFileSize: 'findings.fileUpload.fileUploadWrongSize',
+          } as ErrorMessages,
+        },
+        templates: {
+          footer: AddDocumentsFooterComponent,
+        },
+      })
+
+      .onClose.pipe(take(1))
+      .subscribe((_) => {
+        // TODO
+      });
   }
 
   triggerFileAction({
@@ -175,7 +204,16 @@ export class FindingDocumentsComponent implements OnDestroy {
     documentId: number;
   }): void {
     if (event.actionType === GridFileActionType.Download) {
-      this.documentsStoreService.downloadDocument(documentId, fileName);
+      this.documentQueueService.addDownloadTask(
+        DownloadType.FindingDetails,
+        DownloadTypeName.FindingDetails,
+        fileName,
+        { documentId },
+      );
+
+      if (event.element) {
+        animateFlyToDownload(event.element);
+      }
     } else if (event.actionType === GridFileActionType.Delete) {
       this.confirmationService.confirm({
         header: this.ts.translate('findings.deleteDocument.header'),
@@ -216,9 +254,67 @@ export class FindingDocumentsComponent implements OnDestroy {
   }
 
   downloadSelectedDocuments(): void {
-    this.documentsStoreService.downloadAllDocuments(
-      this.selectedDocumentsIds,
-      DocType.Finding,
+    this.documentQueueService.addDownloadTask(
+      DownloadType.FindingDetailBulk,
+      DownloadTypeName.FindingDetailBulk,
+      'Finding List.zip',
+      { ids: this.selectedDocumentsIds, docType: DocType.Finding },
     );
+
+    if (this.bulkDownloadBtn?.nativeElement) {
+      animateFlyToDownload(this.bulkDownloadBtn.nativeElement);
+    }
+  }
+
+  private registerDownloadHandlers(): void {
+    this.documentQueueService.registerDownloadHandler(
+      DownloadType.FindingDetails,
+      this.createFindingDownloadHandler(),
+    );
+    this.documentQueueService.registerDownloadHandler(
+      DownloadType.FindingDetailBulk,
+      this.createBulkFindingDownloadHandler(),
+    );
+  }
+
+  private createFindingDownloadHandler(): (
+    data: any,
+    fileName: string,
+  ) => Observable<{ blob: Blob; fileName: string }> {
+    return (data, fileName) =>
+      this.documentsService
+        .downloadDocument(data.documentId, fileName, true)
+        .pipe(map((response) => this.mapDownloadResponse(response, fileName)));
+  }
+
+  private createBulkFindingDownloadHandler(): (
+    data: any,
+    fileName: string,
+  ) => Observable<{ blob: Blob; fileName: string }> {
+    return (data, fileName) =>
+      this.documentsService
+        .downloadAllDocuments(data.ids, data.docType, true)
+        .pipe(map((response) => this.mapDownloadResponse(response, fileName)));
+  }
+
+  private mapDownloadResponse(
+    response: any,
+    fallbackFileName: string,
+  ): { blob: Blob; fileName: string } {
+    if (!response.body) {
+      throw new Error('Document download failed: Blob is null');
+    }
+    const contentDisposition = response.headers.get('content-disposition');
+
+    if (!contentDisposition && response.headers) {
+      throw new Error('Content-Disposition header is missing');
+    }
+
+    return {
+      blob: response.body,
+      fileName:
+        this.documentQueueService.extractFileName(contentDisposition ?? '') ||
+        fallbackFileName,
+    };
   }
 }

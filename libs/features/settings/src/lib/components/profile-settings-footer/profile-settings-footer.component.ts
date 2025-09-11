@@ -6,7 +6,7 @@ import { ProfileStoreService } from '@customer-portal/data-access/settings';
 import {
   SharedButtonComponent,
   SharedButtonType,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/components/button';
 
 @Component({
   selector: 'lib-profile-settings-footer',

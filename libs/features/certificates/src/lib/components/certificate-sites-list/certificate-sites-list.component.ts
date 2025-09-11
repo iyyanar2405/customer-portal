@@ -3,11 +3,8 @@ import { Component } from '@angular/core';
 import { TranslocoDirective } from '@jsverse/transloco';
 
 import { CertificateDetailsStoreService } from '@customer-portal/data-access/certificates';
-import {
-  ColumnDefinition,
-  GridComponent,
-  GridConfig,
-} from '@customer-portal/shared';
+import { GridComponent } from '@customer-portal/shared/components/grid';
+import { ColumnDefinition, GridConfig } from '@customer-portal/shared/models';
 
 import { CERTIFICATES_SITES_LIST_COLUMNS } from '../../constants';
 

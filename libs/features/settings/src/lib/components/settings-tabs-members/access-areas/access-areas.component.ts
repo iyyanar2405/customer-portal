@@ -14,6 +14,7 @@ import { AccessAreas } from '../../../models';
 enum PermissionAreas {
   View = 'view',
   Edit = 'edit',
+  Submit = 'submit',
 }
 
 @Component({
@@ -39,7 +40,7 @@ export class AccessAreasComponent {
   onChangeAccessAreas(i: number, areaType: string): void {
     const allAreas = [...this.areas()];
     const selectedArea = allAreas[i];
-    const { edit, view } = selectedArea.permission;
+    const { edit, view, submit } = selectedArea.permission;
 
     if (areaType === this.permissionAreas.View && view !== undefined) {
       view.isChecked = !view.isChecked;
@@ -53,7 +54,19 @@ export class AccessAreasComponent {
       }
     }
 
-    selectedArea.permission = { edit, view };
+    if (areaType === this.permissionAreas.Submit && submit !== undefined) {
+      submit.isChecked = !submit.isChecked;
+
+      if (view !== undefined) {
+        view.isChecked = submit.isChecked;
+      }
+
+      if (edit !== undefined) {
+        edit.isChecked = submit.isChecked;
+      }
+    }
+
+    selectedArea.permission = { edit, view, submit };
     allAreas[i] = selectedArea;
 
     this.changeAccessAreas.emit(allAreas);

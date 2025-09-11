@@ -1,16 +1,12 @@
 import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  OnInit,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ActivatedRoute, Params, Router, RouterModule } from '@angular/router';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { TabViewChangeEvent, TabViewModule } from 'primeng/tabview';
-import { filter, tap } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 import { SettingsTab } from '@customer-portal/data-access/settings';
+import { RouteStoreService } from '@customer-portal/router';
 
 import { SettingsTabsCompanyDetailsComponent } from '../settings-tabs-company-details';
 import { SettingsTabsMembersComponent } from '../settings-tabs-members';
@@ -31,31 +27,30 @@ import { SettingsTabsPersonalInformationComponent } from '../settings-tabs-perso
   styleUrl: './settings-tabs.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SettingsTabsComponent implements OnInit {
+export class SettingsTabsComponent {
   private readonly settingsTabMapping: SettingsTab[] = [
     SettingsTab.PersonalInformation,
     SettingsTab.CompanyDetails,
     SettingsTab.Members,
   ];
 
+  tabIndex$: Observable<number>;
+
   public tabIndex = 0;
 
   constructor(
-    private readonly ref: ChangeDetectorRef,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
-  ) {}
+    private readonly routeStoreService: RouteStoreService,
+  ) {
+    this.tabIndex$ = this.routeStoreService.getQueryParamByKey('tab').pipe(
+      map((tab: string | null) => {
+        if (!tab) return 0;
+        const index = this.settingsTabMapping.indexOf(tab as SettingsTab);
 
-  ngOnInit(): void {
-    this.route.queryParams
-      .pipe(
-        filter((params: any) => params.tab),
-        tap(({ tab }) => {
-          this.tabIndex = this.settingsTabMapping.indexOf(tab);
-          this.ref.markForCheck();
-        }),
-      )
-      .subscribe();
+        return index !== -1 ? index : 0;
+      }),
+    );
   }
 
   onTabChange(event: TabViewChangeEvent): void {

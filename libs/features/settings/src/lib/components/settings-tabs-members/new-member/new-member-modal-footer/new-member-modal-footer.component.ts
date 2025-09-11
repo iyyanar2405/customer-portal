@@ -3,13 +3,13 @@ import { TranslocoDirective } from '@jsverse/transloco';
 import { MessageService } from 'primeng/api';
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
 
-import { SettingsMembersStoreService } from '@customer-portal/data-access/settings';
+import { SettingsMembersStoreService } from '@customer-portal/data-access/settings/state/store-services';
 import {
-  getToastContentBySeverity,
   SharedButtonComponent,
   SharedButtonType,
-  ToastSeverity,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/components/button';
+import { getToastContentBySeverity } from '@customer-portal/shared/helpers/custom-toast';
+import { ToastSeverity } from '@customer-portal/shared/models';
 
 @Component({
   selector: 'lib-new-member-modal-footer',

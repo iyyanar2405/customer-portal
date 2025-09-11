@@ -4,6 +4,7 @@ import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 import { ButtonModule } from 'primeng/button';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { TooltipModule } from 'primeng/tooltip';
+import { take } from 'rxjs';
 
 import {
   ProfileStoreService,
@@ -39,20 +40,25 @@ export class SettingsTabsPersonalInformationComponent {
   }
 
   onClickEditSettings(): void {
-    this.ref = this.dialogService.open(ProfileSettingsModalComponent, {
-      header: this.ts.translate('settings.form.profile.settingsModal.header'),
-      width: '50vw',
-      contentStyle: { overflow: 'auto', padding: '0' },
-      breakpoints: modalBreakpoints,
-      data: {
-        languages: this.profileStoreService.profileInformation().languages,
-        roles: this.profileStoreService.userRoles(),
-        jobTitle: this.profileStoreService.profileInformation().jobTitle,
-      },
-      templates: {
-        footer: ProfileSettingsFooterComponent,
-      },
-    });
+    this.dialogService
+      .open(ProfileSettingsModalComponent, {
+        header: this.ts.translate('settings.form.profile.settingsModal.header'),
+        width: '50vw',
+        contentStyle: { overflow: 'auto', padding: '0' },
+        breakpoints: modalBreakpoints,
+        data: {
+          languages: this.profileStoreService.profileInformation().languages,
+          roles: this.profileStoreService.userRoles(),
+          jobTitle: this.profileStoreService.profileInformation().jobTitle,
+        },
+        templates: {
+          footer: ProfileSettingsFooterComponent,
+        },
+      })
+      .onClose.pipe(take(1))
+      .subscribe((result) => {
+        // to do: Add handler
+      });
   }
 
   onEditVeracityClick(pageName: string): void {

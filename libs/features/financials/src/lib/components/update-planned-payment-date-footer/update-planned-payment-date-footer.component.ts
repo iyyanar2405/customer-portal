@@ -7,7 +7,7 @@ import { InvoiceListStoreService } from '@customer-portal/data-access/financials
 import {
   SharedButtonComponent,
   SharedButtonType,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/components/button';
 
 @Component({
   selector: 'lib-update-planned-payment-date-footer',

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TranslocoDirective } from '@jsverse/transloco';
 
@@ -15,5 +15,6 @@ import { NotificationFilterComponent } from '../notification-filter/notification
   ],
   templateUrl: './notifications.component.html',
   styleUrl: './notifications.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotificationsComponent {}

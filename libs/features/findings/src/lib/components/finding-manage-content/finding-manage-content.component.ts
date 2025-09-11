@@ -8,12 +8,10 @@ import {
   FindingDetailsStoreService,
   FindingResponsesModel,
 } from '@customer-portal/data-access/findings';
-import {
-  FINDINGS_TAG_STATES_MAP,
-  LanguageOption,
-  LanguageSwitcherComponent,
-  TagComponent,
-} from '@customer-portal/shared';
+import { TagComponent } from '@customer-portal/shared/components/grid';
+import { LanguageSwitcherComponent } from '@customer-portal/shared/components/language-switcher';
+import { FINDINGS_TAG_STATES_MAP } from '@customer-portal/shared/constants';
+import { LanguageOption } from '@customer-portal/shared/models';
 
 import { FindingRespondToComponent } from '../finding-respond-to/finding-respond-to.component';
 

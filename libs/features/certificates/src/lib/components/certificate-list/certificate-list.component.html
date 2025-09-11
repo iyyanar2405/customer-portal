@@ -1,6 +1,7 @@
 @if (isPreferenceInitialized | async) {
   <shared-grid
-    class="table-list"
+   #grid
+   class="table-list"
     dataKey="certificateId"
     [columns]="cols"
     [data]="certificateListStoreService.certificates()"
@@ -10,6 +11,7 @@
     [filterOptions]="certificateListStoreService.filterOptions()"
     [filteringConfig$]="certificateListStoreService.filteringConfig"
     [hasActiveFilters]="certificateListStoreService.hasActiveFilters()"
+    [isLoading]="certificateListStoreService.isLoading()"
     [paginator]="true"
     [preferenceData]="preferenceData()"
     [route]="'/certificates/'"
@@ -21,7 +23,7 @@
     [sortable]="true"
     [statusStatesMap]="statusMap"
     [totalRecords]="certificateListStoreService.totalRecords()"
-    (exportExcel)="certificateListStoreService.exportCertificatesExcel()"
+    (exportExcel)="onExportExcelClick()"
     (gridConfigChangedEvent)="onGridConfigChanged($event)"
     (savePreference)="onSavePreference($event)">
   </shared-grid>

@@ -4,22 +4,26 @@ import { FormsModule } from '@angular/forms';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { CheckboxChangeEvent, CheckboxModule } from 'primeng/checkbox';
 import { DialogService } from 'primeng/dynamicdialog';
-import { filter, tap } from 'rxjs';
+import { filter, take, tap } from 'rxjs';
 
-import { ActionsListStoreService } from '@customer-portal/data-access/actions';
+import { ActionsListStoreService } from '@customer-portal/data-access/actions/state';
 import { NotificationModel as ActionModel } from '@customer-portal/data-access/notifications';
 import { SettingsCoBrowsingStoreService } from '@customer-portal/data-access/settings';
 import { BasePreferencesComponent } from '@customer-portal/preferences';
 import {
-  ColumnDefinition,
-  FINDINGS_STATUS_STATES_MAP,
-  GridComponent,
-  GridConfig,
-  GridRowAction,
   HtmlDetailsFooterModalComponent,
   HtmlDetailsModalComponent,
+} from '@customer-portal/shared/components';
+import { GridComponent } from '@customer-portal/shared/components/grid';
+import {
+  FINDINGS_STATUS_STATES_MAP,
   modalBreakpoints,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/constants';
+import {
+  ColumnDefinition,
+  GridConfig,
+  GridRowAction,
+} from '@customer-portal/shared/models';
 
 import { ACTIONS_LIST_COLUMNS } from '../../constants/actions-list-column-constant';
 
@@ -70,22 +74,26 @@ export class ActionsListComponent
 
     const { entityId, entityType } = inputData.rowData as ActionModel;
 
-    const dialogRef = this.dialogService.open(HtmlDetailsModalComponent, {
-      header: inputData.rowData.actionName,
-      modal: true,
-      width: '600px',
-      breakpoints: modalBreakpoints,
-      data: { message: inputData.rowData.message },
-      templates: {
-        footer: HtmlDetailsFooterModalComponent,
-      },
-    });
-
-    dialogRef.onClose.subscribe((result) => {
-      if (result) {
-        this.actionsListStoreService.navigateFromAction(entityId, entityType);
-      }
-    });
+    this.dialogService
+      .open(HtmlDetailsModalComponent, {
+        header: inputData.rowData.actionName,
+        modal: true,
+        width: '600px',
+        breakpoints: modalBreakpoints,
+        data: {
+          message: inputData.rowData.message,
+          footerButtonLanguage: inputData.rowData.language,
+        },
+        templates: {
+          footer: HtmlDetailsFooterModalComponent,
+        },
+      })
+      .onClose.pipe(take(1))
+      .subscribe((result) => {
+        if (result) {
+          this.actionsListStoreService.navigateFromAction(entityId, entityType);
+        }
+      });
   }
 
   onGridConfigChanged(gridConfig: GridConfig): void {
