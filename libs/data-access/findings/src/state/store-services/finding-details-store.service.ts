@@ -111,6 +111,10 @@ export class FindingDetailsStoreService {
 
   findingId = toSignal(this.findingId$, { initialValue: '' });
 
+  get isLoading(): Signal<boolean> {
+    return this.store.selectSignal(FindingDetailsSelectors.isLoading);
+  }
+
   constructor(
     private routeStoreService: RouteStoreService,
     private store: Store,

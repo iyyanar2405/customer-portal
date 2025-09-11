@@ -5,7 +5,11 @@ import { BehaviorSubject } from 'rxjs';
 
 import { ObjectName, ObjectType, PageName } from '@customer-portal/shared';
 
-import { LoadPreferenceSuccess, PreferenceStoreService } from '../state';
+import {
+  LoadPreferenceFail,
+  LoadPreferenceSuccess,
+  PreferenceStoreService,
+} from '../state';
 
 export abstract class BasePreferencesComponent {
   private preferenceDataLoadedSubject = new BehaviorSubject<boolean>(false);
@@ -52,7 +56,7 @@ export abstract class BasePreferencesComponent {
   private handlePreferenceActions() {
     this.actions$
       .pipe(
-        ofActionSuccessful(LoadPreferenceSuccess),
+        ofActionSuccessful(LoadPreferenceSuccess, LoadPreferenceFail),
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe(() => {

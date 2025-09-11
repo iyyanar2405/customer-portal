@@ -1,7 +1,6 @@
 export * from './finding-details.model';
 export * from './finding-document-list-item.model';
 export * from './finding-documents-actions.model';
-export * from './finding-graphs.model';
 export * from './finding-history-response.model';
 export * from './finding-list-item.model';
 export * from './finding-responses-form.model';
@@ -9,5 +8,4 @@ export * from './finding-responses.model';
 export * from './finding-tabs.enum';
 export * from './finding-trends-graph.model';
 export * from './open-findings-months-period.model';
-export * from './open-findings-response.enum';
-export * from './finding-by-clause-status.enum';
+export * from './finding-status.enum';

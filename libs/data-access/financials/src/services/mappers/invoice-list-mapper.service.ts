@@ -1,11 +1,13 @@
 import {
   convertToUtcDate,
+  utcDateToPayloadFormat,
+} from '@customer-portal/shared/helpers/date';
+import { mapFilterConfigToValues } from '@customer-portal/shared/helpers/grid';
+import {
   FilteringConfig,
   GridEventActionType,
   GridFileActionType,
-  mapFilterConfigToValues,
-  utcDateToPayloadFormat,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/models/grid';
 
 import { InvoiceExcelPayloadDto, InvoiceListItemDto } from '../../dtos';
 import { isInvoiceOverdueOrUnpaid } from '../../helpers';
@@ -32,6 +34,7 @@ export class InvoiceListMapperService {
       referenceNumber: item.referenceNumber,
       reportingCountry: item.reportingCountry,
       projectNumber: item.projectNumber,
+      accountDNVId: item.accountDNVId,
       status: item.status,
       actions: [
         {
@@ -47,7 +50,7 @@ export class InvoiceListMapperService {
             label: GridEventActionType.RequestChanges,
             i18nKey: 'gridEvent.requestChanges',
             icon: 'pi pi-pencil',
-            disabled: !isAdminUser,
+            disabled: !isAdminUser || isDnvUser,
           },
           {
             label: GridEventActionType.UpdatePlannedPaymentDate,

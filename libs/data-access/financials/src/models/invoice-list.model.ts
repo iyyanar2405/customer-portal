@@ -16,4 +16,5 @@ export interface InvoiceListItemModel {
   status: string;
   reportingCountry: string;
   projectNumber: string;
+  accountDNVId: number;
 }

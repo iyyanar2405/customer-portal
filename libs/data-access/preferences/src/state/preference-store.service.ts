@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Signal } from '@angular/core';
 import { Store } from '@ngxs/store';
 
 import { ObjectName, ObjectType, PageName } from '@customer-portal/shared';
@@ -15,6 +15,14 @@ export class PreferenceStoreService {
     return this.store.selectSignal(
       PreferenceSelectors.data(pageName, objectName, objectType),
     );
+  }
+
+  get isLoading(): Signal<boolean> {
+    return this.store.selectSignal(PreferenceSelectors.isLoading);
+  }
+
+  get error(): Signal<string | null> {
+    return this.store.selectSignal(PreferenceSelectors.error);
   }
 
   loadPreference = (

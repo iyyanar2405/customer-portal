@@ -49,12 +49,20 @@ export class InvoiceListStoreService {
     return this.store.select(InvoiceListSelectors.filteringConfig);
   }
 
+  get filteringConfigSignal(): Signal<FilteringConfig> {
+    return this.store.selectSignal(InvoiceListSelectors.filteringConfig);
+  }
+
   get filterOptions(): Signal<FilterOptions> {
     return this.store.selectSignal(InvoiceListSelectors.filterOptions);
   }
 
   get canUploadData(): Signal<boolean> {
     return this.store.selectSignal(InvoiceListSelectors.canUploadData);
+  }
+
+  get isLoading(): Signal<boolean> {
+    return this.store.selectSignal(InvoiceListSelectors.isLoading);
   }
 
   @Dispatch()

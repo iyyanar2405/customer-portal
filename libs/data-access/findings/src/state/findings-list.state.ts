@@ -2,28 +2,40 @@ import { Injectable } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { Action, State, StateContext } from '@ngxs/store';
 import { MessageService } from 'primeng/api';
-import { catchError, tap } from 'rxjs';
+import { catchError, take, tap } from 'rxjs';
 
-import { NavigateFromOverviewCardToFindingsListView } from '@customer-portal/overview-shared';
 import {
-  DEFAULT_GRID_CONFIG,
+  GlobalServiceMasterStoreService,
+  GlobalSiteMasterStoreService,
+} from '@customer-portal/data-access/global';
+import {
+  ClearNavigationFilters,
+  OverviewSharedStoreService,
+} from '@customer-portal/overview-shared';
+import { DEFAULT_GRID_CONFIG } from '@customer-portal/shared/constants';
+import {
   downloadFileFromByteArray,
-  FilterableColumnDefinition,
-  FilterOptions,
   getFilterOptions,
   getToastContentBySeverity,
+  throwIfNotSuccess,
+  updateGridConfigBasedOnFilters,
+} from '@customer-portal/shared/helpers';
+import {
+  FilterableColumnDefinition,
+  FilterOptions,
   GridConfig,
   ToastSeverity,
-  updateGridConfigBasedOnFilters,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/models';
 
 import { FindingListItemModel } from '../models';
 import { FindingsListMapperService, FindingsListService } from '../services';
 import {
+  ApplyNavigationFiltersFromOverview,
   ExportFindingsExcel,
   ExportFindingsExcelFail,
   ExportFindingsExcelSuccess,
   LoadFindingsList,
+  LoadFindingsListFail,
   LoadFindingsListSuccess,
   ResetFindingsListState,
   SetNavigationGridConfig,
@@ -35,12 +47,18 @@ export interface FindingsListStateModel {
   findingsItems: FindingListItemModel[];
   gridConfig: GridConfig;
   filterOptions: FilterOptions;
+  isLoading: boolean;
+  loaded: boolean;
+  error: string | null;
 }
 
 const defaultState: FindingsListStateModel = {
   findingsItems: [],
   gridConfig: DEFAULT_GRID_CONFIG,
   filterOptions: {},
+  isLoading: false,
+  loaded: false,
+  error: null,
 };
 
 @State<FindingsListStateModel>({
@@ -53,19 +71,37 @@ export class FindingsListState {
     private findingsService: FindingsListService,
     private messageService: MessageService,
     private ts: TranslocoService,
+    private globalSiteMasterStoreService: GlobalSiteMasterStoreService,
+    private globalServiceMasterStoreService: GlobalServiceMasterStoreService,
+    private overviewSharedStore: OverviewSharedStoreService,
   ) {}
 
   @Action(LoadFindingsList)
   loadFindingsList(ctx: StateContext<FindingsListStateModel>) {
+    ctx.patchState({
+      isLoading: true,
+      findingsItems: [],
+      error: '',
+      loaded: false,
+    });
+
     return this.findingsService.getFindingList().pipe(
+      throwIfNotSuccess(),
       tap((findingListDto) => {
-        const findingsItems =
-          FindingsListMapperService.mapToFindingItemModel(findingListDto);
+        const siteMasterList =
+          this.globalSiteMasterStoreService.siteMasterList();
+        const serviceMasterList =
+          this.globalServiceMasterStoreService.serviceMasterList();
+        const findingsItems = FindingsListMapperService.mapToFindingItemModel(
+          findingListDto,
+          siteMasterList,
+          serviceMasterList,
+        );
 
         ctx.dispatch(new LoadFindingsListSuccess(findingsItems));
-
         ctx.dispatch(new UpdateFilterOptions());
       }),
+      catchError(() => ctx.dispatch(new LoadFindingsListFail())),
     );
   }
 
@@ -74,7 +110,22 @@ export class FindingsListState {
     ctx: StateContext<FindingsListStateModel>,
     { findingsItems }: LoadFindingsListSuccess,
   ): void {
-    ctx.patchState({ findingsItems });
+    ctx.patchState({
+      findingsItems,
+      isLoading: false,
+      error: '',
+      loaded: true,
+    });
+  }
+
+  @Action(LoadFindingsListFail)
+  loadFindingsListFail(ctx: StateContext<any>) {
+    ctx.patchState({
+      findingsItems: [],
+      isLoading: false,
+      error: 'Failed to load finding data',
+      loaded: true,
+    });
   }
 
   @Action(UpdateGridConfig, { cancelUncompleted: true })
@@ -93,6 +144,7 @@ export class FindingsListState {
 
     const columnFilterConfigs: FilterableColumnDefinition[] = [
       { field: 'findingNumber', hasColumnDelimiter: false },
+      { field: 'response', hasColumnDelimiter: false },
       { field: 'status', hasColumnDelimiter: false },
       { field: 'title', hasColumnDelimiter: false },
       { field: 'companyName', hasColumnDelimiter: false },
@@ -170,11 +222,17 @@ export class FindingsListState {
     });
   }
 
-  @Action(NavigateFromOverviewCardToFindingsListView)
-  navigateFromOverviewCardToFindingsListView(
+  @Action(ApplyNavigationFiltersFromOverview)
+  applyNavigationFiltersFromOverview(
     ctx: StateContext<FindingsListStateModel>,
-    { overviewCardFilters }: NavigateFromOverviewCardToFindingsListView,
   ) {
-    ctx.dispatch(new SetNavigationGridConfig(overviewCardFilters));
+    return this.overviewSharedStore.overviewNavigationFilters$
+      .pipe(take(1))
+      .subscribe((overviewCardFilters) => {
+        if (overviewCardFilters) {
+          ctx.dispatch(new SetNavigationGridConfig(overviewCardFilters));
+          ctx.dispatch(new ClearNavigationFilters());
+        }
+      });
   }
 }

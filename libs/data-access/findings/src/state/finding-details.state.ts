@@ -4,7 +4,8 @@ import { Action, State, StateContext } from '@ngxs/store';
 import { MessageService } from 'primeng/api';
 import { catchError, forkJoin, switchMap, tap } from 'rxjs';
 
-import { UnreadActionsStoreService } from '@customer-portal/data-access/actions';
+import { LoggingService } from '@customer-portal/core';
+import { UnreadActionsStoreService } from '@customer-portal/data-access/actions/state';
 import {
   ProfileStoreService,
   SettingsCoBrowsingStoreService,
@@ -14,14 +15,12 @@ import {
   PermissionsList,
 } from '@customer-portal/permissions';
 import { RouteStoreService } from '@customer-portal/router';
-import {
-  DEFAULT_GRID_CONFIG,
-  FilterOptions,
-  getFilterOptionsForColumn,
-  getToastContentBySeverity,
-  GridConfig,
-  ToastSeverity,
-} from '@customer-portal/shared';
+import { DEFAULT_GRID_CONFIG } from '@customer-portal/shared/constants';
+import { throwIfNotSuccess } from '@customer-portal/shared/helpers/custom-operators';
+import { getToastContentBySeverity } from '@customer-portal/shared/helpers/custom-toast';
+import { getFilterOptionsForColumn } from '@customer-portal/shared/helpers/grid';
+import { ToastSeverity } from '@customer-portal/shared/models';
+import { FilterOptions, GridConfig } from '@customer-portal/shared/models/grid';
 
 import {
   FindingDetailsModel,
@@ -42,6 +41,7 @@ import {
   LoadFindingDetails,
   LoadFindingDetailsSuccess,
   LoadFindingDocumentsList,
+  LoadFindingDocumentsListFail,
   LoadFindingDocumentsListSuccess,
   LoadLatestFindingResponses,
   LoadLatestFindingResponsesSuccess,
@@ -62,9 +62,13 @@ export interface FindingDetailsStateModel {
   isFindingResponseFormDirty: boolean;
   isRespondInProgress: boolean;
   responseHistory: FindingHistoryResponseModel[];
-  documentsList: FindingDocumentListItemModel[];
   gridConfig: GridConfig;
   filterOptions: FilterOptions;
+  documents: {
+    loading: boolean;
+    error: string | null;
+    list: FindingDocumentListItemModel[];
+  };
 }
 
 const defaultState: FindingDetailsStateModel = {
@@ -107,10 +111,14 @@ const defaultState: FindingDetailsStateModel = {
   latestFindingResponses: null,
   responseHistory: [],
   isRespondInProgress: false,
-  documentsList: [],
   gridConfig: DEFAULT_GRID_CONFIG,
   filterOptions: {},
   isFindingResponseFormDirty: false,
+  documents: {
+    loading: false,
+    error: '',
+    list: [],
+  },
 };
 
 @State<FindingDetailsStateModel>({
@@ -129,6 +137,7 @@ export class FindingDetailsState {
     private unreadActionsStoreService: UnreadActionsStoreService,
     private messageService: MessageService,
     private ts: TranslocoService,
+    private loggingService: LoggingService,
   ) {}
 
   @Action(LoadFindingDetails)
@@ -212,15 +221,35 @@ export class FindingDetailsState {
     return this.findingDetailsService.respondToFindings(dto).pipe(
       tap((result: any) => {
         if (result.data.postLatestFindingResponse?.isSuccess) {
+          this.loggingService.logEvent('Finding_Response_Submit_Success', {
+            findingNumber,
+            responseId,
+            timestamp: new Date().toISOString(),
+          });
           ctx.dispatch(
             new SendFindingResponsesFormSuccess(dto.request.isSubmitToDnv),
           );
           this.unreadActionsStoreService.loadUnreadActions();
         } else {
+          this.loggingService.logEvent('Finding_Response_Submit_Failed', {
+            findingNumber,
+            responseId,
+            error:
+              result.data.postLatestFindingResponse?.message ||
+              'Error during finding response submission',
+            timestamp: new Date().toISOString(),
+          });
           ctx.dispatch(new SwitchIsRespondInProgress(false));
         }
       }),
       catchError((error) => {
+        this.loggingService.logEvent('Finding_Response_Submit_Failed', {
+          findingNumber,
+          responseId,
+          error: error?.message || error,
+          timestamp: new Date().toISOString(),
+        });
+
         ctx.dispatch(new SwitchIsRespondInProgress(false));
 
         throw error;
@@ -334,6 +363,13 @@ export class FindingDetailsState {
   @Action(LoadFindingDocumentsList)
   loadFindingDocumentsList(ctx: StateContext<FindingDetailsStateModel>) {
     const state = ctx.getState();
+    ctx.patchState({
+      ...state,
+      documents: {
+        ...state.documents,
+        loading: true,
+      },
+    });
     const { findingNumber, header } = state.findingDetails;
     const hasFindingsEditPermission = this.profileStoreService.hasPermission(
       PermissionCategories.Findings,
@@ -345,6 +381,7 @@ export class FindingDetailsState {
     return this.findingDocumentsListService
       .getFindingDocumentsList(header.auditNumber, findingNumber)
       .pipe(
+        throwIfNotSuccess(),
         tap((findingListDto) => {
           const findingDocuments =
             FindingDocumentsListMapperService.mapToFindingDocumentItemModel(
@@ -357,6 +394,7 @@ export class FindingDetailsState {
 
           ctx.dispatch(new UpdateDocumentFilterOptions(findingDocuments));
         }),
+        catchError(() => ctx.dispatch(new LoadFindingDocumentsListFail())),
       );
   }
 
@@ -365,7 +403,24 @@ export class FindingDetailsState {
     ctx: StateContext<FindingDetailsStateModel>,
     { documentsList }: LoadFindingDocumentsListSuccess,
   ) {
-    ctx.patchState({ documentsList });
+    ctx.patchState({
+      documents: {
+        error: '',
+        list: documentsList,
+        loading: false,
+      },
+    });
+  }
+
+  @Action(LoadFindingDocumentsListFail)
+  loadFindingDocumentsListFail(ctx: StateContext<any>) {
+    ctx.patchState({
+      documents: {
+        error: 'Failed to load finding document List data',
+        list: [],
+        loading: false,
+      },
+    });
   }
 
   @Action(UpdateDocumentGridConfig)

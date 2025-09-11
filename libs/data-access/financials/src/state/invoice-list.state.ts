@@ -2,25 +2,29 @@ import { Injectable } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { Action, State, StateContext } from '@ngxs/store';
 import { MessageService } from 'primeng/api';
-import { catchError, map, tap } from 'rxjs';
+import { catchError, tap } from 'rxjs';
 
-import { NavigateFromNotificationsListToFinancialsListView } from '@customer-portal/data-access/notifications';
+import { NavigateFromNotificationsListToFinancialsListView } from '@customer-portal/data-access/notifications/state';
 import {
   SettingsCoBrowsingStoreService,
   SettingsCompanyDetailsStoreService,
 } from '@customer-portal/data-access/settings';
+import { DEFAULT_GRID_CONFIG } from '@customer-portal/shared/constants';
 import {
-  DEFAULT_GRID_CONFIG,
   downloadFileFromByteArray,
-  FilterableColumnDefinition,
-  FilterOptions,
   getContentType,
-  getFilterOptions,
   getToastContentBySeverity,
-  GridConfig,
-  ToastSeverity,
+} from '@customer-portal/shared/helpers';
+import { throwIfNotSuccess } from '@customer-portal/shared/helpers/custom-operators';
+import {
+  getFilterOptions,
   updateGridConfigBasedOnFilters,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/helpers/grid';
+import {
+  FilterableColumnDefinition,
+  ToastSeverity,
+} from '@customer-portal/shared/models';
+import { FilterOptions, GridConfig } from '@customer-portal/shared/models/grid';
 
 import { InvoiceListDto } from '../dtos';
 import { InvoiceListItemModel } from '../models';
@@ -34,6 +38,7 @@ import {
   ExportInvoicesExcelFail,
   ExportInvoicesExcelSuccess,
   LoadInvoiceList,
+  LoadInvoiceListFail,
   LoadInvoiceListSuccess,
   ResetInvoiceListState,
   SwitchCanUploadData,
@@ -49,6 +54,8 @@ export interface InvoiceListStateModel {
   filterOptions: FilterOptions;
   contactId: string | null;
   canUploadData: boolean;
+  isLoading: boolean;
+  error: string | null;
 }
 
 const defaultState: InvoiceListStateModel = {
@@ -57,6 +64,8 @@ const defaultState: InvoiceListStateModel = {
   filterOptions: {},
   contactId: null,
   canUploadData: false,
+  isLoading: false,
+  error: null,
 };
 
 @State<InvoiceListStateModel>({
@@ -75,13 +84,19 @@ export class InvoiceListState {
 
   @Action(LoadInvoiceList)
   loadInvoiceList(ctx: StateContext<InvoiceListStateModel>) {
-    return this.getInvoiceList().pipe(
-      tap((items) => {
+    ctx.patchState({
+      isLoading: true,
+      error: '',
+    });
+
+    return this.invoiceListService.getInvoiceList().pipe(
+      throwIfNotSuccess(),
+      tap((items: InvoiceListDto) => {
         const isAdminUser =
           this.settingsCompanyDetailsStoreService.isUserAdmin();
         const isDnvUser = this.settingsCoBrowsingStoreService.isDnvUser();
         const invoices = InvoiceListMapperService.mapToInvoiceItemModel(
-          items,
+          items.data.items,
           isAdminUser,
           isDnvUser,
         );
@@ -91,6 +106,7 @@ export class InvoiceListState {
           ctx.dispatch(new UpdateFilterOptions());
         }
       }),
+      catchError(() => ctx.dispatch(new LoadInvoiceListFail())),
     );
   }
 
@@ -101,6 +117,17 @@ export class InvoiceListState {
   ) {
     ctx.patchState({
       invoices,
+      isLoading: false,
+      error: '',
+    });
+  }
+
+  @Action(LoadInvoiceListFail)
+  loadInvoiceListFail(ctx: StateContext<any>) {
+    ctx.patchState({
+      invoices: [],
+      error: 'Failed to load invoice data',
+      isLoading: false,
     });
   }
 
@@ -291,15 +318,5 @@ export class InvoiceListState {
     this.messageService.add(message);
 
     ctx.dispatch(new LoadInvoiceList());
-  }
-
-  private getInvoiceList() {
-    return this.invoiceListService
-      .getInvoiceList()
-      .pipe(
-        map((dto: InvoiceListDto) =>
-          dto?.isSuccess && dto?.data?.items ? dto.data.items : [],
-        ),
-      );
   }
 }

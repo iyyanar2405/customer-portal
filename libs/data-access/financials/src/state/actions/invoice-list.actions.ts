@@ -11,7 +11,9 @@ export class LoadInvoiceListSuccess {
 
   constructor(public invoices: InvoiceListItemModel[]) {}
 }
-
+export class LoadInvoiceListFail {
+  static readonly type = '[Invoice List] Load Invoice List Fail';
+}
 export class ResetInvoiceListState {
   static readonly type = '[Invoice List] Reset Invoices List State';
 }

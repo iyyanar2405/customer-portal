@@ -11,6 +11,7 @@ import {
 
 import { FindingListItemModel } from '../../models';
 import {
+  ApplyNavigationFiltersFromOverview,
   ExportFindingsExcel,
   LoadFindingsList,
   ResetFindingsListState,
@@ -40,6 +41,22 @@ export class FindingsListStoreService {
     return this.store.select(FindingsListSelectors.filteringConfig);
   }
 
+  get filteringConfigSignal(): Signal<FilteringConfig> {
+    return this.store.selectSignal(FindingsListSelectors.filteringConfig);
+  }
+
+  get isLoading(): Signal<boolean> {
+    return this.store.selectSignal(FindingsListSelectors.isLoading);
+  }
+
+  get loaded$(): Observable<boolean> {
+    return this.store.select(FindingsListSelectors.loaded);
+  }
+
+  get loaded(): Signal<boolean> {
+    return this.store.selectSignal(FindingsListSelectors.loaded);
+  }
+
   constructor(private store: Store) {}
 
   @Dispatch()
@@ -54,4 +71,8 @@ export class FindingsListStoreService {
 
   @Dispatch()
   resetFindingsListState = () => new ResetFindingsListState();
+
+  @Dispatch()
+  applyNavigationFiltersFromOverview = () =>
+    new ApplyNavigationFiltersFromOverview();
 }

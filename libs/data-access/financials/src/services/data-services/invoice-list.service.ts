@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { map, Observable } from 'rxjs';
@@ -30,19 +30,30 @@ export class InvoiceListService {
       .query({
         query: INVOICE_LIST_QUERY,
         variables: {},
-        fetchPolicy: 'no-cache',
       })
       .pipe(map((results: any) => results?.data?.InvoiceListPage));
   }
 
-  exportInvoices({ filters }: InvoiceExcelPayloadDto): Observable<number[]> {
+  exportInvoices(
+    { filters }: InvoiceExcelPayloadDto,
+    skipLoading?: boolean,
+  ): Observable<number[]> {
+    let headers = new HttpHeaders();
+
+    if (skipLoading) {
+      headers = headers.append('SKIP_LOADING', 'true');
+    }
+
     return this.http
-      .post<{ data: number[] }>(this.exportInvoiceExcelUrl, { filters })
+      .post<{
+        data: number[];
+      }>(this.exportInvoiceExcelUrl, filters, { headers })
       .pipe(map((response) => response.data));
   }
 
   downloadInvoices(
     invoiceNumbers: string[],
+    skipLoading?: boolean,
   ): Observable<InvoiceDownloadDataDto> {
     return this.apollo
       .use(this.clientName)
@@ -50,6 +61,9 @@ export class InvoiceListService {
         query: DOWNLOAD_INVOICES_QUERY,
         variables: {
           invoiceNumber: invoiceNumbers,
+        },
+        context: {
+          headers: skipLoading ? { SKIP_LOADING: 'true' } : {},
         },
       })
       .pipe(map((results: any) => results.data.DownloadInvoice.data));
@@ -61,6 +75,40 @@ export class InvoiceListService {
       variables: {
         invoiceNumber: invoicesId,
         plannedDates: date,
+      },
+      update: (cache) => {
+        try {
+          const existing: any = cache.readQuery({
+            query: INVOICE_LIST_QUERY,
+            variables: {},
+          });
+          if (!existing || !existing.InvoiceListPage?.data?.items) return;
+
+          const updatedItems = existing.InvoiceListPage.data.items.map(
+            (item: any) =>
+              invoicesId.includes(item.invoice)
+                ? { ...item, plannedPaymentDate: date }
+                : item,
+          );
+
+          cache.writeQuery({
+            query: INVOICE_LIST_QUERY,
+            variables: {},
+            data: {
+              ...existing,
+              InvoiceListPage: {
+                ...existing.InvoiceListPage,
+                data: {
+                  ...existing.InvoiceListPage.data,
+                  items: updatedItems,
+                },
+              },
+            },
+          });
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.error('Error updating planned payment date in cache:', error);
+        }
       },
     });
   }

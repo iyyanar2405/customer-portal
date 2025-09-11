@@ -14,12 +14,9 @@ import {
 } from 'rxjs';
 
 import { RouteStoreService } from '@customer-portal/router';
-import {
-  downloadFromByteArray,
-  FileUpload,
-  getToastContentBySeverity,
-  ToastSeverity,
-} from '@customer-portal/shared';
+import { getToastContentBySeverity } from '@customer-portal/shared/helpers/custom-toast';
+import { downloadFromByteArray } from '@customer-portal/shared/helpers/download';
+import { FileUpload, ToastSeverity } from '@customer-portal/shared/models';
 
 import { BaseFileUploadErrors } from '../models/documents.model';
 import { DocumentsService } from '../services/documents.service';

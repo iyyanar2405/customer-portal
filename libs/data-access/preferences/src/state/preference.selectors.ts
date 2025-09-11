@@ -1,4 +1,4 @@
-import { createSelector } from '@ngxs/store';
+import { createSelector, Selector } from '@ngxs/store';
 
 import { PreferenceState, PreferenceStateModel } from './preference.state';
 
@@ -23,5 +23,15 @@ export class PreferenceSelectors {
 
       return preference ? structuredClone(preference.data) : emptyPreference;
     });
+  }
+
+  @Selector()
+  static isLoading(state: PreferenceStateModel): boolean {
+    return state.isLoading;
+  }
+
+  @Selector()
+  static error(state: PreferenceStateModel): string | null {
+    return state.error;
   }
 }
