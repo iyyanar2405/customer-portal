@@ -16,7 +16,9 @@ export class LoadOverviewCardDataSuccess {
     public shouldKeepPreviousData?: boolean,
   ) {}
 }
-
+export class LoadOverviewCardDataFail {
+  static readonly type = '[Overview] Load Overview Card Data Fail';
+}
 export class LoadMoreOverviewCardData {
   static readonly type = '[Overview] Load More Overview Card Data';
 }

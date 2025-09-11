@@ -9,7 +9,7 @@ import {
   UpdateScheduleCalendarConfirm,
   UpdateScheduleCalendarReschedule,
 } from '../actions';
-import { ScheduleCalendarActionSelectors } from '../selectors';
+import { ScheduleCalendarActionSelectors } from '../selectors/schedule-calendar-action.selectors';
 
 @Injectable()
 export class ScheduleCalendarActionStoreService {

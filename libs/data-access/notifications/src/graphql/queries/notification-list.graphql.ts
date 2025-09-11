@@ -23,11 +23,13 @@ export const NOTIFICATIONS_DETAILS_QUERY = gql`
           createdTime
           infoId
           message
+          language
           notificationCategory
           readStatus
           subject
           entityType
           entityId
+          snowLink
         }
         totalItems
         totalPages

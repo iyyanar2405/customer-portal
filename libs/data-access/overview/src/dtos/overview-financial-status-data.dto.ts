@@ -5,6 +5,7 @@ export interface OverviewFinancialStatusGraphWrapperDto {
 export interface OverviewFinancialStatusGraphDto {
   data: OverviewFinancialStatusGraphDataDto[];
   isSuccess: boolean;
+  message: string;
 }
 
 export interface OverviewFinancialStatusGraphDataDto {

@@ -1,20 +1,22 @@
 import { Injectable } from '@angular/core';
 import { Action, State, StateContext } from '@ngxs/store';
 import { MessageService } from 'primeng/api';
-import { catchError, filter, tap } from 'rxjs';
+import { catchError, tap } from 'rxjs';
 
-import { NavigateFromNotificationsListToContractsListView } from '@customer-portal/data-access/notifications';
+import { NavigateFromNotificationsListToContractsListView } from '@customer-portal/data-access/notifications/state';
+import { DEFAULT_GRID_CONFIG } from '@customer-portal/shared/constants';
+import { throwIfNotSuccess } from '@customer-portal/shared/helpers/custom-operators';
+import { getToastContentBySeverity } from '@customer-portal/shared/helpers/custom-toast';
+import { downloadFileFromByteArray } from '@customer-portal/shared/helpers/download';
 import {
-  DEFAULT_GRID_CONFIG,
-  downloadFileFromByteArray,
-  FilterableColumnDefinition,
-  FilterOptions,
   getFilterOptions,
-  getToastContentBySeverity,
-  GridConfig,
-  ToastSeverity,
   updateGridConfigBasedOnFilters,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/helpers/grid';
+import {
+  FilterableColumnDefinition,
+  ToastSeverity,
+} from '@customer-portal/shared/models';
+import { FilterOptions, GridConfig } from '@customer-portal/shared/models/grid';
 
 import { ContractsListItemModel } from '../models';
 import { ContractsListMapperService, ContractsListService } from '../services';
@@ -23,6 +25,7 @@ import {
   ExportContractsExcelFail,
   ExportContractsExcelSuccess,
   LoadContractsList,
+  LoadContractsListFail,
   LoadContractsListSuccess,
   ResetContractsListState,
   UpdateFilterOptions,
@@ -33,12 +36,16 @@ export interface ContractsListStateModel {
   contracts: ContractsListItemModel[];
   gridConfig: GridConfig;
   filterOptions: FilterOptions;
+  isLoading: boolean;
+  error: string | null;
 }
 
 const defaultState: ContractsListStateModel = {
   contracts: [],
   gridConfig: DEFAULT_GRID_CONFIG,
   filterOptions: {},
+  isLoading: false,
+  error: null,
 };
 
 @State<ContractsListStateModel>({
@@ -54,8 +61,14 @@ export class ContractsListState {
 
   @Action(LoadContractsList)
   loadContractsList(ctx: StateContext<ContractsListStateModel>) {
+    ctx.patchState({
+      isLoading: true,
+      error: '',
+      contracts: [],
+    });
+
     return this.contractsListService.getContractsList().pipe(
-      filter((contractsListDto) => contractsListDto.isSuccess),
+      throwIfNotSuccess(),
       tap((contractsListDto) => {
         const contracts =
           ContractsListMapperService.mapToContractListItemModel(
@@ -67,6 +80,7 @@ export class ContractsListState {
           ctx.dispatch(new UpdateFilterOptions());
         }
       }),
+      catchError(() => ctx.dispatch(new LoadContractsListFail())),
     );
   }
 
@@ -77,6 +91,17 @@ export class ContractsListState {
   ) {
     ctx.patchState({
       contracts,
+      isLoading: false,
+      error: '',
+    });
+  }
+
+  @Action(LoadContractsListFail)
+  loadContractsListFail(ctx: StateContext<any>) {
+    ctx.patchState({
+      contracts: [],
+      isLoading: false,
+      error: 'Failed to load Contract data',
     });
   }
 

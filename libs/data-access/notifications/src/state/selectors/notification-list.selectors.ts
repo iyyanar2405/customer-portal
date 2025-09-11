@@ -1,7 +1,7 @@
 import { Selector } from '@ngxs/store';
 import { TreeNode } from 'primeng/api';
 
-import { SharedSelectMultipleDatum } from '@customer-portal/shared';
+import { SharedSelectMultipleDatum } from '@customer-portal/shared/components/select/multiple';
 
 import { NotificationModel } from '../../models';
 import {
@@ -61,6 +61,11 @@ export class NotificationListSelectors {
   @Selector([NotificationListSelectors._selectedCategoryList])
   static selectedCategoryList(selectedCategoryList: number[]): number[] {
     return selectedCategoryList;
+  }
+
+  @Selector([NotificationListSelectors._isLoading])
+  static isLoading(isLoading: boolean): boolean {
+    return isLoading;
   }
 
   @Selector([NotificationListState])
@@ -158,5 +163,10 @@ export class NotificationListSelectors {
     state: NotificationsListStateModel,
   ): number[] {
     return state?.selectedSiteList;
+  }
+
+  @Selector([NotificationListState])
+  private static _isLoading(state: NotificationsListStateModel): boolean {
+    return state.isLoading;
   }
 }

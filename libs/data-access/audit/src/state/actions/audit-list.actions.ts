@@ -11,6 +11,9 @@ export class LoadAuditListSuccess {
 
   constructor(public auditItems: AuditListItemModel[]) {}
 }
+export class LoadAuditListFail {
+  static readonly type = '[Audit List] Load Audit List Fail';
+}
 
 export class UpdateGridConfig {
   static readonly type = '[Audit List] Update Grid Config';
@@ -44,4 +47,8 @@ export class SetNavigationGridConfig {
   static readonly type = '[Audit List] Set Navigation Grid Config';
 
   constructor(public chartNavigationPayload: FilterValue[]) {}
+}
+
+export class ApplyNavigationFiltersFromOverview {
+  static readonly type = '[AuditList] Apply Navigation Filters From Overview';
 }

@@ -14,11 +14,15 @@ import { LoadOverviewFinancialStatusData } from './actions';
 export interface OverviewFinancialStatusStateModel {
   overviewFinancialStatusGraphData: DoughnutChartModel;
   overviewFinancialStatusError: boolean;
+  isLoading: boolean;
+  errorMessage: string | null;
 }
 
 const defaultState: OverviewFinancialStatusStateModel = {
   overviewFinancialStatusGraphData: EMPTY_GRAPH_DATA,
   overviewFinancialStatusError: false,
+  isLoading: false,
+  errorMessage: '',
 };
 @State<OverviewFinancialStatusStateModel>({
   name: 'financialStatus',
@@ -34,6 +38,12 @@ export class OverviewFinancialStatusState {
   loadOverviewFinancialStatusData(
     ctx: StateContext<OverviewFinancialStatusStateModel>,
   ) {
+    ctx.patchState({
+      isLoading: true,
+      errorMessage: '',
+      overviewFinancialStatusGraphData: EMPTY_GRAPH_DATA,
+    });
+
     return this.overviewFinancialStatusService
       .getOverviewFinancialWidget()
       .pipe(
@@ -47,16 +57,22 @@ export class OverviewFinancialStatusState {
             ctx.patchState({
               overviewFinancialStatusGraphData: overviewFinancialData,
               overviewFinancialStatusError: false,
+              isLoading: false,
+              errorMessage: '',
             });
           } else {
             ctx.patchState({
               overviewFinancialStatusError: true,
+              isLoading: false,
+              errorMessage: overviewFinancialData.message,
             });
           }
         }),
         catchError(() => {
           ctx.patchState({
             overviewFinancialStatusError: true,
+            isLoading: false,
+            errorMessage: 'Failed To load overview financial status',
           });
 
           return of(null);

@@ -38,55 +38,64 @@
   </div>
 
   <div class="body">
-    <form [formGroup]="form">
-      <div class="grouping">
-        <label for="rescheduleDate">
-          {{ t('schedules.reschedule.dateLabel') }}
-        </label>
-        <p-calendar
-          appendTo="body"
-          dateFormat="dd-M-yy"
-          formControlName="weekRange"
-          id="rescheduleDate"
-          [ariaLabel]="t('schedules.reschedule.dateLabel')"
-          [defaultDate]="calendarDefaultDate"
-          [firstDayOfWeek]="1"
-          [minDate]="calendarMinDate"
-          [placeholder]="t('schedules.reschedule.datePlaceholder')"
-          [selectionMode]="'range'"
-          [showWeek]="true"
-          [startWeekFromFirstDayOfYear]="true"
-          (onSelect)="onSelectDate($event)">
-        </p-calendar>
-      </div>
-
-      <div class="grouping">
-        <label for="rescheduleReason">
-          {{ t('schedules.reschedule.reasonLabel') }}
-        </label>
-        <p-dropdown
-          formControlName="rescheduleReason"
-          id="rescheduleReason"
-          [ariaLabel]="t('schedules.reschedule.reasonLabel')"
-          [options]="scheduleCalendarActionStoreService.rescheduleReasonList()"
-          [overlayOptions]="getOverlayOptions()"
-          [placeholder]="t('schedules.reschedule.reasonPlaceholder')">
-        </p-dropdown>
-      </div>
-
-      <div class="grouping">
-        <label for="additionalComments">
-          {{ t('schedules.reschedule.commentsLabel') }}
-        </label>
-        <input
-          formControlName="additionalComments"
-          id="additionalComments"
-          pInputText
-          type="text"
-          [placeholder]="t('schedules.reschedule.commentsPlaceholder')" />
-      </div>
-    </form>
-
-    <p>{{ t('schedules.reschedule.disclaimer') }}</p>
+      @if (rescheduleState === 'SupportRequest'){
+    <div class="disclaimer-container">
+      <p class="scheduleInfo">{{ t('schedules.reschedule.scheduleInfo') }}</p>
+      <p class="disclaimer">{{ t('schedules.reschedule.requestChangeDisclaimer') }}</p>
+      <p>{{ t('schedules.reschedule.chargesDisclaimer') }}</p>
+    </div>
+  }
+    @else{
+      <form [formGroup]="form">
+        <div class="grouping">
+          <label for="rescheduleDate">
+            {{ t('schedules.reschedule.dateLabel') }}
+          </label>
+          <p-calendar
+            appendTo="body"
+            dateFormat="dd-M-yy"
+            formControlName="weekRange"
+            id="rescheduleDate"
+            [ariaLabel]="t('schedules.reschedule.dateLabel')"
+            [defaultDate]="calendarDefaultDate"
+            [firstDayOfWeek]="1"
+            [minDate]="calendarMinDate"
+            [placeholder]="t('schedules.reschedule.datePlaceholder')"
+            [selectionMode]="'range'"
+            [showWeek]="true"
+            [startWeekFromFirstDayOfYear]="true"
+            (onSelect)="onSelectDate($event)">
+          </p-calendar>
+        </div>
+  
+        <div class="grouping">
+          <label for="rescheduleReason">
+            {{ t('schedules.reschedule.reasonLabel') }}
+          </label>
+          <p-dropdown
+            formControlName="rescheduleReason"
+            id="rescheduleReason"
+            [ariaLabel]="t('schedules.reschedule.reasonLabel')"
+            [options]="scheduleCalendarActionStoreService.rescheduleReasonList()"
+            [overlayOptions]="getOverlayOptions()"
+            [placeholder]="t('schedules.reschedule.reasonPlaceholder')">
+          </p-dropdown>
+        </div>
+  
+        <div class="grouping">
+          <label for="additionalComments">
+            {{ t('schedules.reschedule.commentsLabel') }}
+          </label>
+          <input
+            formControlName="additionalComments"
+            id="additionalComments"
+            pInputText
+            type="text"
+            [placeholder]="t('schedules.reschedule.commentsPlaceholder')" />
+        </div>
+      </form>
+  
+      <p>{{ t('schedules.reschedule.disclaimer') }}</p>
+    }
   </div>
 </ng-container>

@@ -1,4 +1,5 @@
-import { convertToUtcDate, GridFileActionType } from '@customer-portal/shared';
+import { convertToUtcDate } from '@customer-portal/shared/helpers/date';
+import { GridFileActionType } from '@customer-portal/shared/models/grid';
 
 import {
   FindingDocumentListItemDto,

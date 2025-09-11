@@ -2,6 +2,7 @@
   <h3>{{ t('audit.auditDetailsDescription.findings') }}</h3>
 
   <shared-grid
+    #grid
     dataKey="findings"
     [columns]="cols"
     [data]="auditDetailsStoreService.auditFindingItems()"
@@ -13,6 +14,7 @@
     [filterOptions]="auditDetailsStoreService.auditFindingFilterOptions()"
     [filteringConfig$]="auditDetailsStoreService.auditFindingFilteringConfig"
     [hasActiveFilters]="auditDetailsStoreService.auditFindingHasActiveFilters()"
+    [isLoading]="auditDetailsStoreService.isLoadingFindings()"
     [paginator]="true"
     [route]="'/findings/'"
     [rowHover]="true"

@@ -3,6 +3,7 @@ export interface FindingListItemModel {
   status: string;
   title: string;
   category: string;
+  response: string;
   companyName: string;
   services: string;
   site: string;

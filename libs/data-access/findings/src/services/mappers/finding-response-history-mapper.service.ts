@@ -1,4 +1,4 @@
-import { formatDateToGivenZoneAndFormat } from '@customer-portal/shared';
+import { formatDateToGivenZoneAndFormat } from '@customer-portal/shared/helpers/date';
 
 import {
   AuditorCommentDto,

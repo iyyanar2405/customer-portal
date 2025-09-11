@@ -52,9 +52,11 @@ export class SettingsCompanyDetailsMapperService {
   ): SettingsCompanyDetailsData {
     return {
       accountId: datum.accountId,
+      accountDNVId: datum.accountDNVId,
       address: datum.address,
       city: datum.city,
       country: datum.country,
+      countryCode: datum.countryCode,
       countryId: datum.countryId,
       organizationName: datum.organizationName,
       poNumberRequired: datum.poNumberRequired,

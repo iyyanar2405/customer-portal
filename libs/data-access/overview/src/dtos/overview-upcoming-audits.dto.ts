@@ -1,4 +1,5 @@
 export interface OverviewUpcomingAuditDto {
+  message: string | null | undefined;
   isSuccess: boolean;
   data: OverviewUpcomingAuditDataDto[];
 }

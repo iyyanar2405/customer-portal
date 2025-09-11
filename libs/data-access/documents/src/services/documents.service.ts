@@ -8,7 +8,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '@customer-portal/environments';
-import { FileUpload, getContentType } from '@customer-portal/shared';
+import { getContentType } from '@customer-portal/shared/helpers/download';
+import { FileUpload } from '@customer-portal/shared/models';
 
 import { DocumentDeleteDto } from '../dtos/document-delete.dto';
 import { DocType } from '../models';
@@ -20,17 +21,22 @@ export class DocumentsService {
   downloadDocument(
     documentId: number,
     fileName?: string,
+    skipLoading?: boolean,
   ): Observable<HttpResponse<Blob>> {
     const { documentsApi } = environment;
 
     const query = `documentId=${documentId}`;
     const url = `${documentsApi}/download?${query}`;
 
-    const headers = fileName
+    let headers = fileName
       ? new HttpHeaders({
           Accept: getContentType(fileName),
         })
-      : undefined;
+      : new HttpHeaders();
+
+    if (skipLoading) {
+      headers = headers.append('SKIP_LOADING', 'true');
+    }
 
     return this.httpClient.get<Blob>(url, {
       observe: 'response',
@@ -89,13 +95,21 @@ export class DocumentsService {
   downloadAllDocuments(
     ids: number[],
     docType: DocType,
+    skipLoading?: boolean,
   ): Observable<HttpResponse<Blob>> {
     const { documentsApi } = environment;
     const url = `${documentsApi}/Bulkdownload?DocType=${docType}`;
 
+    let headers = new HttpHeaders();
+
+    if (skipLoading) {
+      headers = headers.append('SKIP_LOADING', 'true');
+    }
+
     return this.httpClient.post<Blob>(url, ids, {
       observe: 'response',
       responseType: 'blob' as 'json',
+      headers,
     });
   }
 }

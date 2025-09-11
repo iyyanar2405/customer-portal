@@ -13,6 +13,10 @@ export class RouteStoreService {
     return this.store.selectSignal(RouteSelectors.data);
   }
 
+  get currentUrl(): Signal<string | undefined> {
+    return this.store.selectSignal(RouteSelectors.url);
+  }
+
   getPathParamByKey(paramKey: string): Observable<string> {
     return this.store
       .select((state) => RouteSelectors.getPathParamByKey(state.router))

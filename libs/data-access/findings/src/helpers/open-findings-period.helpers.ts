@@ -21,10 +21,16 @@ export const getOpenFindingsDateRange = (
   };
 
   const { startOffset, endOffset } = periodRanges[period];
-  const startDate =
-    startOffset !== null
-      ? now.minus({ days: startOffset }).toJSDate()
-      : new Date(0);
+  let startDate: Date;
+
+  if (period === OpenFindingsMonthsPeriod.Overdue) {
+    startDate = new Date(new Date().getFullYear() - 3, 0, 1);
+  } else {
+    startDate =
+      startOffset !== null
+        ? now.minus({ days: startOffset }).toJSDate()
+        : new Date(0);
+  }
 
   const endDate = now.minus({ days: endOffset }).toJSDate();
 

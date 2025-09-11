@@ -1,9 +1,7 @@
 import { computed, Injectable } from '@angular/core';
 
-import {
-  isValidKey,
-  ProfileStoreService,
-} from '@customer-portal/data-access/settings';
+import { ProfileStoreService } from '@customer-portal/data-access/settings';
+import { isValidKey } from '@customer-portal/data-access/settings/helpers';
 
 @Injectable({
   providedIn: 'root',

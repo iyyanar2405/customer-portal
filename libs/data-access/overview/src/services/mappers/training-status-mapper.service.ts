@@ -18,12 +18,14 @@ export class TrainingStatusMapper {
             imageUrl: 'assets/external-apps/boostAudit.png',
           })) ?? [],
         isSuccess: true,
+        message: 'success',
       };
     }
 
     return {
       data: [],
       isSuccess: false,
+      message: 'Training status failed to load',
     };
   }
 }

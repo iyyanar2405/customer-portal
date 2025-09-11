@@ -20,6 +20,7 @@
             overviewFinancialStatusStoreService.overviewFinancialStatusGraphData()
               .data
           "
+          [isLoading]="overviewFinancialStatusStoreService.isLoading()"
           [options]="overviewFinancialsStatusOptions"
           [plugins]="doughnutPlugins"
           [tooltipTitle]="t('overview.totalInvoices')"
@@ -27,11 +28,14 @@
           (tooltipButtonClick)="onTooltipButtonClick($event)">
         </shared-chart>
       } @else {
-        <div class="no-data-image">
+        @if(!overviewFinancialStatusStoreService.isLoading()){
+          <div class="no-data-image">
           <img
             alt="No Data Display"
             src="./assets/images/no-data-display.png" />
-        </div>
+          </div>
+        }
+       
       }
     </div>
   </div>

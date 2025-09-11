@@ -23,12 +23,14 @@ export const SETTINGS_COMPANY_DETAILS_QUERY = gql`
           address
           city
           country
+          countryCode
           countryId
           isSerReqOpen
           organizationName
           poNumberRequired
           vatNumber
           zipCode
+          accountDNVId
         }
       }
       isSuccess

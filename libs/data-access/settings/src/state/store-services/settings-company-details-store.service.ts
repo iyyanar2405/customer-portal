@@ -3,12 +3,12 @@ import { Store } from '@ngxs/store';
 import { Dispatch } from '@ngxs-labs/dispatch-decorator';
 import { Observable } from 'rxjs';
 
+import { AdminPermissionChecker } from '@customer-portal/shared/directives/permissions';
 import {
-  AdminPermissionChecker,
   FilteringConfig,
   FilterOptions,
   GridConfig,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/models/grid';
 
 import {
   SettingsCompanyDetailsCountryListData,
@@ -18,7 +18,9 @@ import {
 import {
   LoadSettingsCompanyDetails,
   LoadSettingsCompanyDetailsCountryList,
+  ResetCompanyLoadAndErrorState,
   ResetSettingsCompanyDetailsState,
+  SetCompanyDetailsAdminStatus,
   UpdateEditCompanyDetailsFormValidity,
   UpdateSettingsCompanyDetails,
   UpdateSettingsCompanyDetailsEntityListFilterOptions,
@@ -34,14 +36,6 @@ export class SettingsCompanyDetailsStoreService
 
   get isUserAdmin(): Signal<boolean> {
     return this.store.selectSignal(SettingsSelectors.isUserAdmin);
-  }
-
-  get companyDetailsLoaded(): Signal<boolean> {
-    return this.store.selectSignal(SettingsSelectors.companyDetailsLoaded);
-  }
-
-  get companyDetailsLoaded$(): Observable<boolean> {
-    return this.store.select(SettingsSelectors.companyDetailsLoaded);
   }
 
   get updatePendingParentCompany(): Signal<boolean> {
@@ -94,6 +88,18 @@ export class SettingsCompanyDetailsStoreService
     );
   }
 
+  get companyDetailsError$(): Observable<string | null> {
+    return this.store.select(
+      (state) => state.settings.loadingErrors.companyDetails,
+    );
+  }
+
+  get companyDataLoaded$(): Observable<boolean> {
+    return this.store.select(
+      (state) => state.settings.loadedStates.companyDetails,
+    );
+  }
+
   @Dispatch()
   loadSettingsCompanyDetails = () => new LoadSettingsCompanyDetails();
 
@@ -120,4 +126,11 @@ export class SettingsCompanyDetailsStoreService
   @Dispatch()
   updateEditCompanyDetailsFormValidity = (isValid: boolean) =>
     new UpdateEditCompanyDetailsFormValidity(isValid);
+
+  @Dispatch()
+  resetCompanyLoadAndErrorState = () => new ResetCompanyLoadAndErrorState();
+
+  @Dispatch()
+  setCompanyDetailsAdminStatus = (isUserAdmin: boolean) =>
+    new SetCompanyDetailsAdminStatus(isUserAdmin);
 }

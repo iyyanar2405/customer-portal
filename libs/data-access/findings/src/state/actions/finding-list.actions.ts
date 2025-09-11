@@ -11,7 +11,9 @@ export class LoadFindingsListSuccess {
 
   constructor(public findingsItems: FindingListItemModel[]) {}
 }
-
+export class LoadFindingsListFail {
+  static readonly type = '[Findings List] Load Findings List Fail';
+}
 export class UpdateGridConfig {
   static readonly type = '[Findings List] Update Grid Config';
 
@@ -44,4 +46,9 @@ export class SetNavigationGridConfig {
   static readonly type = '[Fidnings List] Set Navigation Grid Config';
 
   constructor(public chartNavigationPayload: FilterValue[]) {}
+}
+
+export class ApplyNavigationFiltersFromOverview {
+  static readonly type =
+    '[FindingsList] Apply Navigation Filters From Overview';
 }

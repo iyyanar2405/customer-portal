@@ -28,6 +28,9 @@ export const OPEN_FINDINGS_GRAPH_QUERY = gql`
           }
         }
       }
+      errorCode
+      isSuccess
+      message
     }
   }
 `;

@@ -16,9 +16,10 @@ export interface ScheduleListItemModel {
   siteAuditId: number;
   siteAddress: string;
   auditID: number;
-  siteZip: number;
+  siteZip: string;
   siteCountry: string;
   siteState: string;
   reportingCountry: string;
   projectNumber: string;
+  accountDNVId: number;
 }

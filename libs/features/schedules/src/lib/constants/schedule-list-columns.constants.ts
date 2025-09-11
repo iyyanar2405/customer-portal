@@ -100,7 +100,7 @@ export const SCHEDULES_LIST_COLUMNS: ColumnDefinition[] = [
     displayName: 'schedules.scheduleList.siteAuditId',
     type: ColumnType.SearchCheckboxFilter,
     cellType: CellType.Text,
-    hidden: false,
+    hidden: true,
     fixed: false,
     sticky: false,
   },

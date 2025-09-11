@@ -1,5 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, OnInit, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarOptions, DatesSetArg } from '@fullcalendar/core';
@@ -11,10 +17,10 @@ import { CalendarModule } from 'primeng/calendar';
 import { OverviewUpcomingAuditStoreService } from '@customer-portal/data-access/overview';
 import { OverviewSharedStoreService } from '@customer-portal/overview-shared';
 import {
-  CalendarViewType,
   SharedButtonComponent,
   SharedButtonType,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/components/button';
+import { CalendarViewType } from '@customer-portal/shared/models';
 
 @Component({
   selector: 'lib-overview-upcoming-audits',
@@ -29,6 +35,7 @@ import {
   providers: [OverviewUpcomingAuditStoreService],
   templateUrl: './overview-upcoming-audits.component.html',
   styleUrl: './overview-upcoming-audits.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OverviewUpcomingAuditsComponent implements OnInit {
   visibleMonthDate?: Date;
@@ -66,7 +73,10 @@ export class OverviewUpcomingAuditsComponent implements OnInit {
   }
 
   onButtonClick(): void {
-    this.overviewSharedStoreService.setSelectedDate(this.visibleMonthDate);
+    this.overviewSharedStoreService.setSelectedDate(
+      this.visibleMonthDate,
+      CalendarViewType.Year,
+    );
   }
 
   private handleDatesSet = (viewInfo: DatesSetArg): void => {
@@ -112,6 +122,9 @@ export class OverviewUpcomingAuditsComponent implements OnInit {
   }
 
   private handleDateSelect(event: Date): void {
-    this.overviewSharedStoreService.setSelectedDate(event);
+    this.overviewSharedStoreService.setSelectedDate(
+      event,
+      CalendarViewType.Month,
+    );
   }
 }

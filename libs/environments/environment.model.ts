@@ -1,7 +1,6 @@
-// environment.model.ts
 export interface EnvironmentModel {
   api: string;
-  apiKey: string;
+  apimKey: string;
   appInsights?: {
     instrumentationKey: string;
   };
@@ -22,6 +21,7 @@ export interface EnvironmentModel {
   notificationGraphqlHost: string;
   lmsUrl: string;
   serviceNow: ServiceNowEnvironmentModel;
+  cacheDuration?: number; // in seconds
 }
 
 export interface PowerBiCredentials {
@@ -39,5 +39,6 @@ export interface ServiceNowEnvironmentModel {
     dnvSchedule: string;
     dnvCertificate: string;
     dnvCompanySettings: string;
+    dnvReschedule: string;
   };
 }

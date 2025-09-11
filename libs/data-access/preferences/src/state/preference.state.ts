@@ -1,21 +1,28 @@
 import { Injectable } from '@angular/core';
 import { Action, State, StateContext } from '@ngxs/store';
-import { tap } from 'rxjs';
+import { catchError, tap } from 'rxjs';
+
+import { throwIfNotSuccess } from '@customer-portal/shared/helpers/custom-operators';
 
 import { PreferenceModel } from '../models';
 import { PreferenceMapperService, PreferenceService } from '../services';
 import {
   LoadPreference,
+  LoadPreferenceFail,
   LoadPreferenceSuccess,
   SavePreference,
 } from './preference.actions';
 
 export interface PreferenceStateModel {
   preferenceItems: PreferenceModel[];
+  isLoading: boolean;
+  error: string | null;
 }
 
 const defaultState: PreferenceStateModel = {
   preferenceItems: [],
+  isLoading: false,
+  error: null,
 };
 
 @State<PreferenceStateModel>({
@@ -31,15 +38,18 @@ export class PreferenceState {
     ctx: StateContext<PreferenceStateModel>,
     { objectName, objectType, pageName }: LoadPreference,
   ) {
+    ctx.patchState({ isLoading: true, error: null });
+
     return this.preferenceService
       .getPreference(objectType, objectName, pageName)
       .pipe(
-        tap((result) => {
+        throwIfNotSuccess(),
+        tap((preferenceDto) => {
           const preference =
-            PreferenceMapperService.mapToPreferenceModel(result);
-
+            PreferenceMapperService.mapToPreferenceModel(preferenceDto);
           ctx.dispatch(new LoadPreferenceSuccess(preference));
         }),
+        catchError((err) => ctx.dispatch(new LoadPreferenceFail(err))),
       );
   }
 
@@ -65,6 +75,21 @@ export class PreferenceState {
     ctx.patchState({
       preferenceItems,
     });
+  }
+
+  @Action(LoadPreferenceFail)
+  loadPreferenceFail(
+    ctx: StateContext<PreferenceStateModel>,
+    { error }: LoadPreferenceFail,
+  ) {
+    let message = 'Failed to load preferences';
+
+    if (typeof error === 'object' && error && 'message' in error) {
+      message = error['message'] || message;
+    } else if (typeof error === 'string') {
+      message = error;
+    }
+    ctx.patchState({ isLoading: false, error: message });
   }
 
   @Action(SavePreference)

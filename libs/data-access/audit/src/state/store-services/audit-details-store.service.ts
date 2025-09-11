@@ -134,8 +134,20 @@ export class AuditDetailsStoreService {
     return this.store.select(AuditDetailsSelectors.subAuditFilteringConfig);
   }
 
+  get subAuditFilteringConfigSignal(): Signal<FilteringConfig> {
+    return this.store.selectSignal(
+      AuditDetailsSelectors.subAuditFilteringConfig,
+    );
+  }
+
   get auditFindingFilteringConfig(): Observable<FilteringConfig> {
     return this.store.select(AuditDetailsSelectors.auditFindingFilteringConfig);
+  }
+
+  get auditFindingFilteringConfigSignal(): Signal<FilteringConfig> {
+    return this.store.selectSignal(
+      AuditDetailsSelectors.auditFindingFilteringConfig,
+    );
   }
 
   get siteItemsFilteringConfig(): Observable<FilteringConfig> {
@@ -146,6 +158,26 @@ export class AuditDetailsStoreService {
     return this.store.select(
       AuditDetailsSelectors.auditDocumentsFilteringConfig,
     );
+  }
+
+  get isLoadingDocuments(): Signal<boolean> {
+    return this.store.selectSignal(AuditDetailsSelectors.isLoadingDocuments);
+  }
+
+  get isLoadingSites(): Signal<boolean> {
+    return this.store.selectSignal(AuditDetailsSelectors.isLoadingSites);
+  }
+
+  get isLoadingSubAudits(): Signal<boolean> {
+    return this.store.selectSignal(AuditDetailsSelectors.isLoadingSubAudits);
+  }
+
+  get isLoadingFindings(): Signal<boolean> {
+    return this.store.selectSignal(AuditDetailsSelectors.isLoadingFindings);
+  }
+
+  get auditDetailsLoading(): Signal<boolean> {
+    return this.store.selectSignal(AuditDetailsSelectors.auditDetailsLoading);
   }
 
   public auditId = toSignal(this.auditId$, { initialValue: '' });

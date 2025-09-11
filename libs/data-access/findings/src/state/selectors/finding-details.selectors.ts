@@ -1,14 +1,16 @@
 import { Selector } from '@ngxs/store';
 
+import { FindingsStatusStates } from '@customer-portal/shared/constants';
 import {
   applyGridConfig,
-  FilteringConfig,
-  FilterOptions,
-  FindingsStatusStates,
   getNumberOfFilteredRecords,
   isAnyFilterActive,
+} from '@customer-portal/shared/helpers/grid';
+import {
+  FilteringConfig,
+  FilterOptions,
   LanguageOption,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/models';
 
 import {
   FindingDetailsDescription,
@@ -112,6 +114,11 @@ export class FindingDetailsSelectors {
     return isFindingResponseFormDirty;
   }
 
+  @Selector([FindingDetailsSelectors._isLoading])
+  static isLoading(isLoading: boolean): boolean {
+    return isLoading;
+  }
+
   @Selector([FindingDetailsState])
   private static _findingDetails(
     state: FindingDetailsStateModel,
@@ -201,9 +208,9 @@ export class FindingDetailsSelectors {
   private static _documentsList(
     state: FindingDetailsStateModel,
   ): FindingDocumentListItemModel[] {
-    const { documentsList, gridConfig } = state;
+    const { documents, gridConfig } = state;
 
-    return applyGridConfig(documentsList, gridConfig);
+    return applyGridConfig(documents.list, gridConfig);
   }
 
   @Selector([FindingDetailsState])
@@ -224,9 +231,9 @@ export class FindingDetailsSelectors {
   private static _documentsListTotalFilteredRecords(
     state: FindingDetailsStateModel,
   ): number {
-    const { documentsList, gridConfig } = state;
+    const { documents, gridConfig } = state;
 
-    return getNumberOfFilteredRecords(documentsList, gridConfig);
+    return getNumberOfFilteredRecords(documents.list, gridConfig);
   }
 
   @Selector([FindingDetailsState])
@@ -246,5 +253,10 @@ export class FindingDetailsSelectors {
     state: FindingDetailsStateModel,
   ): boolean {
     return state.isFindingResponseFormDirty;
+  }
+
+  @Selector([FindingDetailsState])
+  private static _isLoading(state: FindingDetailsStateModel): boolean {
+    return state.documents.loading;
   }
 }

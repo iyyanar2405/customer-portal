@@ -74,7 +74,7 @@ export class ConfirmScheduleDetailsState {
 
     if (location === ScheduleCalendarActionLocationTypes.Calendar) {
       schedules = this.store.selectSnapshot(
-        (state) => state?.calendarSchedule?.calendarSchedule ?? [],
+        (state) => state?.scheduleListCalendar?.calendarSchedule ?? [],
       );
     } else if (location === ScheduleCalendarActionLocationTypes.List) {
       schedules = this.store.selectSnapshot(

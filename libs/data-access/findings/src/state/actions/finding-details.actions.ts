@@ -73,7 +73,9 @@ export class LoadFindingDocumentsListSuccess {
 
   constructor(public documentsList: FindingDocumentListItemModel[]) {}
 }
-
+export class LoadFindingDocumentsListFail {
+  static readonly type = '[Finding Details] Load Finding Document List failed';
+}
 export class UpdateDocumentGridConfig {
   static readonly type = '[Finding Details] Update Document Grid Config';
 

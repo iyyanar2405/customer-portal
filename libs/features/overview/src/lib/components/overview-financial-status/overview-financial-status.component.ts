@@ -1,17 +1,19 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { TranslocoDirective } from '@jsverse/transloco';
 
 import { OverviewFinancialStatusStoreService } from '@customer-portal/data-access/overview';
 import { OverviewSharedStoreService } from '@customer-portal/overview-shared';
 import {
-  ChartComponent,
-  ChartFilter,
-  ChartTypeEnum,
-  FilterValue,
   SharedButtonComponent,
   SharedButtonType,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/components/button';
+import { ChartComponent } from '@customer-portal/shared/components/chart';
+import {
+  ChartFilter,
+  ChartTypeEnum,
+} from '@customer-portal/shared/models/chart';
+import { FilterValue } from '@customer-portal/shared/models/grid';
 
 import { OVERVIEW_FINANCIALS_STATUS_OPTIONS } from '../../constants';
 
@@ -110,6 +112,7 @@ const customLegendFontPlugin = {
   ],
   templateUrl: './overview-financial-status.component.html',
   styleUrl: './overview-financial-status.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OverviewFinancialStatusComponent implements OnInit {
   overviewFinancialsStatusOptions = OVERVIEW_FINANCIALS_STATUS_OPTIONS;

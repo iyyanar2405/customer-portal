@@ -29,5 +29,5 @@ export class ResetSelectedCobrowsingCompany {
 export class UpdateImpersonatedUser {
   static readonly type = '[Settings] Update Impersonated User';
 
-  constructor(public impersonatedUserEmail: string) {}
+  constructor(public impersonatedUserEmail: string | null) {}
 }

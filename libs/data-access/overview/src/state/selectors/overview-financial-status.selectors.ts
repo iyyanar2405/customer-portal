@@ -15,10 +15,20 @@ export class OverviewFinancialStatusSelectors {
     return state.overviewFinancialStatusGraphData;
   }
 
+  @Selector([OverviewFinancialStatusSelectors._isLoading])
+  static isLoading(_isLoading: boolean): boolean {
+    return _isLoading;
+  }
+
   @Selector([OverviewFinancialStatusState])
   static overviewFinancialStatusError(
     state: OverviewFinancialStatusStateModel,
   ): boolean {
     return state.overviewFinancialStatusError;
+  }
+
+  @Selector([OverviewFinancialStatusState])
+  private static _isLoading(state: OverviewFinancialStatusStateModel): boolean {
+    return state.isLoading;
   }
 }

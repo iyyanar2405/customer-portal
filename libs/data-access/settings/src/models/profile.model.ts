@@ -35,6 +35,7 @@ export interface UserPermissions {
     noAccess: boolean;
     view: boolean;
     edit: boolean;
+    submit?: boolean;
   };
 }
 
@@ -57,4 +58,9 @@ export interface UserValidation {
   userIsActive: boolean;
   termsAcceptanceRedirectUrl: string;
   policySubCode: null | number;
+  isDnvUser: boolean;
+  userEmail: string;
+  veracityId: string;
+  portalLanguage: string;
+  isAdmin: boolean;
 }

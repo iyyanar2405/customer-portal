@@ -1,10 +1,8 @@
 import { SecurityContext } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 
-import {
-  convertToUtcDate,
-  mapApiResponseToPageName,
-} from '@customer-portal/shared';
+import { mapApiResponseToPageName } from '@customer-portal/shared/helpers';
+import { convertToUtcDate } from '@customer-portal/shared/helpers/date';
 
 import { NotificationListDto, NotificationsDto } from '../../dtos';
 import { NotificationModel } from '../../models';
@@ -18,7 +16,7 @@ export class NotificationsListMapperService {
       return [];
     }
 
-    const { items } = dto;
+    const { items } = dto.data;
 
     return items.map((notification: NotificationsDto) => ({
       id: notification.infoId,
@@ -27,9 +25,11 @@ export class NotificationsListMapperService {
       title: notification.subject,
       message:
         domSanitizer.sanitize(SecurityContext.HTML, notification.message) ?? '',
+      language: notification.language,
       receivedOn: convertToUtcDate(notification.createdTime),
       entityType: mapApiResponseToPageName(notification.entityType),
       entityId: notification.entityId,
+      snowLink: notification.snowLink,
       actions: [
         {
           actionType: 'redirect',
@@ -40,8 +40,8 @@ export class NotificationsListMapperService {
       ],
       iconTooltip: {
         displayIcon: notification.readStatus === false,
-        iconClass: 'pi pi-circle-fill',
-        iconPosition: 'prefix',
+        iconClass: '',
+        iconPosition: '',
         tooltipMessage: 'Audit plan available',
       },
     }));

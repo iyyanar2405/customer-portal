@@ -6,6 +6,14 @@
       (clickEvent)="onReschedule()">
     </shared-button>
   }
+    @if (!isDnvUser()) {
+      <shared-button 
+        class="request-changes-button"
+        [label]="t('serviceNow.requestChanges')" 
+        [type]="sharedButtonType.Outline"
+        (clickEvent)="onRequestChanges()">
+      </shared-button>
+    }
 
   @if (isConfirmVisible()) {
     <shared-button

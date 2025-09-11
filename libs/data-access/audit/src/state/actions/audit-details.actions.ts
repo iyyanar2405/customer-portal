@@ -34,7 +34,9 @@ export class LoadAuditFindingsListSuccess {
 
   constructor(public auditFindingItems: AuditFindingListItemModel[]) {}
 }
-
+export class LoadAuditFindingsListFail {
+  static readonly type = '[Audit Details] Load Findings List Fail';
+}
 export class UpdateAuditFindingListGridConfig {
   static readonly type =
     '[Audit Details] Update Audit Finding List Grid Config';
@@ -69,7 +71,9 @@ export class LoadSubAuditListSuccess {
 
   constructor(public subAuditItems: SubAuditListItemModel[]) {}
 }
-
+export class LoadSubAuditListFail {
+  static readonly type = '[Audit Details] Load Audit List Fail';
+}
 export class UpdateSubAuditListGridConfig {
   static readonly type = '[Audit Details] Update SubAudit Grid Config';
 
@@ -91,6 +95,7 @@ export class ExportSubAuditExcelSuccess {
 
   constructor(public input: number[]) {}
 }
+
 // #endregion SubAuditList
 
 // #region AuditSitesList
@@ -104,7 +109,9 @@ export class LoadAuditSitesListSuccess {
 
   constructor(public auditSiteItems: AuditSiteListItemModel[]) {}
 }
-
+export class LoadAuditSitesListFail {
+  static readonly type = '[Audit Details] Load Audit Sites List Fail';
+}
 export class UpdateAuditSitesListGridConfig {
   static readonly type = '[Audit Details] Update Audit Sites Grid Config';
 
@@ -131,11 +138,19 @@ export class LoadAuditDocumentsListSuccess {
 
   constructor(public auditDocumentsList: AuditDocumentListItemModel[]) {}
 }
-
+export class LoadAuditDocumentsListFail {
+  static readonly type = '[Audit Details] Load Audit Documents List Fail';
+}
 export class UpdateAuditDocumentsListGridConfig {
   static readonly type = '[Audit Details] Update Audit Documents Grid Config';
 
   constructor(public auditDocumentsGridConfig: GridConfig) {}
+}
+
+export class LoadAuditHeaderDocDetails {
+  static readonly type = '[AuditDetails] Load Audit Header Docs';
+
+  constructor(public auditId: string) {}
 }
 
 export class UpdateAuditDocumentsListFilterOptions {

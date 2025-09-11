@@ -1,4 +1,4 @@
-@defer (when (isLoading | async) === false) {
+@if (auditDetails().header) {
   <ng-container *transloco="let t">
     <section aria-labelledby="audit-details-head" class="head" role="region">
       <h1 id="audit-details-head">
@@ -63,20 +63,24 @@
 
         <div class="buttons">
           <shared-button
+            #planDownloadBtn
             [icon]="'download'"
             [isDisabled]="!auditDetails().header.auditPlanDocId.length"
             [label]="t('audit.auditDetailsDescription.downloadPlanLabel')"
             [type]="sharedButtonType.Secondary"
-            (clickEvent)="handleDownload(auditDetails().header.auditPlanDocId)">
+            (clickEvent)="
+              handleDownload(auditDetails().header.auditPlanDocId, 'plan')
+            ">
           </shared-button>
 
           <shared-button
+            #reportDownloadBtn
             [icon]="'download'"
             [isDisabled]="!auditDetails().header.auditReportDocId.length"
             [label]="t('audit.auditDetailsDescription.downloadReportLabel')"
             [type]="sharedButtonType.Secondary"
             (clickEvent)="
-              handleDownload(auditDetails().header.auditReportDocId)
+              handleDownload(auditDetails().header.auditReportDocId, 'report')
             ">
           </shared-button>
         </div>
@@ -85,6 +89,4 @@
       <lib-audit-tab-view></lib-audit-tab-view>
     </section>
   </ng-container>
-} @placeholder {
-  <div></div>
 }

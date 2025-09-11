@@ -1,5 +1,6 @@
 @if (isPreferenceInitialized | async) {
   <shared-grid
+    #grid
     class="table-list"
     dataKey="audit"
     [columns]="cols"
@@ -10,6 +11,7 @@
     [filterOptions]="auditListStoreService.filterOptions()"
     [filteringConfig$]="auditListStoreService.filteringConfig"
     [hasActiveFilters]="auditListStoreService.hasActiveFilters()"
+    [isLoading]="auditListStoreService.isLoading()"
     [paginator]="true"
     [preferenceData]="preferenceData()"
     [route]="'/audits/'"

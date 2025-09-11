@@ -16,6 +16,10 @@ export class OverviewUpcomingAuditStoreService {
     );
   }
 
+  get isLoading(): Signal<boolean> {
+    return this.store.selectSignal(OverviewUpcomingAuditsSelectors.isLoading);
+  }
+
   @Dispatch()
   loadOverviewUpcomingAuditEvents = (
     selectedMonth: number,

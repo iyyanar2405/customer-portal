@@ -2,11 +2,13 @@ import { Selector } from '@ngxs/store';
 
 import {
   applyGridConfig,
-  FilteringConfig,
-  FilterOptions,
   getNumberOfFilteredRecords,
   isAnyFilterActive,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/helpers/grid';
+import {
+  FilteringConfig,
+  FilterOptions,
+} from '@customer-portal/shared/models/grid';
 
 import { ContractsListItemModel } from '../../models';
 import {
@@ -42,6 +44,11 @@ export class ContractsListSelectors {
     return hasActiveFilters;
   }
 
+  @Selector([ContractsListSelectors._isLoading])
+  static isLoading(isLoading: boolean): boolean {
+    return isLoading;
+  }
+
   @Selector([ContractsListState])
   private static _contracts(
     state: ContractsListStateModel,
@@ -73,5 +80,10 @@ export class ContractsListSelectors {
   @Selector([ContractsListState])
   private static _hasActiveFilters(state: ContractsListStateModel): boolean {
     return isAnyFilterActive(state.gridConfig.filtering);
+  }
+
+  @Selector([ContractsListState])
+  private static _isLoading(state: ContractsListStateModel): boolean {
+    return state.isLoading;
   }
 }

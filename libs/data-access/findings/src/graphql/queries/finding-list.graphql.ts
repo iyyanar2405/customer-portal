@@ -9,19 +9,20 @@ export const FINDING_LIST_QUERY = gql`
         title
         status
         category
-        companyName
+        response
+        companyId
         openDate
         dueDate
         acceptedDate
         closedDate
-        sites
+        siteId
         services
-        cities
-        countries
+        __typename
       }
       isSuccess
       message
       errorCode
+      __typename
     }
   }
 `;

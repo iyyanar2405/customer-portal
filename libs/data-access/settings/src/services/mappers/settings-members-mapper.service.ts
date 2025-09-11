@@ -287,17 +287,19 @@ export class SettingsMembersMapper {
   static mapToMemberSites(
     data: SettingsMembersPermissionsDataModel,
     selectedServiceIds: number[],
+    selectedCompanyIds: number[],
   ): TreeNode[] {
     const countryMap = new Map<string | number, Country>();
-
     const countries = data.data.flatMap((d) =>
-      d.companies.flatMap((company) =>
-        company.services.flatMap((service) =>
-          selectedServiceIds.includes(service.serviceId)
-            ? service.countries
-            : [],
+      d.companies
+        .filter((company) => selectedCompanyIds.includes(company.companyId))
+        .flatMap((company) =>
+          company.services.flatMap((service) =>
+            selectedServiceIds.includes(service.serviceId)
+              ? service.countries
+              : [],
+          ),
         ),
-      ),
     );
 
     countries.forEach((country) => {
@@ -372,47 +374,61 @@ export class SettingsMembersMapper {
     data: SettingsMembersPermissionsDataModel,
     selectedSiteIds: (string | number)[],
   ): any[] => {
-    const uniqueServicesMap = new Map<number | string, any>();
-    const uniqueCountriesMap = new Map<number | string, any>();
+    const countryMap = new Map<
+      number,
+      { countryId: number; countryName: string; cities: any[] }
+    >();
 
-    const uniqueServices = data.data
-      .flatMap((d) => d.companies)
-      .flatMap((company) => company.services)
-      .filter((service) => {
-        if (!uniqueServicesMap.has(service.serviceId)) {
-          uniqueServicesMap.set(service.serviceId, service);
+    data.data.forEach((user) => {
+      user.companies.forEach((company) => {
+        company.services.forEach((service) => {
+          service.countries.forEach((country) => {
+            if (!countryMap.has(country.countryId)) {
+              countryMap.set(country.countryId, {
+                countryId: country.countryId,
+                countryName: country.countryName,
+                cities: [],
+              });
+            }
+            const countryEntry = countryMap.get(country.countryId)!;
+            country.cities.forEach((city) => {
+              let cityEntry = countryEntry.cities.find(
+                (c) => c.cityName === city.cityName,
+              );
 
-          return true;
-        }
+              if (!cityEntry) {
+                cityEntry = { cityName: city.cityName, sites: [] };
+                countryEntry.cities.push(cityEntry);
+              }
 
-        return false;
+              const existingSiteIds = new Set(
+                cityEntry.sites.map((s: any) => s.siteId),
+              );
+
+              city.sites.forEach((site) => {
+                if (
+                  selectedSiteIds.includes(site.siteId ?? '') &&
+                  !existingSiteIds.has(site.siteId)
+                ) {
+                  cityEntry.sites.push({
+                    siteId: site.siteId,
+                    siteName: site.siteName,
+                  });
+                  existingSiteIds.add(site.siteId);
+                }
+              });
+            });
+          });
+        });
       });
+    });
 
-    return uniqueServices.flatMap((service) =>
-      service.countries
-        .filter((country) => {
-          if (!uniqueCountriesMap.has(country.countryId)) {
-            uniqueCountriesMap.set(country.countryId, country);
-
-            return true;
-          }
-
-          return false;
-        })
-        .map((country) => ({
-          countryId: Number(country.countryId),
-          countryName: country.countryName,
-          cities: country.cities
-            .map((city) => ({
-              cityName: city.cityName,
-              sites: city.sites.filter((site) =>
-                selectedSiteIds.includes(site.siteId!),
-              ),
-            }))
-            .filter((city) => city.sites.length > 0),
-        }))
-        .filter((country) => country.cities.length > 0),
-    );
+    return Array.from(countryMap.values())
+      .map((country) => ({
+        ...country,
+        cities: country.cities.filter((city) => city.sites.length > 0),
+      }))
+      .filter((country) => country.cities.length > 0);
   };
 
   public static getActions(

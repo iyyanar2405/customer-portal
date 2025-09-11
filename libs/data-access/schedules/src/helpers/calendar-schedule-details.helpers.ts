@@ -1,8 +1,8 @@
+import { CURRENT_DATE_FORMAT } from '@customer-portal/shared/constants';
 import {
   convertToUtcDate,
-  CURRENT_DATE_FORMAT,
   utcDateToPayloadFormat,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/helpers/date';
 
 import {
   ScheduleCalendarActionLocationTypes,

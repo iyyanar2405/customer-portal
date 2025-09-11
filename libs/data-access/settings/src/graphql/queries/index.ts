@@ -10,3 +10,5 @@ export * from './settings-user-details-to-manage-permission.graphql';
 export * from './settings-submit-manage-members-permissions.graphql';
 export * from './settings-user-validation.graphql';
 export * from './co-browsing-company-list.graphql';
+export * from './site-master-list.graphql';
+export * from './service-master-list.graphql';

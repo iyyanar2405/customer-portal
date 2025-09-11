@@ -7,6 +7,7 @@ import {
   ContractsListService,
   ContractsListState,
 } from '@customer-portal/data-access/contracts';
+import { DocumentsState } from '@customer-portal/data-access/documents/state/documents.state';
 import { Language } from '@customer-portal/shared';
 
 export const loader = [Language.English, Language.Italian].reduce(
@@ -34,7 +35,9 @@ export const CONTRACTS_ROUTES = [
         scope: 'contracts',
         loader,
       }),
-      importProvidersFrom(NgxsModule.forFeature([ContractsListState])),
+      importProvidersFrom(
+        NgxsModule.forFeature([ContractsListState, DocumentsState]),
+      ),
       {
         provide: CONTRACTS_LIST_SERVICE,
         useClass: ContractsListService,

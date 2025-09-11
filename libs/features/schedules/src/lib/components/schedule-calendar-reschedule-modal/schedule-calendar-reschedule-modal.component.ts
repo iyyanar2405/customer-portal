@@ -25,11 +25,11 @@ import {
   ConfirmScheduleDetailsStoreService,
   ScheduleCalendarActionStoreService,
 } from '@customer-portal/data-access/schedules';
-import {
-  calculateWeekRange,
-  CURRENT_DATE_FORMAT,
-  CustomDatePipe,
-} from '@customer-portal/shared';
+import { CURRENT_DATE_FORMAT } from '@customer-portal/shared/constants';
+import { calculateWeekRange } from '@customer-portal/shared/helpers/date';
+import { CustomDatePipe } from '@customer-portal/shared/pipes/custom-date.pipe';
+
+import { RescheduleAction } from '../../constants/schedule-list-reschedule.enum';
 
 @Component({
   selector: 'lib-schedule-calendar-reschedule-modal',
@@ -55,6 +55,7 @@ export class ScheduleCalendarRescheduleModalComponent implements OnInit {
   public calendarDefaultDate!: Date;
   public calendarMinDate: Date = new Date();
   public form!: FormGroup;
+  public rescheduleState!: RescheduleAction;
 
   constructor(
     private readonly config: DynamicDialogConfig,
@@ -71,6 +72,7 @@ export class ScheduleCalendarRescheduleModalComponent implements OnInit {
       this.config.data.id,
       this.config.data.location,
     );
+    this.rescheduleState = this.config.data.rescheduleState;
     this.scheduleCalendarActionStoreService.loadScheduleCalendarRescheduleReasons();
     this.setFormGroup();
     this.setFormObs();

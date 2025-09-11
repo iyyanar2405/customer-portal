@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { CardModule } from 'primeng/card';
 
@@ -8,7 +8,7 @@ import { environment } from '@customer-portal/environments';
 import {
   SharedButtonComponent,
   SharedButtonType,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/components/button';
 
 @Component({
   selector: 'lib-overview-training-status',
@@ -21,6 +21,7 @@ import {
   providers: [TrainingStatusStoreService],
   templateUrl: './overview-training-status.component.html',
   styleUrl: './overview-training-status.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OverviewTrainingStatusComponent implements OnInit {
   trainingStatusCount = 2;

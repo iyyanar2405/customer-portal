@@ -11,4 +11,5 @@ export enum PermissionsList {
   NoAccess = 'noAccess',
   View = 'view',
   Edit = 'edit',
+  Submit = 'submit',
 }

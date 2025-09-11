@@ -12,6 +12,10 @@ export class LoadContractsListSuccess {
   constructor(public contracts: ContractsListItemModel[]) {}
 }
 
+export class LoadContractsListFail {
+  static readonly type = '[Contracts List] Load Contracts List Fail';
+}
+
 export class UpdateGridConfig {
   static readonly type = '[Contracts List] Update Grid Config';
 

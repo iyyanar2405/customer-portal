@@ -8,29 +8,29 @@ export const FINDINGS_BY_CLAUSE_LIST_QUERY = gql`
       data {
         data {
           name
-          majorCount
-          minorCount
-          observationCount
-          toImproveCount
           totalCount
+          categoryCounts {
+            key
+            value
+          }
         }
         children {
           data {
             name
-            majorCount
-            minorCount
-            observationCount
-            toImproveCount
             totalCount
+            categoryCounts {
+              key
+              value
+            }
           }
           children {
             data {
               name
-              majorCount
-              minorCount
-              observationCount
-              toImproveCount
               totalCount
+              categoryCounts {
+                key
+                value
+              }
             }
           }
         }

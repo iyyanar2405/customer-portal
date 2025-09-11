@@ -33,6 +33,7 @@ export class ProfileMapperService {
           noAccess: role.roleLevel.includes(UserRoles.NoAccess),
           view: role.roleLevel.includes(UserRoles.View),
           edit: role.roleLevel.includes(UserRoles.Edit),
+          submit: role.roleLevel.includes(UserRoles.Submit),
         },
       ]),
     );

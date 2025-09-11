@@ -1,10 +1,14 @@
 import {
-  COLUMN_DELIMITER,
+  ServiceMasterListItemModel,
+  SiteMasterListItemModel,
+} from '@customer-portal/data-access/global';
+import { COLUMN_DELIMITER } from '@customer-portal/shared/constants';
+import {
   convertToUtcDate,
-  FilteringConfig,
-  mapFilterConfigToValues,
   utcDateToPayloadFormat,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/helpers/date';
+import { mapFilterConfigToValues } from '@customer-portal/shared/helpers/grid';
+import { FilteringConfig } from '@customer-portal/shared/models/grid';
 
 import {
   AuditExcelPayloadDto,
@@ -14,23 +18,50 @@ import {
 import { AuditListItemModel } from '../../models';
 
 export class AuditListMapperService {
-  static mapToAuditItemModel(dto: AuditListDto): AuditListItemModel[] {
+  static mapToAuditItemModel(
+    dto: AuditListDto,
+    siteMasterList: SiteMasterListItemModel[],
+    serviceMasterList: ServiceMasterListItemModel[],
+  ): AuditListItemModel[] {
     if (!dto?.data) {
       return [];
     }
 
     const { data } = dto;
 
-    return data.map((audit: AuditListItemDto) => {
-      const services = Array.from(new Set(audit.services)).join(
-        COLUMN_DELIMITER,
-      );
+    const serviceMap = new Map(
+      serviceMasterList.map((s) => [s.id, s.serviceName]),
+    );
+    const siteMap = new Map(siteMasterList.map((s) => [s.id, s]));
+    const companyMap = new Map(siteMasterList.map((s) => [s.companyId, s]));
 
-      const sites = Array.from(new Set(audit.sites)).join(COLUMN_DELIMITER);
-      const countries = Array.from(new Set(audit.countries)).join(
-        COLUMN_DELIMITER,
-      );
-      const cities = Array.from(new Set(audit.cities)).join(COLUMN_DELIMITER);
+    const result = data.map((audit: AuditListItemDto) => {
+      const services = Array.from(
+        new Set(
+          (audit.services || [])
+            .map((serviceId) => serviceMap.get(serviceId))
+            .filter(Boolean),
+        ),
+      ).join(COLUMN_DELIMITER);
+
+      const matchedSites = (audit.sites || [])
+        .map((siteId) => siteMap.get(siteId))
+        .filter(Boolean);
+
+      const siteNames = Array.from(
+        new Set(matchedSites.map((site) => site?.siteName).filter(Boolean)),
+      ).join(COLUMN_DELIMITER);
+
+      const cities = Array.from(
+        new Set(matchedSites.map((site) => site?.city).filter(Boolean)),
+      ).join(COLUMN_DELIMITER);
+
+      const countries = Array.from(
+        new Set(matchedSites.map((site) => site?.countryName).filter(Boolean)),
+      ).join(COLUMN_DELIMITER);
+
+      const companySite = companyMap.get(audit.companyId);
+      const companyName = companySite?.companyName ?? '';
 
       return {
         auditNumber: String(audit.auditId),
@@ -39,13 +70,15 @@ export class AuditListMapperService {
         city: cities,
         country: countries,
         service: services,
-        companyName: audit.companyName,
-        site: sites,
+        companyName,
+        site: siteNames,
         leadAuthor: audit.leadAuditor,
         status: audit.status,
         type: audit.type,
       };
     });
+
+    return result;
   }
 
   static mapToAuditExcelPayloadDto(

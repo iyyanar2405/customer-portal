@@ -1,9 +1,13 @@
-import { FilterValue } from '@customer-portal/shared';
+import { CalendarViewType } from '@customer-portal/shared/models';
+import { FilterValue } from '@customer-portal/shared/models/grid';
 
 export class OverviewUpcomingSetSelectedDate {
   static readonly type = '[Overview Shared] Set Selected Date';
 
-  constructor(public date: Date | undefined) {}
+  constructor(
+    public date: Date | undefined,
+    public calendarViewType: CalendarViewType,
+  ) {}
 }
 
 export class OverviewFinancialNavigateToListView {
@@ -26,17 +30,13 @@ export class ResetOverviewSharedState {
 export abstract class NavigateFromOverviewCardAction {
   constructor(public overviewCardFilters: FilterValue[]) {}
 }
-export class NavigateFromOverviewCardToAuditListView extends NavigateFromOverviewCardAction {
-  static readonly type =
-    '[Overview Shared] Navigate From Overview Card To Audit List View';
+
+export class SetNavigationFilters {
+  static readonly type = '[OverviewShared] Set Navigation Filters';
+
+  constructor(public filters: FilterValue[]) {}
 }
 
-export class NavigateFromOverviewCardToScheduleListView extends NavigateFromOverviewCardAction {
-  static readonly type =
-    '[Overview Shared] Navigate From Overview Card To Schedule List View';
-}
-
-export class NavigateFromOverviewCardToFindingsListView extends NavigateFromOverviewCardAction {
-  static readonly type =
-    '[Overview Shared] Navigate From Overview Card To Findings List View';
+export class ClearNavigationFilters {
+  static readonly type = '[OverviewShared] Clear Navigation Filters';
 }

@@ -46,7 +46,7 @@ export class NotificationListService {
           pageSize,
         },
       })
-      .pipe(map((results: any) => results?.data?.notifications?.data));
+      .pipe(map((results: any) => results?.data?.notifications));
   }
 
   updateNotification(id: number): Observable<boolean> {

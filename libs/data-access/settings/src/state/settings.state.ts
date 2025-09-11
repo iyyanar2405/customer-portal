@@ -1,24 +1,20 @@
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
 import { TranslocoService } from '@jsverse/transloco';
 import { Action, State, StateContext } from '@ngxs/store';
 import { MessageService, TreeNode } from 'primeng/api';
-import { concatMap, EMPTY, filter, map, Observable, of, take, tap } from 'rxjs';
+import { EMPTY, filter, map, Observable, tap } from 'rxjs';
 
+import { DEFAULT_GRID_CONFIG } from '@customer-portal/shared/constants';
+import { getToastContentBySeverity } from '@customer-portal/shared/helpers/custom-toast';
+import { getFilterOptions } from '@customer-portal/shared/helpers/grid';
 import {
-  AppPagesEnum,
-  CoBrowsingCookieService,
-  CoBrowsingSharedService,
-  DEFAULT_GRID_CONFIG,
   FilterableColumnDefinition,
-  FilterOptions,
-  getFilterOptions,
-  getToastContentBySeverity,
-  GridConfig,
   Language,
-  LocaleService,
   ToastSeverity,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/models';
+import { FilterOptions, GridConfig } from '@customer-portal/shared/models/grid';
+import { CoBrowsingCookieService } from '@customer-portal/shared/services/co-browsing';
+import { LocaleService } from '@customer-portal/shared/services/locale';
 
 import {
   CoBrowsingCompanyListDto,
@@ -26,8 +22,6 @@ import {
   SettingsAdminListDto,
   SettingsCompanyDetailsCountryListDataDto,
   SettingsCompanyDetailsCountryListDto,
-  SettingsCompanyDetailsDataDto,
-  SettingsCompanyDetailsDto,
   SettingsMembersListDto,
   SettingsMembersPermissionsDto,
   SettingsMembersRolesDto,
@@ -100,13 +94,17 @@ import {
   RemoveMemberError,
   RemoveMemberSuccess,
   ResetAdminListState,
+  ResetCompanyLoadAndErrorState,
   ResetMembersListState,
+  ResetProfileLoadAndErrorState,
   ResetSelectedCobrowsingCompany,
   ResetSettingsCompanyDetailsState,
   SaveMemberPermissionsCompanies,
   SaveMemberPermissionsServices,
   SaveMemberPermissionsSites,
+  SetCompanyDetailsAdminStatus,
   SetInitialLoginStatus,
+  SetProfileLanguage,
   SubmitManageMembersPermissions,
   SubmitManageMembersPermissionsError,
   SubmitManageMembersPermissionsSuccess,
@@ -137,12 +135,17 @@ import {
   UpdateSubmitSettingsValues,
 } from './actions';
 
+interface LoadingErrorState {
+  profileData: string | null;
+  profileLanguage: string | null;
+  companyDetails: string | null;
+}
+
 export interface SettingsStateModel {
   isUserAdmin: boolean;
   isInitialLogin: boolean;
   parentCompany: SettingsCompanyDetailsData | null;
   legalEntityList: SettingsCompanyDetailsData[];
-  companyDetailsLoaded: boolean;
   legalEntityListCounter: number;
   legalEntityGridConfig: GridConfig;
   legalEntityFilterOptions: FilterOptions;
@@ -181,6 +184,12 @@ export interface SettingsStateModel {
   adminViewCompanyList: CoBrowsingCompany[];
   selectedCoBrowsingCompany: CoBrowsingCompany | null;
   selectedCoBrowsingCompanyId: string | null;
+  loadingErrors: LoadingErrorState;
+  loadedStates: {
+    profileData: boolean;
+    profileLanguage: boolean;
+    companyDetails: boolean;
+  };
 }
 
 const defaultState: SettingsStateModel = {
@@ -188,7 +197,6 @@ const defaultState: SettingsStateModel = {
   isInitialLogin: true,
   parentCompany: null,
   legalEntityList: [],
-  companyDetailsLoaded: false,
   legalEntityListCounter: 0,
   legalEntityGridConfig: DEFAULT_GRID_CONFIG,
   legalEntityFilterOptions: {},
@@ -239,6 +247,16 @@ const defaultState: SettingsStateModel = {
   adminViewCompanyList: [],
   selectedCoBrowsingCompany: null,
   selectedCoBrowsingCompanyId: null,
+  loadingErrors: {
+    profileData: null,
+    profileLanguage: null,
+    companyDetails: null,
+  },
+  loadedStates: {
+    profileData: false,
+    profileLanguage: false,
+    companyDetails: false,
+  },
 };
 
 const COLUMNS_DEFINITION: FilterableColumnDefinition[] = [
@@ -272,9 +290,7 @@ export class SettingsState {
     private readonly settingsMembersPermissionsService: SettingsMembersPermissionsService,
     private readonly settingsUserDetailsToManagePermission: SettingsUserDetailsToManagePermission,
     private readonly coBrowsingCompanyListService: CoBrowsingCompanyListService,
-    private readonly coBrowsingSharedService: CoBrowsingSharedService,
     private readonly coBrowsingCookieService: CoBrowsingCookieService,
-    private readonly router: Router,
   ) {}
 
   // #region InitialLogin
@@ -643,10 +659,12 @@ export class SettingsState {
       ]);
     }
 
-    const { selectedSiteIds, permissionsData } = ctx.getState();
+    const { selectedSiteIds, permissionsData, selectedCompanyIds } =
+      ctx.getState();
     const sites = SettingsMembersMapper.mapToMemberSites(
       permissionsData!,
       selectedServiceIds,
+      selectedCompanyIds!,
     );
 
     if (selectedSiteIds?.length) {
@@ -784,6 +802,7 @@ export class SettingsState {
 
           ctx.dispatch(new DiscardNewMemberFormInfo());
           ctx.dispatch(new DiscardMemberPermissionsUserSelection());
+          ctx.dispatch(new DiscardMemberPermissionsDataAndCompanies());
         }),
       );
   }
@@ -886,14 +905,45 @@ export class SettingsState {
   @Action(LoadProfileData)
   loadProfileData(ctx: StateContext<SettingsStateModel>) {
     return this.profileService.getProfileData().pipe(
-      filter((profileDto) => profileDto.isSuccess),
-      tap((profileDto) => {
-        const profileData =
-          ProfileMapperService.mapToProfileItemModel(profileDto);
+      map((profileDto) => {
+        if (!profileDto || !profileDto.isSuccess) {
+          const errorMessage =
+            profileDto?.message || 'Failed to load profile data';
+          const currentState = ctx.getState();
+          ctx.patchState({
+            loadingErrors: {
+              ...currentState.loadingErrors,
+              profileData: errorMessage,
+            },
+            loadedStates: {
+              ...currentState.loadedStates,
+              profileData: true,
+            },
+          });
 
-        if (profileData?.information) {
-          ctx.patchState({ information: profileData?.information });
+          return profileDto;
         }
+
+        return profileDto;
+      }),
+      filter((profileDto) => profileDto?.isSuccess ?? false),
+      tap((profileDto) => {
+        const currentState = ctx.getState();
+        const profileData = ProfileMapperService.mapToProfileItemModel(
+          profileDto!,
+        );
+
+        ctx.patchState({
+          information: profileData?.information,
+          loadedStates: {
+            ...currentState.loadedStates,
+            profileData: true,
+          },
+          loadingErrors: {
+            ...currentState.loadingErrors,
+            profileData: null,
+          },
+        });
       }),
     );
   }
@@ -966,12 +1016,48 @@ export class SettingsState {
   @Action(LoadProfileLanguage)
   loadProfileLanguage(ctx: StateContext<SettingsStateModel>) {
     return this.profileLanguageService.getProfileLanguage().pipe(
+      map((profileDto) => {
+        if (!profileDto || !profileDto.isSuccess) {
+          const currentState = ctx.getState();
+          const errorMessage =
+            profileDto?.message || 'Failed to load profile language';
+          ctx.patchState({
+            loadingErrors: {
+              ...currentState.loadingErrors,
+              profileLanguage: errorMessage,
+            },
+            loadedStates: {
+              ...currentState.loadedStates,
+              profileLanguage: true,
+            },
+          });
+
+          return profileDto;
+        }
+
+        return profileDto;
+      }),
+      filter(
+        (profileDto): profileDto is ProfileLanguageDto =>
+          !!profileDto && profileDto.isSuccess,
+      ),
       tap((dto: ProfileLanguageDto) => {
+        const currentState = ctx.getState();
         ctx.dispatch(
           new LoadProfileLanguageSuccess(
             ProfileLanguageMapperService.mapToProfileLanguageModel(dto),
           ),
         );
+        ctx.patchState({
+          loadedStates: {
+            ...currentState.loadedStates,
+            profileLanguage: true,
+          },
+          loadingErrors: {
+            ...currentState.loadingErrors,
+            profileLanguage: null,
+          },
+        });
       }),
     );
   }
@@ -986,6 +1072,16 @@ export class SettingsState {
     ctx.patchState({ languageLabel });
   }
 
+  @Action(SetProfileLanguage)
+  setProfileLanguage(
+    ctx: StateContext<SettingsStateModel>,
+    { languageLabel }: SetProfileLanguage,
+  ) {
+    this.localeService.setLocale(languageLabel);
+    this.translocoService.setActiveLang(languageLabel);
+    ctx.patchState({ languageLabel: languageLabel as Language });
+  }
+
   @Action(UpdateProfileLanguage)
   updateProfileLanguage(
     ctx: StateContext<SettingsStateModel>,
@@ -995,11 +1091,20 @@ export class SettingsState {
       .updateProfileLanguage(languageLabel)
       .pipe(
         tap((dto: ProfileLanguageDto) => {
-          ctx.dispatch(
-            new UpdateProfileLanguageSuccess(
-              ProfileLanguageMapperService.mapToProfileLanguageModel(dto),
-            ),
-          );
+          if (!dto?.isSuccess) {
+            const message = getToastContentBySeverity(ToastSeverity.Error);
+            const entityType = this.translocoService.translate('language');
+            message.summary = this.translocoService.translate('error.update', {
+              entityType,
+            });
+            this.messageService.add(message);
+          } else {
+            ctx.dispatch(
+              new UpdateProfileLanguageSuccess(
+                ProfileLanguageMapperService.mapToProfileLanguageModel(dto),
+              ),
+            );
+          }
         }),
       );
   }
@@ -1033,21 +1138,58 @@ export class SettingsState {
   }
 
   // #endregion ProfileSection
-
   // #region SettingsCompanyDetails
 
   @Action(LoadSettingsCompanyDetails)
   loadSettingsCompanyDetails(ctx: StateContext<SettingsStateModel>) {
-    return this.getSettingsCompanyDetails().pipe(
-      tap((data) => {
+    return this.settingsCompanyDetailsService.getSettingsCompanyDetails().pipe(
+      map((companyDto) => {
+        if (!companyDto || !companyDto.isSuccess) {
+          const currentState = ctx.getState();
+          const errorMessage =
+            companyDto?.message || 'Failed to load company data';
+          ctx.patchState({
+            loadingErrors: {
+              ...currentState.loadingErrors,
+              companyDetails: errorMessage,
+            },
+            loadedStates: {
+              ...currentState.loadedStates,
+              companyDetails: true,
+            },
+          });
+
+          return companyDto;
+        }
+
+        return companyDto;
+      }),
+      filter((companyDto) => companyDto?.isSuccess ?? false),
+      tap((companyDto) => {
+        const currentState = ctx.getState();
         ctx.dispatch(
           new LoadSettingsCompanyDetailsSuccess(
             SettingsCompanyDetailsMapperService.mapToSettingsCompanyDetailsModel(
-              data,
+              companyDto?.data ?? {
+                isAdmin: false,
+                legalEntities: [],
+                parentCompany: null,
+                userStatus: '',
+              },
             ),
           ),
         );
         ctx.dispatch(new UpdateSettingsCompanyDetailsEntityListFilterOptions());
+        ctx.patchState({
+          loadedStates: {
+            ...currentState.loadedStates,
+            companyDetails: true,
+          },
+          loadingErrors: {
+            ...currentState.loadingErrors,
+            companyDetails: null,
+          },
+        });
       }),
     );
   }
@@ -1064,7 +1206,16 @@ export class SettingsState {
       legalEntityList,
       legalEntityListCounter: legalEntityList.length,
       parentCompany,
-      companyDetailsLoaded: true,
+    });
+  }
+
+  @Action(SetCompanyDetailsAdminStatus)
+  setCompanyDetailsAdminStatus(
+    ctx: StateContext<SettingsStateModel>,
+    { isUserAdmin }: SetCompanyDetailsAdminStatus,
+  ) {
+    ctx.patchState({
+      isUserAdmin,
     });
   }
 
@@ -1205,33 +1356,71 @@ export class SettingsState {
     });
   }
 
+  @Action(ResetProfileLoadAndErrorState)
+  resetProfileLoadAndErrorState(ctx: StateContext<SettingsStateModel>): void {
+    ctx.patchState({
+      loadedStates: {
+        ...ctx.getState().loadedStates,
+        profileData: false,
+        profileLanguage: false,
+      },
+      loadingErrors: {
+        ...ctx.getState().loadingErrors,
+        profileData: null,
+        profileLanguage: null,
+      },
+      information: {
+        firstName: '',
+        lastName: '',
+        displayName: '',
+        country: '',
+        countryCode: '',
+        region: '',
+        email: '',
+        phone: '',
+        portalLanguage: '',
+        veracityId: '',
+        communicationLanguage: 'English',
+        jobTitle: '',
+        languages: [],
+        accessLevel: {},
+        sidebarMenu: [],
+      },
+      languageLabel: Language.English,
+    });
+  }
+
+  @Action(ResetCompanyLoadAndErrorState)
+  resetCompanyLoadAndErrorState(ctx: StateContext<SettingsStateModel>): void {
+    ctx.patchState({
+      loadedStates: {
+        ...ctx.getState().loadedStates,
+        companyDetails: false,
+      },
+      loadingErrors: {
+        ...ctx.getState().loadingErrors,
+        companyDetails: null,
+      },
+      isUserAdmin: false,
+      legalEntityList: [],
+      legalEntityListCounter: 0,
+      parentCompany: null,
+    });
+  }
+
   @Action(UpdateImpersonatedUser)
   updateImpersonatedUser(
     ctx: StateContext<SettingsStateModel>,
     { impersonatedUserEmail }: UpdateImpersonatedUser,
   ) {
-    return this.coBrowsingCookieService
-      .postUserEmailCookie(impersonatedUserEmail)
-      .pipe(
-        take(1),
-        concatMap(() => of(this.reInitializeApp(ctx, impersonatedUserEmail))),
-      );
+    return this.coBrowsingCookieService.postUserEmailCookie(
+      impersonatedUserEmail,
+    );
   }
 
   // #endregion AdminCoBrowsing
 
   // #region Helper methods
-  private getSettingsCompanyDetails(): Observable<SettingsCompanyDetailsDataDto> {
-    return this.settingsCompanyDetailsService
-      .getSettingsCompanyDetails()
-      .pipe(
-        map((dto: SettingsCompanyDetailsDto) =>
-          dto?.isSuccess && dto?.data
-            ? dto.data
-            : ({} as SettingsCompanyDetailsDataDto),
-        ),
-      );
-  }
 
   private getSettingsCompanyDetailsCountryList(): Observable<
     SettingsCompanyDetailsCountryListDataDto[]
@@ -1290,20 +1479,56 @@ export class SettingsState {
             roleName: AccessAreaRoleNames.CONTRACTS_VIEW,
           },
           edit: undefined,
+          submit: undefined,
         },
       },
       {
-        area: MemberAreaPermissions.ScheduleAuditsFindings,
+        area: MemberAreaPermissions.Schedules,
         permission: {
           view: {
             isChecked: true,
             roleId: 2,
-            roleName: AccessAreaRoleNames.SAF_VIEW,
+            roleName: AccessAreaRoleNames.SCHEDULE_VIEW,
           },
           edit: {
             isChecked: true,
             roleId: 3,
-            roleName: AccessAreaRoleNames.SAF_EDIT,
+            roleName: AccessAreaRoleNames.SCHEDULE_EDIT,
+          },
+        },
+      },
+      {
+        area: MemberAreaPermissions.Audits,
+        permission: {
+          view: {
+            isChecked: true,
+            roleId: 8,
+            roleName: AccessAreaRoleNames.AUDITS_VIEW,
+          },
+          edit: {
+            isChecked: true,
+            roleId: 9,
+            roleName: AccessAreaRoleNames.AUDITS_EDIT,
+          },
+        },
+      },
+      {
+        area: MemberAreaPermissions.Findings,
+        permission: {
+          view: {
+            isChecked: true,
+            roleId: 10,
+            roleName: AccessAreaRoleNames.FINDINGS_VIEW,
+          },
+          edit: {
+            isChecked: true,
+            roleId: 11,
+            roleName: AccessAreaRoleNames.FINDINGS_EDIT,
+          },
+          submit: {
+            isChecked: true,
+            roleId: 12,
+            roleName: AccessAreaRoleNames.FINDINGS_SUBMIT,
           },
         },
       },
@@ -1350,17 +1575,52 @@ export class SettingsState {
         },
       },
       {
-        area: MemberAreaPermissions.ScheduleAuditsFindings,
+        area: MemberAreaPermissions.Schedules,
         permission: {
           view: {
             isChecked: true,
             roleId: 2,
-            roleName: 'SAF_View',
+            roleName: AccessAreaRoleNames.SCHEDULE_VIEW,
           },
           edit: {
             isChecked: false,
             roleId: 3,
-            roleName: 'SAF_Edit',
+            roleName: AccessAreaRoleNames.SCHEDULE_EDIT,
+          },
+        },
+      },
+      {
+        area: MemberAreaPermissions.Audits,
+        permission: {
+          view: {
+            isChecked: true,
+            roleId: 8,
+            roleName: AccessAreaRoleNames.AUDITS_VIEW,
+          },
+          edit: {
+            isChecked: false,
+            roleId: 9,
+            roleName: AccessAreaRoleNames.AUDITS_EDIT,
+          },
+        },
+      },
+      {
+        area: MemberAreaPermissions.Findings,
+        permission: {
+          view: {
+            isChecked: true,
+            roleId: 10,
+            roleName: AccessAreaRoleNames.FINDINGS_VIEW,
+          },
+          edit: {
+            isChecked: false,
+            roleId: 11,
+            roleName: AccessAreaRoleNames.FINDINGS_EDIT,
+          },
+          submit: {
+            isChecked: false,
+            roleId: 12,
+            roleName: AccessAreaRoleNames.FINDINGS_SUBMIT,
           },
         },
       },
@@ -1509,6 +1769,13 @@ export class SettingsState {
           });
         }
 
+        if (permission.submit?.isChecked) {
+          acc.push({
+            roleId: permission.submit.roleId,
+            roleName: permission.submit.roleName,
+          });
+        }
+
         return acc;
       },
       [],
@@ -1553,19 +1820,4 @@ export class SettingsState {
   }
 
   // #endregion Helper methods
-
-  private reInitializeApp(
-    ctx: StateContext<SettingsStateModel>,
-    userEmail: string,
-  ): void {
-    this.coBrowsingSharedService.setCoBrowsingUserEmail(userEmail);
-
-    ctx.dispatch([
-      new LoadProfileData(),
-      new LoadProfileLanguage(),
-      new LoadSettingsCompanyDetails(),
-    ]);
-
-    this.router.navigate([AppPagesEnum.Overview], {});
-  }
 }

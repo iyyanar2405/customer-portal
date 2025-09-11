@@ -1,17 +1,20 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { TranslocoDirective } from '@jsverse/transloco';
-import { DynamicDialogRef } from 'primeng/dynamicdialog';
+import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 
 import {
   ConfirmScheduleDetailsStoreService,
   ScheduleCalendarActionTypes,
   ScheduleStatus,
 } from '@customer-portal/data-access/schedules';
+import { SettingsCoBrowsingStoreService } from '@customer-portal/data-access/settings';
 import {
   SharedButtonComponent,
   SharedButtonType,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/components/button';
+
+import { RequestChangesModel } from '../../../models';
 
 @Component({
   selector: 'lib-schedule-calendar-details-modal-footer',
@@ -34,9 +37,15 @@ export class ScheduleCalendarDetailsModalFooterComponent {
   );
   public sharedButtonType = SharedButtonType;
 
+  public isDnvUser = computed(() =>
+    this.settingsCoBrowsingStoreService.isDnvUser(),
+  );
+
   constructor(
     private readonly confirmScheduleDetailsStoreService: ConfirmScheduleDetailsStoreService,
     private readonly ref: DynamicDialogRef,
+    private readonly config: DynamicDialogConfig,
+    private settingsCoBrowsingStoreService: SettingsCoBrowsingStoreService,
   ) {}
 
   onConfirm(): void {
@@ -45,5 +54,13 @@ export class ScheduleCalendarDetailsModalFooterComponent {
 
   onReschedule(): void {
     this.ref.close(ScheduleCalendarActionTypes.Reschedule);
+  }
+
+  onRequestChanges(): void {
+    const requestChanges: RequestChangesModel = {
+      action: ScheduleCalendarActionTypes.RequestChanges,
+      id: this.config.data.id.toString(),
+    };
+    this.ref.close(requestChanges);
   }
 }

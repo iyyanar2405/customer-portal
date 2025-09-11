@@ -14,8 +14,18 @@ export class TrainingStatusSelectors {
     return state.trainings;
   }
 
+  @Selector([TrainingStatusSelectors._isLoading])
+  static isLoading(_isLoading: boolean): boolean {
+    return _isLoading;
+  }
+
   @Selector([TrainingStatusState])
   static trainingStatusError(state: TrainingStatusStateModel): boolean {
     return state.traningStatusError;
+  }
+
+  @Selector([TrainingStatusState])
+  private static _isLoading(state: TrainingStatusStateModel): boolean {
+    return state.isLoading;
   }
 }

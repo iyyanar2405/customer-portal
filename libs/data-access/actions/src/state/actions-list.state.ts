@@ -5,15 +5,14 @@ import { Action, State, StateContext } from '@ngxs/store';
 import { TreeNode } from 'primeng/api';
 import { tap } from 'rxjs';
 
+import { SharedSelectMultipleDatum } from '@customer-portal/shared/components/select/multiple';
+import { DEFAULT_GRID_CONFIG, Routes } from '@customer-portal/shared/constants';
+import { constructNavigation } from '@customer-portal/shared/helpers/navigation';
 import {
-  constructNavigation,
-  DEFAULT_GRID_CONFIG,
   FilterValue,
   GridConfig,
-  Routes,
-  SharedSelectMultipleDatum,
   SharedSelectTreeChangeEventOutput,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/models';
 
 import { ActionFilterKey } from '../constants';
 import {
@@ -81,6 +80,7 @@ const defaultState: ActionsListStateModel = {
       actionName: '',
       dueDate: '',
       message: '',
+      language: '',
       service: '',
       site: '',
       highPriority: false,
@@ -140,7 +140,7 @@ export class ActionsListState {
     private domSanitizer: DomSanitizer,
   ) {}
 
-  @Action(LoadActionsDetails)
+  @Action(LoadActionsDetails, { cancelUncompleted: true })
   loadActionsDetails(ctx: StateContext<ActionsListStateModel>) {
     const state = ctx.getState();
     const {

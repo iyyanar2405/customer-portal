@@ -12,6 +12,7 @@ import { ActivatedRoute } from '@angular/router';
 import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 import { MessageService } from 'primeng/api';
 import { DialogService } from 'primeng/dynamicdialog';
+import { take } from 'rxjs';
 
 import {
   CertificateParams,
@@ -32,21 +33,22 @@ import {
   SettingsCompanyDetailsStoreService,
 } from '@customer-portal/data-access/settings';
 import {
-  ADMIN_PERMISSION_CHECKER,
-  CustomDatePipe,
-  getToastContentBySeverity,
-  HasAdminPermissionDirective,
-  LanguageOption,
   LanguageSwitcherComponent,
   MessageComponent,
   MessageModel,
   MessageSeverity,
-  modalBreakpoints,
   SharedButtonComponent,
   SharedButtonType,
   StatusComponent,
-  ToastSeverity,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/components';
+import { modalBreakpoints } from '@customer-portal/shared/constants';
+import {
+  ADMIN_PERMISSION_CHECKER,
+  HasAdminPermissionDirective,
+} from '@customer-portal/shared/directives/permissions';
+import { getToastContentBySeverity } from '@customer-portal/shared/helpers/custom-toast';
+import { LanguageOption, ToastSeverity } from '@customer-portal/shared/models';
+import { CustomDatePipe } from '@customer-portal/shared/pipes/custom-date.pipe';
 
 import { CertificateMarkLanguageList } from '../../constants';
 import { CertificateDownloadDialogComponent } from '../certificate-download-dialog';
@@ -178,9 +180,8 @@ export class CertificateDetailsComponent
   }
 
   confirmDownload(isDownloadCertificationMark?: boolean): void {
-    const dialogRef = this.dialogService.open(
-      CertificateDownloadDialogComponent,
-      {
+    this.dialogService
+      .open(CertificateDownloadDialogComponent, {
         header: isDownloadCertificationMark
           ? this.ts.translate('certificate.downloadDialog.markHeader')
           : this.ts.translate('certificate.downloadDialog.header'),
@@ -194,11 +195,8 @@ export class CertificateDetailsComponent
           languages: this.certMarkLanguages,
           serviceName: this.certificateDetails().header.services,
         },
-      },
-    );
-
-    dialogRef.onClose
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      })
+      .onClose.pipe(take(1))
       .subscribe((data: CertificateDownloadDialogSubmitData) => {
         if (!data || !data.isSubmitted) return;
 
@@ -226,19 +224,15 @@ export class CertificateDetailsComponent
   }
 
   openCertificationMarksListDialog(): void {
-    const dialogRef = this.dialogService.open(
-      CertificateMarkDownloadListDialogComponent,
-      {
+    this.dialogService
+      .open(CertificateMarkDownloadListDialogComponent, {
         header: this.ts.translate('certificate.downloadDialog.markHeader'),
         modal: true,
         width: '55vw',
         breakpoints: modalBreakpoints,
         styleClass: 'certificate-marks-download-list-dialog',
-      },
-    );
-
-    dialogRef.onClose
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      })
+      .onClose.pipe(take(1))
       .subscribe((isBack: boolean) => {
         if (isBack) {
           this.confirmDownload(true);
@@ -247,9 +241,8 @@ export class CertificateDetailsComponent
   }
 
   openCertificateSuspensionDialog(): void {
-    const dialogRef = this.dialogService.open(
-      CertificateSuspensionMessageModalComponent,
-      {
+    this.dialogService
+      .open(CertificateSuspensionMessageModalComponent, {
         header: this.ts.translate(
           'certificate.certificateSuspension.certificateSuspensionTitle',
         ),
@@ -260,17 +253,17 @@ export class CertificateDetailsComponent
           certificateNumber: this.certificateDetails().certificateNumber,
           siteName: this.certificateDetails().header.siteName,
           services: this.certificateDetails().header.services,
+          suspensionDate: this.certificateDetails().header.suspendedDate,
         },
         templates: {
           footer: CertificateSuspensionMessageModalFooterComponent,
         },
-      },
-    );
-
-    dialogRef.onClose
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((val: boolean) => {
-        // TODO: Handle button response
+      })
+      .onClose.pipe(take(1))
+      .subscribe((result) => {
+        if (result) {
+          this.openserviceNowCertificateSupport();
+        }
       });
   }
 
@@ -290,6 +283,7 @@ export class CertificateDetailsComponent
         certificateNumber: this.certificateDetails().certificateNumber,
         revisionNumber: this.certificateDetails().header.revisionNumber,
         certificateID: this.certificateDetails().certificateId,
+        accountDNVId: this.certificateDetails().accountDNVId,
         certificateStatus: this.certificateDetails().header.status,
         language: this.profileLanguageStoreService.languageLabel(),
         service: this.certificateDetails().header.services,

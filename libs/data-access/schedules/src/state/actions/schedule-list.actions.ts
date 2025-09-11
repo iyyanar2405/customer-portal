@@ -11,7 +11,9 @@ export class LoadScheduleListSuccess {
 
   constructor(public schedules: ScheduleListItemModel[]) {}
 }
-
+export class LoadScheduleListFail {
+  static readonly type = '[Schedule List] Load Schedule List Fail';
+}
 export class UpdateGridConfig {
   static readonly type = '[Schedule List] Update Grid Config';
 
@@ -38,4 +40,22 @@ export class ExportSchedulesExcelFail {
 
 export class ResetScheduleListState {
   static readonly type = '[Schedule List] Reset Schedules List State';
+}
+
+export class UpdateScheduleListStatusToConfirmed {
+  static readonly type =
+    '[Schedule List] Update Schedule List Status To Confirmed';
+
+  constructor(public siteAuditId: number) {}
+}
+
+export class UpdateScheduleListForReschedule {
+  static readonly type = '[Schedule List] Update Schedule List For Reschedule';
+
+  constructor(public siteAuditId: number) {}
+}
+
+export class ApplyNavigationFiltersFromOverview {
+  static readonly type =
+    '[ScheduleList] Apply Navigation Filters From Overview';
 }

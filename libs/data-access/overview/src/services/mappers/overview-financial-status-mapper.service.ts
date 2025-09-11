@@ -1,8 +1,6 @@
-import {
-  buildStatusColorPalette,
-  DoughnutChartModel,
-  EMPTY_GRAPH_DATA,
-} from '@customer-portal/shared';
+import { EMPTY_GRAPH_DATA } from '@customer-portal/shared/constants';
+import { buildStatusColorPalette } from '@customer-portal/shared/helpers/chart';
+import { DoughnutChartModel } from '@customer-portal/shared/models/chart';
 
 import { OverviewFinancialStatusGraphWrapperDto } from '../../dtos';
 import { DoughnutChartWithStatus } from '../../models';
@@ -23,6 +21,7 @@ export class OverviewFinancialStatusMapperService {
       return {
         ...EMPTY_GRAPH_DATA,
         isSuccess: false,
+        message: 'Failed to load',
       };
     }
 
@@ -33,6 +32,7 @@ export class OverviewFinancialStatusMapperService {
       return {
         ...EMPTY_GRAPH_DATA,
         isSuccess: true,
+        message: '',
       };
     }
 
@@ -73,6 +73,7 @@ export class OverviewFinancialStatusMapperService {
     return {
       ...model,
       isSuccess: true,
+      message: '',
     };
   }
 }

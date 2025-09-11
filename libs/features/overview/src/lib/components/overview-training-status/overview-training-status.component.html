@@ -54,17 +54,22 @@
             }
           }
         } @else {
-          <div class="overview-no-courses">
-            <span class="no-courses-info"
-              >{{ t('overview.cardTexts.noValue') }}
-            </span>
-          </div>
+          @if(!trainingStatusStoreService.isLoading()){
+            <div class="overview-no-courses">
+              <span class="no-courses-info"
+                >{{ t('overview.cardTexts.noValue') }}
+              </span>
+            </div>
+          }
+         
         }
       </div>
     } @else {
-      <div class="no-data-image">
-        <img alt="No Data Display" src="./assets/images/no-data-display.png" />
-      </div>
+      @if(!trainingStatusStoreService.isLoading()){
+        <div class="no-data-image">
+          <img alt="No Data Display" src="./assets/images/no-data-display.png" />
+        </div>
+      }
     }
   </div>
 </ng-container>

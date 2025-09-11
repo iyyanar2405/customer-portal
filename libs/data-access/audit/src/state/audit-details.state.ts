@@ -1,8 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Action, State, StateContext } from '@ngxs/store';
 import { MessageService } from 'primeng/api';
-import { combineLatest, switchMap, tap } from 'rxjs';
+import { catchError, combineLatest, EMPTY, switchMap, tap } from 'rxjs';
 
+import {
+  GlobalServiceMasterStoreService,
+  GlobalSiteMasterStoreService,
+} from '@customer-portal/data-access/global';
 import {
   ProfileStoreService,
   SettingsCoBrowsingStoreService,
@@ -15,13 +19,13 @@ import { RouteStoreService } from '@customer-portal/router';
 import {
   COLUMN_DELIMITER,
   DEFAULT_GRID_CONFIG,
-  downloadFileFromByteArray,
-  FilterOptions,
-  getFilterOptionsForColumn,
-  getToastContentBySeverity,
-  GridConfig,
-  ToastSeverity,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/constants';
+import { throwIfNotSuccess } from '@customer-portal/shared/helpers/custom-operators';
+import { getToastContentBySeverity } from '@customer-portal/shared/helpers/custom-toast';
+import { downloadFileFromByteArray } from '@customer-portal/shared/helpers/download';
+import { getFilterOptionsForColumn } from '@customer-portal/shared/helpers/grid';
+import { ToastSeverity } from '@customer-portal/shared/models';
+import { FilterOptions, GridConfig } from '@customer-portal/shared/models/grid';
 
 import {
   AuditDetailsModel,
@@ -42,12 +46,17 @@ import {
   LoadAuditDetails,
   LoadAuditDetailsSuccess,
   LoadAuditDocumentsList,
+  LoadAuditDocumentsListFail,
   LoadAuditDocumentsListSuccess,
   LoadAuditFindingsList,
+  LoadAuditFindingsListFail,
   LoadAuditFindingsListSuccess,
+  LoadAuditHeaderDocDetails,
   LoadAuditSitesList,
+  LoadAuditSitesListFail,
   LoadAuditSitesListSuccess,
   LoadSubAuditList,
+  LoadSubAuditListFail,
   LoadSubAuditListSuccess,
   ResetAuditDetailsState,
   UpdateAuditDocumentsListFilterOptions,
@@ -63,18 +72,36 @@ import {
 export interface AuditDetailsStateModel {
   auditDetails: AuditDetailsModel;
   auditId: string;
-  subAuditItems: SubAuditListItemModel[];
   subAuditGridConfig: GridConfig;
   subAuditFilterOptions: FilterOptions;
-  auditFindingItems: AuditFindingListItemModel[];
   auditFindingGridConfig: GridConfig;
   auditFindingFilterOptions: FilterOptions;
-  siteItems: AuditSiteListItemModel[];
   siteItemsGridConfig: GridConfig;
   siteItemsFilterOptions: FilterOptions;
-  auditDocumentsList: AuditDocumentListItemModel[];
   auditDocumentsGridConfig: GridConfig;
   auditDocumentsFilterOptions: FilterOptions;
+  loading: boolean;
+  error?: string;
+  subaudit: {
+    loading: boolean;
+    error: string | null;
+    list: SubAuditListItemModel[];
+  };
+  findings: {
+    loading: boolean;
+    error: string | null;
+    list: AuditFindingListItemModel[];
+  };
+  sites: {
+    loading: boolean;
+    error: string | null;
+    list: AuditSiteListItemModel[];
+  };
+  documents: {
+    loading: boolean;
+    error: string | null;
+    list: AuditDocumentListItemModel[];
+  };
 }
 
 const defaultState: AuditDetailsStateModel = {
@@ -94,18 +121,36 @@ const defaultState: AuditDetailsStateModel = {
       auditReportDocId: [],
     },
   },
+  loading: false,
+  error: '',
   subAuditGridConfig: DEFAULT_GRID_CONFIG,
   subAuditFilterOptions: {},
-  auditFindingItems: [],
   auditFindingGridConfig: DEFAULT_GRID_CONFIG,
   auditFindingFilterOptions: {},
-  subAuditItems: [],
-  siteItems: [],
   siteItemsGridConfig: DEFAULT_GRID_CONFIG,
   siteItemsFilterOptions: {},
-  auditDocumentsList: [],
   auditDocumentsGridConfig: DEFAULT_GRID_CONFIG,
   auditDocumentsFilterOptions: {},
+  subaudit: {
+    loading: false,
+    error: '',
+    list: [],
+  },
+  findings: {
+    loading: false,
+    error: '',
+    list: [],
+  },
+  sites: {
+    loading: false,
+    error: '',
+    list: [],
+  },
+  documents: {
+    loading: false,
+    error: '',
+    list: [],
+  },
 };
 
 @State<AuditDetailsStateModel>({
@@ -121,31 +166,73 @@ export class AuditDetailsState {
     private profileStoreService: ProfileStoreService,
     private settingsCoBrowsingStoreService: SettingsCoBrowsingStoreService,
     private messageService: MessageService,
+    private globalSiteMasterStoreService: GlobalSiteMasterStoreService,
+    private globalServiceMasterStoreService: GlobalServiceMasterStoreService,
   ) {}
 
   // #region AuditDetails
   @Action(LoadAuditDetails)
   loadAuditDetails(ctx: StateContext<AuditDetailsStateModel>) {
+    ctx.patchState({ loading: true, error: '' });
+
     return this.routeStoreService.getPathParamByKey('auditId').pipe(
       switchMap((auditId) =>
-        combineLatest([
-          this.auditDetailsService.getAuditDetails(Number(auditId)),
-          this.auditDocumentsListService.getAuditDocumentsList(auditId, true),
-        ]).pipe(
-          tap(([auditDetailsDto, auditDocumentsListDto]) => {
+        this.auditDetailsService.getAuditDetails(Number(auditId)).pipe(
+          throwIfNotSuccess(),
+          tap((auditDetailsDto) => {
             const auditDetails =
-              AuditDetailsMapperService.mapToAuditDetailsModel(
-                auditDetailsDto,
-                auditDocumentsListDto,
-              );
+              AuditDetailsMapperService.mapToAuditDetailsModel(auditDetailsDto);
 
             if (auditDetails) {
               ctx.dispatch(new LoadAuditDetailsSuccess(auditDetails, auditId));
+              ctx.dispatch(new LoadAuditHeaderDocDetails(auditId));
             }
+          }),
+          catchError((error) => {
+            ctx.patchState({
+              loading: false,
+              error: error.message ?? 'Audit details load failed',
+            });
+            this.messageService.add(
+              getToastContentBySeverity(ToastSeverity.Error),
+            );
+
+            return EMPTY;
           }),
         ),
       ),
     );
+  }
+
+  @Action(LoadAuditHeaderDocDetails)
+  loadAuditHeaderDocDetails(
+    ctx: StateContext<AuditDetailsStateModel>,
+    { auditId }: LoadAuditHeaderDocDetails,
+  ) {
+    return this.auditDocumentsListService
+      .getAuditDocumentsList(auditId, true, true)
+      .pipe(
+        throwIfNotSuccess(),
+        tap((auditDocumentsListDto) => {
+          const { auditPlanDocId, auditReportDocId } =
+            AuditDetailsMapperService.extractPlanAndReportDocIds(
+              auditDocumentsListDto,
+            );
+
+          const currentDetails = ctx.getState().auditDetails;
+          ctx.patchState({
+            auditDetails: {
+              ...currentDetails,
+              header: {
+                ...currentDetails.header,
+                auditPlanDocId,
+                auditReportDocId,
+              },
+            },
+          });
+        }),
+        catchError(() => EMPTY),
+      );
   }
 
   @Action(LoadAuditDetailsSuccess)
@@ -153,7 +240,7 @@ export class AuditDetailsState {
     ctx: StateContext<AuditDetailsStateModel>,
     { auditDetails, auditId }: LoadAuditDetailsSuccess,
   ): void {
-    ctx.patchState({ auditDetails, auditId });
+    ctx.patchState({ auditDetails, auditId, loading: false, error: '' });
   }
 
   @Action(ResetAuditDetailsState)
@@ -166,23 +253,40 @@ export class AuditDetailsState {
   // #region AuditFindingList
   @Action(LoadAuditFindingsList)
   loadAuditFindingsList(ctx: StateContext<AuditDetailsStateModel>) {
+    const currentState = ctx.getState();
+    ctx.patchState({
+      ...currentState,
+      findings: {
+        ...currentState.findings,
+        loading: true,
+        error: '',
+      },
+    });
+
     return this.routeStoreService.getPathParamByKey('auditId').pipe(
       switchMap((auditId) =>
         this.auditDetailsService.getAuditFindingList(Number(auditId)).pipe(
+          throwIfNotSuccess(),
           tap((auditFindingListDto) => {
+            const siteMasterList =
+              this.globalSiteMasterStoreService.siteMasterList();
+            const serviceMasterList =
+              this.globalServiceMasterStoreService.serviceMasterList();
             const findingsItems =
               AuditDetailsMapperService.mapToAuditFindingListItemModel(
                 auditFindingListDto,
+                siteMasterList,
+                serviceMasterList,
               );
 
             ctx.dispatch(new LoadAuditFindingsListSuccess(findingsItems));
-
             ctx.dispatch(
               new UpdateAuditFindingListFilterOptions(findingsItems),
             );
           }),
         ),
       ),
+      catchError(() => ctx.dispatch(new LoadAuditFindingsListFail())),
     );
   }
 
@@ -191,7 +295,24 @@ export class AuditDetailsState {
     ctx: StateContext<AuditDetailsStateModel>,
     { auditFindingItems }: LoadAuditFindingsListSuccess,
   ): void {
-    ctx.patchState({ auditFindingItems });
+    ctx.patchState({
+      findings: {
+        error: '',
+        list: auditFindingItems,
+        loading: false,
+      },
+    });
+  }
+
+  @Action(LoadAuditFindingsListFail)
+  loadFindingsListFail(ctx: StateContext<any>) {
+    ctx.patchState({
+      findings: {
+        error: 'Failed to load audit findings data',
+        list: [],
+        loading: false,
+      },
+    });
   }
 
   @Action(UpdateAuditFindingListFilterOptions)
@@ -248,17 +369,18 @@ export class AuditDetailsState {
       auditId,
     );
 
-    return this.auditDetailsService
-      .exportAuditFindingsExcel(payload)
-      .pipe(
-        tap((result) =>
-          downloadFileFromByteArray(
-            result,
-            'auditFindings.xlsx',
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-          ),
-        ),
-      );
+    return this.auditDetailsService.exportAuditFindingsExcel(payload).pipe(
+      tap((result) => {
+        downloadFileFromByteArray(
+          result,
+          'auditFindings.xlsx',
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        );
+        this.messageService.add(
+          getToastContentBySeverity(ToastSeverity.DownloadSuccess),
+        );
+      }),
+    );
   }
 
   // #endregion AuditFindingList
@@ -266,14 +388,33 @@ export class AuditDetailsState {
   // #region SubAuditList
   @Action(LoadSubAuditList)
   loadSubAuditList(ctx: StateContext<AuditDetailsStateModel>) {
+    const currentState = ctx.getState();
+    ctx.patchState({
+      ...currentState,
+      subaudit: {
+        ...currentState.subaudit,
+        loading: true,
+        error: '',
+      },
+    });
+
     return combineLatest([
       this.routeStoreService.getPathParamByKey('auditId'),
     ]).pipe(
       switchMap((auditId) =>
         this.auditDetailsService.getSubAuditList(+auditId).pipe(
+          throwIfNotSuccess(),
           tap((subAuditListDto) => {
+            const siteMasterList =
+              this.globalSiteMasterStoreService.siteMasterList();
+            const serviceMasterList =
+              this.globalServiceMasterStoreService.serviceMasterList();
             const subAuditItems =
-              AuditDetailsMapperService.mapToSubAuditItemModel(subAuditListDto);
+              AuditDetailsMapperService.mapToSubAuditItemModel(
+                subAuditListDto,
+                siteMasterList,
+                serviceMasterList,
+              );
 
             ctx.dispatch(new LoadSubAuditListSuccess(subAuditItems));
 
@@ -281,6 +422,7 @@ export class AuditDetailsState {
           }),
         ),
       ),
+      catchError(() => ctx.dispatch(new LoadSubAuditListFail())),
     );
   }
 
@@ -289,7 +431,24 @@ export class AuditDetailsState {
     ctx: StateContext<AuditDetailsStateModel>,
     { subAuditItems }: LoadSubAuditListSuccess,
   ): void {
-    ctx.patchState({ subAuditItems });
+    ctx.patchState({
+      subaudit: {
+        list: subAuditItems,
+        loading: false,
+        error: '',
+      },
+    });
+  }
+
+  @Action(LoadSubAuditListFail)
+  LoadSubAuditListFail(ctx: StateContext<any>) {
+    ctx.patchState({
+      subaudit: {
+        loading: false,
+        list: [],
+        error: 'Failed to load sub audit data',
+      },
+    });
   }
 
   @Action(UpdateSubAuditListFilterOptions)
@@ -344,7 +503,7 @@ export class AuditDetailsState {
             'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
           );
           this.messageService.add(
-            getToastContentBySeverity(ToastSeverity.Success),
+            getToastContentBySeverity(ToastSeverity.DownloadSuccess),
           );
         },
       }),
@@ -356,11 +515,22 @@ export class AuditDetailsState {
   // #region SitesList
   @Action(LoadAuditSitesList)
   loadSitesList(ctx: StateContext<AuditDetailsStateModel>) {
+    const currentState = ctx.getState();
+    ctx.patchState({
+      ...currentState,
+      sites: {
+        ...currentState.sites,
+        loading: true,
+        error: '',
+      },
+    });
+
     return combineLatest([
       this.routeStoreService.getPathParamByKey('auditId'),
     ]).pipe(
       switchMap((auditId) =>
         this.auditDetailsService.getSitesList(+auditId).pipe(
+          throwIfNotSuccess(),
           tap((sitesListDto) => {
             const siteItems =
               AuditDetailsMapperService.mapToAuditSitesItemModel(sitesListDto);
@@ -371,6 +541,7 @@ export class AuditDetailsState {
           }),
         ),
       ),
+      catchError(() => ctx.dispatch(new LoadAuditSitesListFail())),
     );
   }
 
@@ -379,7 +550,24 @@ export class AuditDetailsState {
     ctx: StateContext<AuditDetailsStateModel>,
     { auditSiteItems: siteItems }: LoadAuditSitesListSuccess,
   ): void {
-    ctx.patchState({ siteItems });
+    ctx.patchState({
+      sites: {
+        error: '',
+        list: siteItems,
+        loading: false,
+      },
+    });
+  }
+
+  @Action(LoadAuditSitesListFail)
+  loadSitesListFail(ctx: StateContext<any>) {
+    ctx.patchState({
+      sites: {
+        list: [],
+        loading: false,
+        error: 'Failed to load audit sites data',
+      },
+    });
   }
 
   @Action(UpdateAuditSitesListFilterOptions)
@@ -413,11 +601,21 @@ export class AuditDetailsState {
   // #region AuditDocumentsList
   @Action(LoadAuditDocumentsList)
   loadAuditDocumentsList(ctx: StateContext<AuditDetailsStateModel>) {
+    const currentState = ctx.getState();
+    ctx.patchState({
+      documents: {
+        ...currentState.documents,
+        loading: true,
+        error: '',
+      },
+    });
+
     return this.routeStoreService.getPathParamByKey('auditId').pipe(
       switchMap((auditId) =>
         this.auditDocumentsListService
           .getAuditDocumentsList(auditId, false)
           .pipe(
+            throwIfNotSuccess(),
             tap((sitesListDto) => {
               const hasAuditsEditPermission =
                 this.profileStoreService.hasPermission(
@@ -442,6 +640,7 @@ export class AuditDetailsState {
                 new UpdateAuditDocumentsListFilterOptions(auditDocumentsList),
               );
             }),
+            catchError(() => ctx.dispatch(new LoadAuditDocumentsListFail())),
           ),
       ),
     );
@@ -452,7 +651,24 @@ export class AuditDetailsState {
     ctx: StateContext<AuditDetailsStateModel>,
     { auditDocumentsList }: LoadAuditDocumentsListSuccess,
   ): void {
-    ctx.patchState({ auditDocumentsList });
+    ctx.patchState({
+      documents: {
+        error: '',
+        list: auditDocumentsList,
+        loading: false,
+      },
+    });
+  }
+
+  @Action(LoadAuditDocumentsListFail)
+  loadAuditDocumentsListFail(ctx: StateContext<any>) {
+    ctx.patchState({
+      documents: {
+        list: [],
+        error: 'Failed to load document data',
+        loading: false,
+      },
+    });
   }
 
   @Action(UpdateAuditDocumentsListFilterOptions)

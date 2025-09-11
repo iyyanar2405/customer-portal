@@ -2,11 +2,13 @@ import { Selector } from '@ngxs/store';
 
 import {
   applyGridConfig,
-  FilteringConfig,
-  FilterOptions,
   getNumberOfFilteredRecords,
   isAnyFilterActive,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/helpers/grid';
+import {
+  FilteringConfig,
+  FilterOptions,
+} from '@customer-portal/shared/models/grid';
 
 import {
   AuditDetailsModel,
@@ -164,6 +166,36 @@ export class AuditDetailsSelectors {
     return auditDocumentsHasActiveFilters;
   }
 
+  @Selector([AuditDetailsSelectors._isLoadingFindings])
+  static isLoadingFindings(isLoadingFindings: boolean): boolean {
+    return isLoadingFindings;
+  }
+
+  @Selector([AuditDetailsSelectors._isLoadingDocuments])
+  static isLoadingDocuments(isLoadingDocuments: boolean): boolean {
+    return isLoadingDocuments;
+  }
+
+  @Selector([AuditDetailsSelectors._isLoadingSubAudits])
+  static isLoadingSubAudits(isLoadingSubAudits: boolean): boolean {
+    return isLoadingSubAudits;
+  }
+
+  @Selector([AuditDetailsSelectors._isLoadingSites])
+  static isLoadingSites(isLoadingSites: boolean): boolean {
+    return isLoadingSites;
+  }
+
+  @Selector([AuditDetailsSelectors._auditDetailsLoading])
+  static auditDetailsLoading(auditDetailsLoading: boolean): boolean {
+    return auditDetailsLoading;
+  }
+
+  @Selector([AuditDetailsState])
+  private static _auditDetailsLoading(state: AuditDetailsStateModel): boolean {
+    return state.loading;
+  }
+
   @Selector([AuditDetailsState])
   private static _auditDetails(
     state: AuditDetailsStateModel,
@@ -175,21 +207,18 @@ export class AuditDetailsSelectors {
   private static _auditFindingItems(
     state: AuditDetailsStateModel,
   ): AuditFindingListItemModel[] {
-    const { auditFindingItems, auditFindingGridConfig } = state;
+    const { findings, auditFindingGridConfig } = state;
 
-    return applyGridConfig(auditFindingItems, auditFindingGridConfig);
+    return applyGridConfig(findings.list, auditFindingGridConfig);
   }
 
   @Selector([AuditDetailsState])
   private static _auditFindingTotalFilteredRecords(
     state: AuditDetailsStateModel,
   ): number {
-    const { auditFindingItems, auditFindingGridConfig } = state;
+    const { findings, auditFindingGridConfig } = state;
 
-    return getNumberOfFilteredRecords(
-      auditFindingItems,
-      auditFindingGridConfig,
-    );
+    return getNumberOfFilteredRecords(findings.list, auditFindingGridConfig);
   }
 
   @Selector([AuditDetailsState])
@@ -217,18 +246,18 @@ export class AuditDetailsSelectors {
   private static _subAuditItems(
     state: AuditDetailsStateModel,
   ): SubAuditListItemModel[] {
-    const { subAuditItems, subAuditGridConfig } = state;
+    const { subaudit, subAuditGridConfig } = state;
 
-    return applyGridConfig(subAuditItems, subAuditGridConfig);
+    return applyGridConfig(subaudit.list, subAuditGridConfig);
   }
 
   @Selector([AuditDetailsState])
   private static _subAuditTotalFilteredRecords(
     state: AuditDetailsStateModel,
   ): number {
-    const { subAuditItems, subAuditGridConfig } = state;
+    const { subaudit, subAuditGridConfig } = state;
 
-    return getNumberOfFilteredRecords(subAuditItems, subAuditGridConfig);
+    return getNumberOfFilteredRecords(subaudit.list, subAuditGridConfig);
   }
 
   @Selector([AuditDetailsState])
@@ -256,18 +285,18 @@ export class AuditDetailsSelectors {
   private static _siteItems(
     state: AuditDetailsStateModel,
   ): AuditSiteListItemModel[] {
-    const { siteItems, siteItemsGridConfig } = state;
+    const { sites, siteItemsGridConfig } = state;
 
-    return applyGridConfig(siteItems, siteItemsGridConfig);
+    return applyGridConfig(sites.list, siteItemsGridConfig);
   }
 
   @Selector([AuditDetailsState])
   private static _siteItemsTotalFilteredRecords(
     state: AuditDetailsStateModel,
   ): number {
-    const { siteItems, siteItemsGridConfig } = state;
+    const { sites, siteItemsGridConfig } = state;
 
-    return getNumberOfFilteredRecords(siteItems, siteItemsGridConfig);
+    return getNumberOfFilteredRecords(sites.list, siteItemsGridConfig);
   }
 
   @Selector([AuditDetailsState])
@@ -295,21 +324,18 @@ export class AuditDetailsSelectors {
   private static _auditDocumentsList(
     state: AuditDetailsStateModel,
   ): AuditDocumentListItemModel[] {
-    const { auditDocumentsList, auditDocumentsGridConfig } = state;
+    const { documents, auditDocumentsGridConfig } = state;
 
-    return applyGridConfig(auditDocumentsList, auditDocumentsGridConfig);
+    return applyGridConfig(documents.list, auditDocumentsGridConfig);
   }
 
   @Selector([AuditDetailsState])
   private static _auditDocumentsTotalFilteredRecords(
     state: AuditDetailsStateModel,
   ): number {
-    const { auditDocumentsList, auditDocumentsGridConfig } = state;
+    const { documents, auditDocumentsGridConfig } = state;
 
-    return getNumberOfFilteredRecords(
-      auditDocumentsList,
-      auditDocumentsGridConfig,
-    );
+    return getNumberOfFilteredRecords(documents.list, auditDocumentsGridConfig);
   }
 
   @Selector([AuditDetailsState])
@@ -331,5 +357,25 @@ export class AuditDetailsSelectors {
     state: AuditDetailsStateModel,
   ): boolean {
     return isAnyFilterActive(state.auditDocumentsGridConfig.filtering);
+  }
+
+  @Selector([AuditDetailsState])
+  private static _isLoadingFindings(state: AuditDetailsStateModel): boolean {
+    return state.findings.loading;
+  }
+
+  @Selector([AuditDetailsState])
+  private static _isLoadingDocuments(state: AuditDetailsStateModel): boolean {
+    return state.documents.loading;
+  }
+
+  @Selector([AuditDetailsState])
+  private static _isLoadingSubAudits(state: AuditDetailsStateModel): boolean {
+    return state.subaudit.loading;
+  }
+
+  @Selector([AuditDetailsState])
+  private static _isLoadingSites(state: AuditDetailsStateModel): boolean {
+    return state.sites.loading;
   }
 }

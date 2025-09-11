@@ -5,7 +5,11 @@ import { Observable } from 'rxjs';
 
 import { Language } from '@customer-portal/shared';
 
-import { LoadProfileLanguage, UpdateProfileLanguage } from '../actions';
+import {
+  LoadProfileLanguage,
+  SetProfileLanguage,
+  UpdateProfileLanguage,
+} from '../actions';
 import { ProfileLanguageSelectors } from '../selectors';
 
 @Injectable({ providedIn: 'root' })
@@ -20,8 +24,24 @@ export class ProfileLanguageStoreService {
     return this.store.select(ProfileLanguageSelectors.languageLabel);
   }
 
+  get profileDataLanguageError$(): Observable<string | null> {
+    return this.store.select(
+      (state) => state.settings.loadingErrors.profileDataLanguage,
+    );
+  }
+
+  get profileLanguageDataLoaded$(): Observable<boolean> {
+    return this.store.select(
+      (state) => state.settings.loadedStates.profileLanguage,
+    );
+  }
+
   @Dispatch()
   loadProfileLanguage = () => new LoadProfileLanguage();
+
+  @Dispatch()
+  setProfileLanguage = (languageLabel: string) =>
+    new SetProfileLanguage(languageLabel);
 
   @Dispatch()
   updateProfileLanguage = (languageLabel: Language) =>

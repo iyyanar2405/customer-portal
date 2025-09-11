@@ -1,4 +1,3 @@
-export * from './__mocks__';
 export * from './constants';
 export * from './dtos';
 export * from './models';

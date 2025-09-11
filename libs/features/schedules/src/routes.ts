@@ -2,13 +2,19 @@ import { importProvidersFrom } from '@angular/core';
 import { InlineLoader, provideTranslocoScope } from '@jsverse/transloco';
 import { NgxsModule } from '@ngxs/store';
 
-import { UnreadActionsStoreService } from '@customer-portal/data-access/actions';
+import { UnreadActionsStoreService } from '@customer-portal/data-access/actions/state';
+import { DocumentsState } from '@customer-portal/data-access/documents/state/documents.state';
 import {
-  CalendarScheduleState,
   ConfirmScheduleDetailsState,
+  ConfirmScheduleDetailsStoreService,
   ScheduleCalendarActionState,
+  ScheduleCalendarActionStoreService,
+  ScheduleListCalendarState,
+  ScheduleListCalendarStoreService,
   ScheduleListState,
+  ScheduleListStoreService,
 } from '@customer-portal/data-access/schedules';
+import { OverviewSharedStoreService } from '@customer-portal/overview-shared';
 import { Language } from '@customer-portal/shared';
 
 export const loader = [Language.English, Language.Italian].reduce(
@@ -33,23 +39,30 @@ export const SCHEDULES_ROUTES = [
     title: 'Schedule',
     providers: [
       UnreadActionsStoreService,
+      ScheduleListCalendarStoreService,
+      OverviewSharedStoreService,
+      ConfirmScheduleDetailsStoreService,
+      ScheduleCalendarActionStoreService,
+      ScheduleListStoreService,
       provideTranslocoScope({
         scope: 'schedules',
         loader,
       }),
-      importProvidersFrom(NgxsModule.forFeature([ScheduleListState])),
+      importProvidersFrom(
+        NgxsModule.forFeature([ScheduleListState, DocumentsState]),
+      ),
     ],
     children: [
       {
         path: '',
         loadComponent: () =>
-          import('./lib/components/calendar-view/calendar-view.component').then(
-            (m) => m.CalendarViewComponent,
-          ),
+          import(
+            './lib/components/schedule-list-calendar/schedule-list-calendar.component'
+          ).then((m) => m.ScheduleListCalendarComponent),
         providers: [
           importProvidersFrom(
             NgxsModule.forFeature([
-              CalendarScheduleState,
+              ScheduleListCalendarState,
               ConfirmScheduleDetailsState,
               ScheduleCalendarActionState,
             ]),

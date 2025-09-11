@@ -18,6 +18,10 @@ export class TrainingStatusStoreService {
     return this.store.selectSignal(TrainingStatusSelectors.trainingStatusError);
   }
 
+  get isLoading(): Signal<boolean> {
+    return this.store.selectSignal(TrainingStatusSelectors.isLoading);
+  }
+
   constructor(private store: Store) {}
 
   @Dispatch()

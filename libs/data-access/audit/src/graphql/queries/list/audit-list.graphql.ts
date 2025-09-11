@@ -7,9 +7,7 @@ export const AUDIT_LIST_QUERY = gql`
         auditId
         sites
         services
-        cities
-        countries
-        companyName
+        companyId
         status
         startDate
         endDate

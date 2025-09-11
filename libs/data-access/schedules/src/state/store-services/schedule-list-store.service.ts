@@ -11,12 +11,15 @@ import {
 
 import { ScheduleListItemModel } from '../../models';
 import {
+  ApplyNavigationFiltersFromOverview,
   ExportSchedulesExcel,
   LoadScheduleList,
   ResetScheduleListState,
   UpdateGridConfig,
+  UpdateScheduleListForReschedule,
+  UpdateScheduleListStatusToConfirmed,
 } from '../actions';
-import { ScheduleListSelectors } from '../selectors';
+import { ScheduleListSelectors } from '../selectors/schedule-list.selectors';
 
 @Injectable()
 export class ScheduleListStoreService {
@@ -46,6 +49,14 @@ export class ScheduleListStoreService {
     return this.store.select(ScheduleListSelectors.filteringConfig);
   }
 
+  get filteringConfigSignal(): Signal<FilteringConfig> {
+    return this.store.selectSignal(ScheduleListSelectors.filteringConfig);
+  }
+
+  get isLoading(): Signal<boolean> {
+    return this.store.selectSignal(ScheduleListSelectors.isLoading);
+  }
+
   @Dispatch()
   loadScheduleList = () => new LoadScheduleList();
 
@@ -58,4 +69,22 @@ export class ScheduleListStoreService {
 
   @Dispatch()
   exportAuditSchedulesExcel = () => new ExportSchedulesExcel();
+
+  @Dispatch()
+  updateScheduleListStatusToConfirmed(siteAuditId: number) {
+    return this.store.dispatch(
+      new UpdateScheduleListStatusToConfirmed(siteAuditId),
+    );
+  }
+
+  @Dispatch()
+  updateScheduleListForReschedule(siteAuditId: number) {
+    return this.store.dispatch(
+      new UpdateScheduleListForReschedule(siteAuditId),
+    );
+  }
+
+  @Dispatch()
+  applyNavigationFiltersFromOverview = () =>
+    new ApplyNavigationFiltersFromOverview();
 }

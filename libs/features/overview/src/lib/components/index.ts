@@ -1,2 +1,1 @@
-export * from './overview';
-export * from './overview-filters';
+export * from './overview-list';

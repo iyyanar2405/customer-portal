@@ -2,11 +2,13 @@ import { Selector } from '@ngxs/store';
 
 import {
   applyGridConfig,
-  FilteringConfig,
-  FilterOptions,
   getNumberOfFilteredRecords,
   isAnyFilterActive,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/helpers/grid';
+import {
+  FilteringConfig,
+  FilterOptions,
+} from '@customer-portal/shared/models/grid';
 
 import { FindingListItemModel } from '../../models';
 import {
@@ -42,6 +44,21 @@ export class FindingsListSelectors {
     return hasActiveFilters;
   }
 
+  @Selector([FindingsListSelectors._isLoading])
+  static isLoading(isLoading: boolean): boolean {
+    return isLoading;
+  }
+
+  @Selector([FindingsListSelectors._loaded])
+  static loaded(loaded: boolean): boolean {
+    return loaded;
+  }
+
+  @Selector([FindingsListState])
+  private static _loaded(state: FindingsListStateModel): boolean {
+    return state.loaded;
+  }
+
   @Selector([FindingsListState])
   private static _findingsItems(
     state: FindingsListStateModel,
@@ -73,5 +90,10 @@ export class FindingsListSelectors {
   @Selector([FindingsListState])
   private static _hasActiveFilters(state: FindingsListStateModel): boolean {
     return isAnyFilterActive(state.gridConfig.filtering);
+  }
+
+  @Selector([FindingsListState])
+  private static _isLoading(state: FindingsListStateModel): boolean {
+    return state.isLoading;
   }
 }

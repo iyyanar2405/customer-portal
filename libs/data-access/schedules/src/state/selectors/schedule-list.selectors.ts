@@ -3,11 +3,13 @@ import { Selector } from '@ngxs/store';
 import {
   applyGridConfig,
   applyGridConfigWithoutPagination,
-  FilteringConfig,
-  FilterOptions,
   getNumberOfFilteredRecords,
   isAnyFilterActive,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/helpers/grid';
+import {
+  FilteringConfig,
+  FilterOptions,
+} from '@customer-portal/shared/models/grid';
 
 import { ScheduleListItemModel } from '../../models';
 import {
@@ -50,6 +52,11 @@ export class ScheduleListSelectors {
     return hasActiveFilters;
   }
 
+  @Selector([ScheduleListSelectors._isLoading])
+  static isLoading(isLoading: boolean): boolean {
+    return isLoading;
+  }
+
   @Selector([ScheduleListState])
   private static _schedules(
     state: ScheduleListStateModel,
@@ -90,5 +97,10 @@ export class ScheduleListSelectors {
   @Selector([ScheduleListState])
   private static _hasActiveFilters(state: ScheduleListStateModel): boolean {
     return isAnyFilterActive(state.gridConfig.filtering);
+  }
+
+  @Selector([ScheduleListState])
+  private static _isLoading(state: ScheduleListStateModel): boolean {
+    return state.isLoading;
   }
 }

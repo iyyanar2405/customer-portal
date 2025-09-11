@@ -3,11 +3,13 @@ import { TreeNode } from 'primeng/api';
 
 import {
   applyGridConfig,
-  FilteringConfig,
-  FilterOptions,
   getNumberOfFilteredRecords,
   isAnyFilterActive,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/helpers/grid';
+import {
+  FilteringConfig,
+  FilterOptions,
+} from '@customer-portal/shared/models/grid';
 
 import {
   MemberAreaPermissions,
@@ -363,8 +365,14 @@ export class SettingsMembersSelectors {
       return permission?.view?.isChecked || permission?.edit?.isChecked;
     };
 
-    const hasPermissionsForScheduleAuditsFindings = hasPermissionForArea(
-      MemberAreaPermissions.ScheduleAuditsFindings,
+    const hasPermissionsForSchedule = hasPermissionForArea(
+      MemberAreaPermissions.Schedules,
+    );
+    const hasPermissionsForAudits = hasPermissionForArea(
+      MemberAreaPermissions.Audits,
+    );
+    const hasPermissionsForFindings = hasPermissionForArea(
+      MemberAreaPermissions.Findings,
     );
     const hasPermissionsForCertificates = hasPermissionForArea(
       MemberAreaPermissions.Certificates,
@@ -378,7 +386,9 @@ export class SettingsMembersSelectors {
       !!selectedCompanyIds?.length &&
       !!selectedServiceIds?.length &&
       !!selectedSiteIds?.length &&
-      (!!hasPermissionsForScheduleAuditsFindings ||
+      (!!hasPermissionsForSchedule ||
+        !!hasPermissionsForAudits ||
+        !!hasPermissionsForFindings ||
         !!hasPermissionsForCertificates);
 
     return isAdminInfoValid || isMemberInfoValid;

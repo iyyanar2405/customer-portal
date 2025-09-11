@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { map, Observable } from 'rxjs';
@@ -6,14 +6,15 @@ import { map, Observable } from 'rxjs';
 import { environment } from '@customer-portal/environments';
 
 import {
+  AuditFindingListDto,
   AuditFindingsExcelPayloadDto,
   SubAuditExcelPayloadDto,
 } from '../../dtos';
+import { SubAuditListDto } from '../../dtos/sub-audit-list.dto';
 import {
   AUDIT_DETAILS_QUERY,
   AUDIT_FINDING_LIST_QUERY,
   AUDIT_SITES_LIST_QUERY,
-  EXPORT_AUDIT_FINDINGS_EXCEL_QUERY,
   SUB_AUDIT_LIST_QUERY,
 } from '../../graphql';
 
@@ -23,13 +24,14 @@ export class AuditDetailsService {
   private findingClientName = 'finding';
 
   private readonly exportSubAuditExcelUrl = `${environment.documentsApi}/ExportSubAudits`;
+  private readonly exportFindingExcelUrl = `${environment.documentsApi}/ExportFindings`;
 
   constructor(
     private readonly apollo: Apollo,
     private readonly http: HttpClient,
   ) {}
 
-  getAuditFindingList(auditId: number) {
+  getAuditFindingList(auditId: number): Observable<AuditFindingListDto> {
     return this.apollo
       .use(this.findingClientName)
       .query({
@@ -41,19 +43,24 @@ export class AuditDetailsService {
       .pipe(map((results: any) => results.data.viewFindings));
   }
 
-  exportAuditFindingsExcel({ filters }: AuditFindingsExcelPayloadDto) {
-    return this.apollo
-      .use(this.findingClientName)
-      .query({
-        query: EXPORT_AUDIT_FINDINGS_EXCEL_QUERY,
-        variables: {
-          filters,
-        },
-      })
-      .pipe(map((results: any) => results.data.exportFindings.data));
+  exportAuditFindingsExcel(
+    { filters }: AuditFindingsExcelPayloadDto,
+    skipLoading?: boolean,
+  ): Observable<number[]> {
+    let headers = new HttpHeaders();
+
+    if (skipLoading) {
+      headers = headers.append('SKIP_LOADING', 'true');
+    }
+
+    return this.http
+      .post<{
+        data: number[];
+      }>(this.exportFindingExcelUrl, filters, { headers })
+      .pipe(map((response) => response.data));
   }
 
-  getSubAuditList(auditId: number) {
+  getSubAuditList(auditId: number): Observable<SubAuditListDto> {
     return this.apollo
       .use(this.auditClientName)
       .query({
@@ -65,11 +72,20 @@ export class AuditDetailsService {
       .pipe(map((results: any) => results.data.viewSubAudits));
   }
 
-  exportSubAuditsExcel(payload: SubAuditExcelPayloadDto): Observable<number[]> {
+  exportSubAuditsExcel(
+    payload: SubAuditExcelPayloadDto,
+    skipLoading?: boolean,
+  ): Observable<number[]> {
+    let headers = new HttpHeaders();
+
+    if (skipLoading) {
+      headers = headers.append('SKIP_LOADING', 'true');
+    }
+
     const url = `${this.exportSubAuditExcelUrl}?auditId=${payload.auditId}`;
 
     return this.http
-      .post<{ data: number[] }>(url, payload.filters)
+      .post<{ data: number[] }>(url, payload.filters, { headers })
       .pipe(map((response) => response.data));
   }
 

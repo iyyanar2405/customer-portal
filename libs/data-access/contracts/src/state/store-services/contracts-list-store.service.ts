@@ -40,6 +40,14 @@ export class ContractsListStoreService {
     return this.store.select(ContractsListSelectors.filteringConfig);
   }
 
+  get filteringConfigSignal(): Signal<FilteringConfig> {
+    return this.store.selectSignal(ContractsListSelectors.filteringConfig);
+  }
+
+  get isLoading(): Signal<boolean> {
+    return this.store.selectSignal(ContractsListSelectors.isLoading);
+  }
+
   constructor(private store: Store) {}
 
   @Dispatch()

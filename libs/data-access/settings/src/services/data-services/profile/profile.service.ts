@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
-import { map, Observable } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 
+import { ProfileDto } from '../../../dtos';
 import { PROFILE_QUERY, PROFILE_SETTINGS_MUTATION } from '../../../graphql';
 
 @Injectable({ providedIn: 'root' })
@@ -10,7 +11,7 @@ export class ProfileService {
 
   constructor(private readonly apollo: Apollo) {}
 
-  getProfileData(): Observable<any> {
+  getProfileData(): Observable<ProfileDto | null> {
     return this.apollo
       .use(this.clientName)
       .query({
@@ -18,7 +19,20 @@ export class ProfileService {
         variables: {},
         fetchPolicy: 'no-cache',
       })
-      .pipe(map((results: any) => results?.data?.userProfile));
+      .pipe(
+        map((result: any) => {
+          if (
+            result === undefined ||
+            result?.data === undefined ||
+            result.data?.userProfile?.isSuccess === false
+          ) {
+            return null;
+          }
+
+          return result.data?.userProfile;
+        }),
+        catchError((_) => of(null)),
+      );
   }
 
   updateProfileSettingsData(

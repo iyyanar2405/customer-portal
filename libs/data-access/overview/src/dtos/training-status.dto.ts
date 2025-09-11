@@ -1,4 +1,5 @@
 export interface TrainingStatusGraphResponseDto {
+  message: string;
   isSuccess: boolean;
   data: TrainingStatusListDto;
 }

@@ -1,9 +1,11 @@
 export * from './constants';
-export * from './dtos';
-export * from './graphql';
-export * from './guards';
 export * from './models';
-export * from './services';
-export * from './state';
-export * from './__mocks__';
-export * from './helpers';
+export {
+  ProfileService,
+  ProfileLanguageService,
+} from './services/data-services/profile';
+export { ProfileStoreService } from './state/store-services/profile-store.service';
+export { SettingsCoBrowsingStoreService } from './state/store-services/settings-co-browsing-store.service';
+export { SettingsCompanyDetailsStoreService } from './state/store-services/settings-company-details-store.service';
+export { SettingsUserValidationService } from './services/data-services/settings-user-validation.service';
+export { ProfileLanguageStoreService } from './state/store-services/profile-language-store.service';

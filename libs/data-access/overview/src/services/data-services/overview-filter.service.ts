@@ -2,9 +2,13 @@ import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { map, Observable } from 'rxjs';
 
-import { OverviewFilterDto } from '../../dtos';
+import {
+  OverviewCompanyServiceSiteFilterData,
+  OverviewFilterDto,
+} from '../../dtos';
 import {
   OVERVIEW_FILTER_COMPANIES_QUERY,
+  OVERVIEW_FILTER_QUERY,
   OVERVIEW_FILTER_SERVICES_QUERY,
   OVERVIEW_FILTER_SITES_QUERY,
 } from '../../graphql';
@@ -14,6 +18,18 @@ export class OverviewFilterService {
   private clientName = 'contact';
 
   constructor(private readonly apollo: Apollo) {}
+
+  getOverviewFilters(): Observable<OverviewCompanyServiceSiteFilterData> {
+    return this.apollo
+      .use(this.clientName)
+      .query({
+        query: OVERVIEW_FILTER_QUERY,
+        variables: {},
+      })
+      .pipe(
+        map((results: any) => results?.data?.overviewCompanyServiceSiteFilter),
+      );
+  }
 
   getOverviewFilterCompanies(
     services: number[],

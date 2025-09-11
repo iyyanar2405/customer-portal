@@ -44,6 +44,6 @@ export class SettingsCoBrowsingStoreService {
   resetSelectedCobrowsingCompany = () => new ResetSelectedCobrowsingCompany();
 
   @Dispatch()
-  updateImpersonatedUser = (impersonatedUser: string) =>
+  updateImpersonatedUser = (impersonatedUser: string | null) =>
     new UpdateImpersonatedUser(impersonatedUser);
 }

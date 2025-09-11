@@ -1,11 +1,11 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { map, Observable } from 'rxjs';
 
 import { environment } from '@customer-portal/environments';
 
-import { ScheduleExcelPayloadDto } from '../../../dtos';
+import { ScheduleExcelPayloadDto, ScheduleListDto } from '../../../dtos';
 import { SCHEDULE_LIST_QUERY } from '../../../graphql';
 
 @Injectable({ providedIn: 'root' })
@@ -19,7 +19,7 @@ export class ScheduleListService {
     private readonly http: HttpClient,
   ) {}
 
-  getScheduleList(): Observable<any> {
+  getScheduleList(): Observable<ScheduleListDto> {
     return this.apollo
       .use(this.clientName)
       .query({
@@ -27,16 +27,24 @@ export class ScheduleListService {
         variables: {
           calendarScheduleFilter: {},
         },
-        fetchPolicy: 'no-cache',
       })
       .pipe(map((results: any) => results.data.viewAuditSchedules));
   }
 
-  exportSchedulesExcel({
-    filters,
-  }: ScheduleExcelPayloadDto): Observable<number[]> {
+  exportSchedulesExcel(
+    { filters }: ScheduleExcelPayloadDto,
+    skipLoading?: boolean,
+  ): Observable<number[]> {
+    let headers = new HttpHeaders();
+
+    if (skipLoading) {
+      headers = headers.append('SKIP_LOADING', 'true');
+    }
+
     return this.http
-      .post<{ data: number[] }>(this.exportAuditSchedulesExcelUrl, { filters })
+      .post<{
+        data: number[];
+      }>(this.exportAuditSchedulesExcelUrl, filters, { headers })
       .pipe(map((response) => response.data));
   }
 }

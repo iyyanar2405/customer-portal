@@ -1,17 +1,14 @@
 import { TreeNode } from 'primeng/api';
 
+import { EMPTY_GRAPH_DATA } from '@customer-portal/shared/constants';
+import { buildStatusColorPalette } from '@customer-portal/shared/helpers/chart';
 import {
   BarChartModel,
-  buildStatusColorPalette,
   DoughnutChartModel,
-  EMPTY_GRAPH_DATA,
-  SharedSelectMultipleDatum,
   TreeColumnDefinition,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/models';
 
 import {
-  FindingGraphsFilterCompaniesDataDto,
-  FindingGraphsFilterServicesDataDto,
   FindingGraphsFilterSitesDataDto,
   FindingsByStatusGraphDto,
   FindingStatusByCategoryGraphDto,
@@ -202,10 +199,6 @@ export class FindingGraphsMapperService {
     return model;
   }
 
-  static mapToChartFilterCompanies() {}
-
-  static mapToChartFilterServices() {}
-
   static mapToChartFilterSites(
     data: FindingGraphsFilterSitesDataDto[] | undefined,
     depth = 0,
@@ -217,31 +210,6 @@ export class FindingGraphsMapperService {
       label: datum.label,
       children: this.mapToChartFilterSites(datum.children, depth + 1),
     }));
-  }
-  //
-
-  static mapToFindingGraphsFilterCompanies(
-    data: FindingGraphsFilterCompaniesDataDto[],
-  ): SharedSelectMultipleDatum<number>[] {
-    return data.map((datum) => ({
-      label: datum.label,
-      value: datum.id,
-    }));
-  }
-
-  static mapToFindingGraphsFilterServices(
-    data: FindingGraphsFilterServicesDataDto[],
-  ): SharedSelectMultipleDatum<number>[] {
-    return data.map((datum) => ({
-      label: datum.label,
-      value: datum.id,
-    }));
-  }
-
-  static mapToFindingGraphsFilterSites(
-    data: FindingGraphsFilterSitesDataDto[],
-  ): TreeNode[] {
-    return this.getFindingGraphsFilterSites(data);
   }
 
   static mapToFindingsTrendsGraphModel(
@@ -290,22 +258,12 @@ export class FindingGraphsMapperService {
   }
 
   static generateGradientMapping(
-    data: TreeNode[],
+    data: TreeNode[] | undefined,
     targetProperty?: string,
   ): Map<number, string> {
-    return generateGradientMapping(data, targetProperty);
-  }
-
-  private static getFindingGraphsFilterSites(
-    data: FindingGraphsFilterSitesDataDto[],
-  ): TreeNode[] {
-    return data.map((datum) => ({
-      data: datum.id,
-      key: `${datum.id}-${datum.label}`,
-      label: datum.label,
-      children: datum.children
-        ? this.getFindingGraphsFilterSites(datum.children)
-        : undefined,
-    }));
+    return generateGradientMapping(
+      Array.isArray(data) ? data : [],
+      targetProperty,
+    );
   }
 }

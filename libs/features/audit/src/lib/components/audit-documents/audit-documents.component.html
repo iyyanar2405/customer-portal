@@ -18,6 +18,8 @@
       auditDetailsStoreService.auditDocumentsHasActiveFilters()
     "
     [isDocumentsGrid]="true"
+    [isLoading]="auditDetailsStoreService.isLoadingDocuments()"
+    [isShowAddDocument]="canAddDocuments()"
     [paginator]="false"
     [rowHover]="true"
     [scrollable]="true"
@@ -43,6 +45,7 @@
       }
       @if (displayDownloadButton) {
         <shared-button
+          #bulkDownloadBtn
           [icon]="'download'"
           [label]="t('audit.attachedDocuments.downloadButton')"
           [type]="sharedButtonType.Outline"

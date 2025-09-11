@@ -2,11 +2,13 @@ import { Selector } from '@ngxs/store';
 
 import {
   applyGridConfig,
-  FilteringConfig,
-  FilterOptions,
   getNumberOfFilteredRecords,
   isAnyFilterActive,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/helpers/grid';
+import {
+  FilteringConfig,
+  FilterOptions,
+} from '@customer-portal/shared/models/grid';
 
 import {
   SettingsCompanyDetailsCountryListData,
@@ -87,16 +89,6 @@ export class SettingsSelectors {
     isEditCompanyDetailsFormValid: boolean,
   ): boolean {
     return isEditCompanyDetailsFormValid;
-  }
-
-  @Selector([SettingsSelectors._companyDetailsLoaded])
-  static companyDetailsLoaded(companyDetailsLoaded: boolean): boolean {
-    return companyDetailsLoaded;
-  }
-
-  @Selector([SettingsState])
-  private static _companyDetailsLoaded(state: SettingsStateModel): boolean {
-    return state.companyDetailsLoaded;
   }
 
   @Selector([SettingsState])

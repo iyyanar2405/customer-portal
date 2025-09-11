@@ -1,10 +1,14 @@
 import {
-  COLUMN_DELIMITER,
+  ServiceMasterListItemModel,
+  SiteMasterListItemModel,
+} from '@customer-portal/data-access/global';
+import { COLUMN_DELIMITER } from '@customer-portal/shared/constants';
+import {
   convertToUtcDate,
-  FilteringConfig,
-  mapFilterConfigToValues,
   utcDateToPayloadFormat,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/helpers/date';
+import { mapFilterConfigToValues } from '@customer-portal/shared/helpers/grid';
+import { FilteringConfig } from '@customer-portal/shared/models/grid';
 
 import {
   FindingExcelPayloadDto,
@@ -14,40 +18,53 @@ import {
 import { FindingListItemModel } from '../../models';
 
 export class FindingsListMapperService {
-  static mapToFindingItemModel(dto: FindingListDto): FindingListItemModel[] {
+  static mapToFindingItemModel(
+    dto: FindingListDto,
+    siteMasterList: SiteMasterListItemModel[],
+    serviceMasterList: ServiceMasterListItemModel[],
+  ): FindingListItemModel[] {
     if (!dto?.data) {
       return [];
     }
 
     const { data } = dto;
 
-    return data.map((finding: FindingListItemDto) => {
-      const services = Array.from(new Set(finding.services)).join(
-        COLUMN_DELIMITER,
-      );
+    const serviceMap = new Map(
+      serviceMasterList.map((s) => [s.id, s.serviceName]),
+    );
+    const siteMap = new Map(siteMasterList.map((s) => [s.id, s]));
+    const companyMap = new Map(siteMasterList.map((s) => [s.companyId, s]));
 
-      const sites = Array.from(new Set(finding.sites)).join(COLUMN_DELIMITER);
-      const countries = Array.from(new Set(finding.countries)).join(
-        COLUMN_DELIMITER,
-      );
-      const cities = Array.from(new Set(finding.cities)).join(COLUMN_DELIMITER);
+    const result = data.map((finding: FindingListItemDto) => {
+      const services = (finding.services || [])
+        .map((serviceId) => serviceMap.get(serviceId))
+        .filter(Boolean)
+        .join(COLUMN_DELIMITER);
+
+      const siteInfo = siteMap.get(finding.siteId);
+
+      const companySite = companyMap.get(finding.companyId);
+      const companyName = companySite?.companyName ?? '';
 
       return {
         findingNumber: finding.findingNumber,
         status: finding.status,
         title: finding.title,
         category: finding.category,
-        companyName: finding.companyName,
+        companyName,
         services,
-        site: sites,
-        city: cities,
+        site: siteInfo?.siteName ?? '',
+        city: siteInfo?.city ?? '',
         findingsId: String(finding.findingsId),
         openDate: convertToUtcDate(finding.openDate),
         closeDate: convertToUtcDate(finding.closedDate),
         acceptedDate: convertToUtcDate(finding.acceptedDate),
-        country: countries,
+        response: finding.response,
+        country: siteInfo?.countryName ?? '',
       };
     });
+
+    return result;
   }
 
   static mapToFindingExcelPayloadDto(
@@ -57,6 +74,7 @@ export class FindingsListMapperService {
       filters: {
         findings: mapFilterConfigToValues(filterConfig, 'findingNumber'),
         findingsId: mapFilterConfigToValues(filterConfig, 'findingsId'),
+        response: mapFilterConfigToValues(filterConfig, 'response'),
         status: mapFilterConfigToValues(filterConfig, 'status'),
         title: mapFilterConfigToValues(filterConfig, 'title'),
         category: mapFilterConfigToValues(filterConfig, 'category'),

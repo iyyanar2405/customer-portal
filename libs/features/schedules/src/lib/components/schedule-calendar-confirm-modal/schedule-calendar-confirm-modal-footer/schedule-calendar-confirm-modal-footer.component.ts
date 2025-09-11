@@ -5,12 +5,14 @@ import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 
 import { SettingsCompanyDetailsStoreService } from '@customer-portal/data-access/settings';
 import {
-  ADMIN_PERMISSION_CHECKER,
-  HasAdminPermissionDirective,
-  Roles,
   SharedButtonComponent,
   SharedButtonType,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/components/button';
+import { Roles } from '@customer-portal/shared/constants';
+import {
+  ADMIN_PERMISSION_CHECKER,
+  HasAdminPermissionDirective,
+} from '@customer-portal/shared/directives/permissions';
 
 import { SCHEDULE_LIST_SUPPORT } from '../../../constants';
 import { RequestChangesModel } from '../../../models';

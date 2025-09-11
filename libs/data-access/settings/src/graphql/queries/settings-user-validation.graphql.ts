@@ -9,6 +9,9 @@ export const SETTINGS_USER_VALIDATION_QUERY = gql`
         policySubCode
         isDnvUser
         userEmail
+        veracityId
+        portalLanguage
+        isAdmin
       }
       errorCode
       isSuccess

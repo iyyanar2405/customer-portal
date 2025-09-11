@@ -33,3 +33,7 @@ export class LoadUserRolesSuccess {
 
   constructor(public roles: string[]) {}
 }
+
+export class ResetProfileLoadAndErrorState {
+  static readonly type = '[Settings] Reset Profile Load and Error State';
+}

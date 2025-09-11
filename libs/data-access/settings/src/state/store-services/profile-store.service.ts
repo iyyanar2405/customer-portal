@@ -11,6 +11,7 @@ import {
 import {
   LoadProfileData,
   LoadUserRoles,
+  ResetProfileLoadAndErrorState,
   SetInitialLoginStatus,
   UpdateSubmitSettingsStateValues,
   UpdateSubmitSettingsStatus,
@@ -46,6 +47,18 @@ export class ProfileStoreService {
     return this.store.selectSignal(ProfileSelectors.userRoles);
   }
 
+  get profileDataError$(): Observable<string | null> {
+    return this.store.select(
+      (state) => state.settings.loadingErrors.profileData,
+    );
+  }
+
+  get profileDataLoaded$(): Observable<boolean> {
+    return this.store.select(
+      (state) => state.settings.loadedStates.profileData,
+    );
+  }
+
   constructor(private store: Store) {}
 
   @Dispatch()
@@ -68,6 +81,9 @@ export class ProfileStoreService {
 
   @Dispatch()
   loadUserRoles = () => new LoadUserRoles();
+
+  @Dispatch()
+  resetProfileLoadAndErrorState = () => new ResetProfileLoadAndErrorState();
 
   hasPermission(
     category: string,

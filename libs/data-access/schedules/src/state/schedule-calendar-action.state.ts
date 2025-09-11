@@ -2,14 +2,14 @@ import { Injectable } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { Action, State, StateContext } from '@ngxs/store';
 import { MessageService } from 'primeng/api';
-import { catchError, map, tap } from 'rxjs';
+import { catchError, filter, map, tap } from 'rxjs';
 
-import { UnreadActionsStoreService } from '@customer-portal/data-access/actions';
-import {
-  downloadFileFromByteArray,
-  getToastContentBySeverity,
-  ToastSeverity,
-} from '@customer-portal/shared';
+import { LoggingService } from '@customer-portal/core/app-insights';
+import { UnreadActionsStoreService } from '@customer-portal/data-access/actions/state';
+import { throwIfNotSuccess } from '@customer-portal/shared/helpers/custom-operators';
+import { getToastContentBySeverity } from '@customer-portal/shared/helpers/custom-toast';
+import { downloadFileFromByteArray } from '@customer-portal/shared/helpers/download';
+import { ToastSeverity } from '@customer-portal/shared/models';
 
 import {
   ScheduleCalendarInviteCalendarAttributesDto,
@@ -17,6 +17,8 @@ import {
   ScheduleCalendarRescheduleReasonDto,
 } from '../dtos';
 import {
+  ConfirmProposedSchedule,
+  RescheduleAudit,
   ScheduleCalendarInviteCalendarAttributesModel,
   ScheduleCalendarRescheduleReasonModel,
 } from '../models';
@@ -24,6 +26,8 @@ import {
   ScheduleCalendarActionMapper,
   ScheduleCalendarActionService,
 } from '../services';
+import { ScheduleListCalendarStoreService } from './store-services/schedule-list-calendar-store.service';
+import { ScheduleListStoreService } from './store-services/schedule-list-store.service';
 import {
   LoadScheduleCalendarAddToCalendar,
   LoadScheduleCalendarAddToCalendarSuccess,
@@ -58,6 +62,9 @@ export class ScheduleCalendarActionState {
     private scheduleCalendarActionService: ScheduleCalendarActionService,
     private ts: TranslocoService,
     private unreadActionsStoreService: UnreadActionsStoreService,
+    private scheduleListCalendarStoreService: ScheduleListCalendarStoreService,
+    private scheduleListStoreService: ScheduleListStoreService,
+    private loggingService: LoggingService,
   ) {}
 
   @Action(LoadScheduleCalendarAddToCalendar)
@@ -144,23 +151,45 @@ export class ScheduleCalendarActionState {
     return this.scheduleCalendarActionService
       .editScheduleCalendarConfirm(siteAuditId)
       .pipe(
-        tap(() => ctx.dispatch(new UpdateScheduleCalendarConfirmSuccess())),
-        catchError(() =>
+        filter((res): res is ConfirmProposedSchedule => !!res),
+        throwIfNotSuccess(),
+        tap(() =>
+          ctx.dispatch(new UpdateScheduleCalendarConfirmSuccess(siteAuditId)),
+        ),
+        catchError((_) =>
           ctx.dispatch(new UpdateScheduleCalendarConfirmError()),
         ),
       );
   }
 
   @Action(UpdateScheduleCalendarConfirmSuccess)
-  updateScheduleCalendarConfirmSuccess() {
+  updateScheduleCalendarConfirmSuccess(
+    ctx: StateContext<ScheduleCalendarActionStateModel>,
+    { siteAuditId }: UpdateScheduleCalendarConfirmSuccess,
+  ) {
+    this.loggingService.logEvent('Schedule_Calendar_Confirm_Success', {
+      siteAuditId,
+      timestamp: new Date().toISOString(),
+    });
+
     const message = getToastContentBySeverity(ToastSeverity.Success);
     message.summary = this.ts.translate('schedules.confirm.success');
     this.messageService.add(message);
     this.unreadActionsStoreService.loadUnreadActions();
+    this.scheduleListCalendarStoreService.updateScheduleStatusToConfirmed(
+      siteAuditId,
+    );
+    this.scheduleListStoreService.updateScheduleListStatusToConfirmed(
+      siteAuditId,
+    );
   }
 
   @Action(UpdateScheduleCalendarConfirmError)
   updateScheduleCalendarConfirmError() {
+    this.loggingService.logEvent('Schedule_Calendar_Confirm_Failed', {
+      timestamp: new Date().toISOString(),
+    });
+
     const message = getToastContentBySeverity(ToastSeverity.Error);
     message.summary = this.ts.translate('schedules.confirm.error');
     this.messageService.add(message);
@@ -186,7 +215,13 @@ export class ScheduleCalendarActionState {
         weekNumber,
       )
       .pipe(
-        tap(() => ctx.dispatch(new UpdateScheduleCalendarRescheduleSuccess())),
+        filter((res): res is RescheduleAudit => !!res),
+        throwIfNotSuccess(),
+        tap(() =>
+          ctx.dispatch(
+            new UpdateScheduleCalendarRescheduleSuccess(siteAuditId),
+          ),
+        ),
         catchError(() =>
           ctx.dispatch(new UpdateScheduleCalendarRescheduleError()),
         ),
@@ -194,10 +229,17 @@ export class ScheduleCalendarActionState {
   }
 
   @Action(UpdateScheduleCalendarRescheduleSuccess)
-  updateScheduleCalendarRescheduleSuccess() {
+  updateScheduleCalendarRescheduleSuccess(
+    ctx: StateContext<ScheduleCalendarActionStateModel>,
+    { siteAuditId }: UpdateScheduleCalendarRescheduleSuccess,
+  ) {
     const message = getToastContentBySeverity(ToastSeverity.Success);
     message.summary = this.ts.translate('schedules.reschedule.success');
     this.messageService.add(message);
+    this.scheduleListCalendarStoreService.updateScheduleStatusForReschedule(
+      siteAuditId,
+    );
+    this.scheduleListStoreService.updateScheduleListForReschedule(siteAuditId);
   }
 
   @Action(UpdateScheduleCalendarRescheduleError)

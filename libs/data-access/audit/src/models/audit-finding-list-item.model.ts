@@ -9,7 +9,6 @@ export interface AuditFindingListItemModel {
   city: string;
   auditNumber: string;
   openDate: string;
-  dueDate: string;
   closeDate: string;
   acceptedDate: string;
 }

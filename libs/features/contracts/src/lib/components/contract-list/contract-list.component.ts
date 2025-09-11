@@ -1,30 +1,50 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { TranslocoModule } from '@jsverse/transloco';
-import { filter, tap } from 'rxjs';
+import { filter, map, Observable, tap } from 'rxjs';
 
 import {
   ContractsListItemModel,
+  ContractsListMapperService,
+  ContractsListService,
   ContractsListStoreService,
 } from '@customer-portal/data-access/contracts';
 import {
   DocType,
-  DocumentsStoreService,
+  DownloadFileNames,
+  DownloadType,
+  DownloadTypeName,
 } from '@customer-portal/data-access/documents';
+import {
+  DocumentQueueService,
+  DocumentsService,
+} from '@customer-portal/data-access/documents/services';
 import { SettingsCoBrowsingStoreService } from '@customer-portal/data-access/settings';
 import { BasePreferencesComponent } from '@customer-portal/preferences';
 import {
-  ColumnDefinition,
-  GridComponent,
-  GridConfig,
-  GridFileActionEvent,
-  GridFileActionType,
+  SharedButtonComponent,
+  SharedButtonType,
+} from '@customer-portal/shared/components/button';
+import { GridComponent } from '@customer-portal/shared/components/grid';
+import {
   ObjectName,
   ObjectType,
   PageName,
-  SharedButtonComponent,
-  SharedButtonType,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/constants';
+import { animateFlyToDownload } from '@customer-portal/shared/helpers/download';
+import {
+  ColumnDefinition,
+  GridConfig,
+  GridFileActionEvent,
+  GridFileActionType,
+} from '@customer-portal/shared/models';
 
 import { CONTRACTS_LIST_COLUMNS } from '../../constants';
 
@@ -43,8 +63,11 @@ import { CONTRACTS_LIST_COLUMNS } from '../../constants';
 })
 export class ContractListComponent
   extends BasePreferencesComponent
-  implements OnDestroy
+  implements OnDestroy, OnInit
 {
+  @ViewChild('grid') gridComponent!: GridComponent;
+  @ViewChild('bulkDownloadBtn', { read: ElementRef })
+  bulkDownloadBtn!: ElementRef;
   cols: ColumnDefinition[] = CONTRACTS_LIST_COLUMNS;
   shouldDisplayDownloadBtn = false;
   selectedContractsIds: number[] = [];
@@ -60,7 +83,9 @@ export class ContractListComponent
   constructor(
     public contractsListStoreService: ContractsListStoreService,
     public settingsCoBrowsingStoreService: SettingsCoBrowsingStoreService,
-    private documentsStoreService: DocumentsStoreService,
+    private documentQueueService: DocumentQueueService,
+    private documentsService: DocumentsService,
+    private contractsListService: ContractsListService,
   ) {
     super();
 
@@ -69,6 +94,10 @@ export class ContractListComponent
       ObjectName.Contracts,
       ObjectType.Grid,
     );
+  }
+
+  ngOnInit(): void {
+    this.registerDownloadHandlers();
   }
 
   onGridConfigChanged(gridConfig: GridConfig): void {
@@ -89,12 +118,39 @@ export class ContractListComponent
     documentId: number;
   }): void {
     if (event.actionType === GridFileActionType.Download) {
-      this.documentsStoreService.downloadDocument(documentId, fileName);
+      this.documentQueueService.addDownloadTask(
+        DownloadType.Contract,
+        DownloadTypeName.Contract,
+        fileName,
+        { documentId },
+      );
+
+      if (event.element) {
+        animateFlyToDownload(event.element);
+      }
     }
   }
 
   onExportExcelClick(): void {
-    this.contractsListStoreService.exportContractsExcel();
+    const filterConfig = {
+      ...this.contractsListStoreService.filteringConfigSignal(),
+    };
+    const payload =
+      ContractsListMapperService.mapToContractsExcelPayloadDto(filterConfig);
+    const fileName = 'contracts.xlsx';
+
+    this.documentQueueService.addDownloadTask(
+      DownloadType.ContractExcel,
+      DownloadTypeName.ContractExcel,
+      fileName,
+      { payload },
+    );
+
+    const exportBtnEl = this.gridComponent.getExportButtonElement();
+
+    if (exportBtnEl) {
+      animateFlyToDownload(exportBtnEl);
+    }
   }
 
   onSelectionChangeData(selectedContracts: ContractsListItemModel[]): void {
@@ -108,13 +164,90 @@ export class ContractListComponent
   }
 
   downloadSelectedContracts(): void {
-    this.documentsStoreService.downloadAllDocuments(
-      this.selectedContractsIds,
-      DocType.Contract,
+    this.documentQueueService.addDownloadTask(
+      DownloadType.ContractBulk,
+      DownloadTypeName.ContractBulk,
+      'contracts.zip',
+      { ids: this.selectedContractsIds, docType: DocType.Contract },
     );
+
+    if (this.bulkDownloadBtn?.nativeElement) {
+      animateFlyToDownload(this.bulkDownloadBtn.nativeElement);
+    }
   }
 
   ngOnDestroy(): void {
     this.contractsListStoreService.resetContractListState();
+  }
+
+  private registerDownloadHandlers(): void {
+    this.documentQueueService.registerDownloadHandler(
+      DownloadType.Contract,
+      this.createSingleContractDownloadHandler(),
+    );
+    this.documentQueueService.registerDownloadHandler(
+      DownloadType.ContractBulk,
+      this.createBulkContractDownloadHandler(),
+    );
+    this.documentQueueService.registerDownloadHandler(
+      DownloadType.ContractExcel,
+      this.createExcelExportHandler(),
+    );
+  }
+
+  private createSingleContractDownloadHandler(): (
+    data: any,
+    fileName: string,
+  ) => Observable<{ blob: Blob; fileName: string }> {
+    return (data, fileName) =>
+      this.documentsService
+        .downloadDocument(data.documentId, fileName, true)
+        .pipe(map((response) => this.mapDownloadResponse(response, fileName)));
+  }
+
+  private createBulkContractDownloadHandler(): (
+    data: any,
+    fileName: string,
+  ) => Observable<{ blob: Blob; fileName: string }> {
+    return (data, fileName) =>
+      this.documentsService
+        .downloadAllDocuments(data.ids, data.docType, true)
+        .pipe(map((response) => this.mapDownloadResponse(response, fileName)));
+  }
+
+  private createExcelExportHandler(): (
+    data: any,
+    fileName: string,
+  ) => Observable<{ blob: Blob; fileName: string }> {
+    return (data, fileName) =>
+      this.contractsListService.exportContractsExcel(data.payload, true).pipe(
+        map((input) => ({
+          blob: new Blob([new Uint8Array(input)], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          }),
+          fileName: fileName || DownloadFileNames.ContractExcel,
+        })),
+      );
+  }
+
+  private mapDownloadResponse(
+    response: any,
+    fallbackFileName: string,
+  ): { blob: Blob; fileName: string } {
+    if (!response.body) {
+      throw new Error('Document download failed: Blob is null');
+    }
+    const contentDisposition = response.headers.get('content-disposition');
+
+    if (!contentDisposition && response.headers) {
+      throw new Error('Content-Disposition header is missing');
+    }
+
+    return {
+      blob: response.body,
+      fileName:
+        this.documentQueueService.extractFileName(contentDisposition ?? '') ||
+        fallbackFileName,
+    };
   }
 }

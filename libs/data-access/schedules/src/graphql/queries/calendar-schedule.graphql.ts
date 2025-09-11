@@ -10,14 +10,16 @@ export const CALENDAR_SCHEDULE_QUERY = gql`
         startDate
         endDate
         status
-        services
-        site
-        city
+        serviceIds
+        siteId
         auditType
         leadAuditor
-        siteAddress
         siteRepresentatives
-        company
+        companyId
+        auditID
+        reportingCountry
+        projectNumber
+        __typename
       }
       isSuccess
       message

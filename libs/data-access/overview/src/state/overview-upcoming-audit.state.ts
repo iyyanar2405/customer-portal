@@ -3,10 +3,9 @@ import { Action, State, StateContext } from '@ngxs/store';
 import { MessageService } from 'primeng/api';
 import { catchError, of, tap } from 'rxjs';
 
-import {
-  getToastContentBySeverity,
-  ToastSeverity,
-} from '@customer-portal/shared';
+import { throwIfNotSuccess } from '@customer-portal/shared/helpers/custom-operators';
+import { getToastContentBySeverity } from '@customer-portal/shared/helpers/custom-toast';
+import { ToastSeverity } from '@customer-portal/shared/models';
 
 import {
   OverviewUpcomingAuditEvent,
@@ -20,12 +19,16 @@ export interface OverviewUpcomingAuditStateModel {
   events: OverviewUpcomingAuditEvent[];
   selectedYear: number;
   selectedMonth: number;
+  isLoading: boolean;
+  errorMessage: string | null;
 }
 
 const defaultState: OverviewUpcomingAuditStateModel = {
   events: [],
   selectedYear: 0,
   selectedMonth: 0,
+  isLoading: false,
+  errorMessage: '',
 };
 
 @State<OverviewUpcomingAuditsStateModel>({
@@ -44,9 +47,15 @@ export class OverviewUpcomingAuditsState {
     ctx: StateContext<OverviewUpcomingAuditsStateModel>,
     { selectedMonth, selectedYear }: LoadOverviewUpcomingAuditEvents,
   ) {
+    ctx.patchState({
+      isLoading: true,
+      errorMessage: '',
+    });
+
     return this.overviewUpcomingAuditService
       .getOverviewUpcomingAuditEvents(selectedMonth, selectedYear)
       .pipe(
+        throwIfNotSuccess(),
         tap((response) => {
           const formattedEvents =
             response.data?.length > 0
@@ -54,8 +63,9 @@ export class OverviewUpcomingAuditsState {
                   response.data[0],
                 )
               : [];
-
           ctx.patchState({
+            isLoading: false,
+            errorMessage: '',
             events: formattedEvents,
             selectedMonth,
             selectedYear,
@@ -65,6 +75,13 @@ export class OverviewUpcomingAuditsState {
           this.messageService.add(
             getToastContentBySeverity(ToastSeverity.SomethingWentWrong),
           );
+          ctx.patchState({
+            events: [],
+            selectedYear: 0,
+            selectedMonth: 0,
+            isLoading: false,
+            errorMessage: 'Failed to load overview upcoming audit data',
+          });
 
           return of([]);
         }),

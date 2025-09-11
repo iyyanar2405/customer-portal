@@ -7,15 +7,14 @@ export const AUDIT_FINDING_LIST_QUERY = gql`
         acceptedDate
         auditId
         category
-        companyName
-        cities
+        companyId
         closedDate
         dueDate
         findingNumber
         findingsId
         openDate
         services
-        sites
+        siteId
         status
         title
       }

@@ -26,6 +26,12 @@ export class LoadSettingsCompanyDetailsCountryListSuccess {
   constructor(public data: SettingsCompanyDetailsCountryListModel) {}
 }
 
+export class SetCompanyDetailsAdminStatus {
+  static readonly type = '[Settings] Set Company Details Admin Status';
+
+  constructor(public isUserAdmin: boolean) {}
+}
+
 export class UpdateSettingsCompanyDetails {
   static readonly type = '[Settings] Update Company Details';
 
@@ -53,4 +59,8 @@ export class UpdateEditCompanyDetailsFormValidity {
     '[Settings] Update Edit Parent Company Details Form Validity';
 
   constructor(public isEditCompanyDetailsFormValid: boolean) {}
+}
+
+export class ResetCompanyLoadAndErrorState {
+  static readonly type = '[Settings] Reset Company Load and Error State';
 }

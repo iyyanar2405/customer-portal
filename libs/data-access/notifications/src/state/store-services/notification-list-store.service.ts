@@ -3,11 +3,9 @@ import { Store } from '@ngxs/store';
 import { Dispatch } from '@ngxs-labs/dispatch-decorator';
 import { TreeNode } from 'primeng/api';
 
-import {
-  GridConfig,
-  SharedSelectMultipleDatum,
-  SharedSelectTreeChangeEventOutput,
-} from '@customer-portal/shared';
+import { SharedSelectMultipleDatum } from '@customer-portal/shared/components/select/multiple';
+import { SharedSelectTreeChangeEventOutput } from '@customer-portal/shared/models';
+import { GridConfig } from '@customer-portal/shared/models/grid';
 
 import { NotificationFilterKey } from '../../constants';
 import { NotificationModel } from '../../models';
@@ -128,6 +126,10 @@ export class NotificationListStoreService {
     return this.store.selectSignal(
       NotificationListSelectors.selectedCategoryList,
     );
+  }
+
+  get isLoading(): Signal<boolean> {
+    return this.store.selectSignal(NotificationListSelectors.isLoading);
   }
 
   @Dispatch()

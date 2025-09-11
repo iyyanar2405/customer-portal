@@ -1,11 +1,11 @@
 import { TreeNode } from 'primeng/api';
 
+import { SharedSelectMultipleDatum } from '@customer-portal/shared/components/select/multiple';
 import {
   FilterValue,
   GridConfig,
-  SharedSelectMultipleDatum,
   SharedSelectTreeChangeEventOutput,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/models';
 
 import { ActionFilterKey } from '../../constants';
 

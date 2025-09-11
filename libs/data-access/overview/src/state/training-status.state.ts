@@ -1,15 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Action, State, StateContext } from '@ngxs/store';
 import { MessageService } from 'primeng/api';
-import { catchError, of, tap } from 'rxjs';
+import { catchError, map, of, tap } from 'rxjs';
 
-import {
-  getToastContentBySeverity,
-  ToastSeverity,
-} from '@customer-portal/shared';
+import { throwIfNotSuccess } from '@customer-portal/shared/helpers/custom-operators';
+import { getToastContentBySeverity } from '@customer-portal/shared/helpers/custom-toast';
+import { ToastSeverity } from '@customer-portal/shared/models';
 
 import { TrainingStatusGraphResponseDto } from '../dtos';
-import { TrainingStatusModel } from '../models';
+import { TrainingStatusListWithStatus, TrainingStatusModel } from '../models';
 import { TrainingStatusMapper, TrainingStatusService } from '../services';
 import {
   LoadTrainingStatus,
@@ -20,11 +19,15 @@ import {
 export interface TrainingStatusStateModel {
   trainings: TrainingStatusModel[];
   traningStatusError: boolean;
+  isLoading: boolean;
+  errorMessage: string | null;
 }
 
 const defaultState: TrainingStatusStateModel = {
   trainings: [],
   traningStatusError: false,
+  isLoading: false,
+  errorMessage: '',
 };
 
 @State<TrainingStatusStateModel>({
@@ -40,22 +43,26 @@ export class TrainingStatusState {
 
   @Action(LoadTrainingStatus)
   loadTrainingStatus(ctx: StateContext<TrainingStatusStateModel>) {
-    return this.trainingStatusService.getTrainingStatusList().pipe(
-      tap((trainingStatusList: TrainingStatusGraphResponseDto) => {
-        const trainingStatus =
-          TrainingStatusMapper.mapToTrainingStatusList(trainingStatusList);
+    ctx.patchState({
+      isLoading: true,
+      errorMessage: '',
+      trainings: [],
+    });
 
-        if (trainingStatus.isSuccess) {
-          ctx.dispatch(new LoadTrainingStatusSuccess(trainingStatus.data));
-        } else {
-          ctx.patchState({
-            traningStatusError: true,
-          });
-        }
+    return this.trainingStatusService.getTrainingStatusList().pipe(
+      map((trainingStatusList: TrainingStatusGraphResponseDto) =>
+        TrainingStatusMapper.mapToTrainingStatusList(trainingStatusList),
+      ),
+      throwIfNotSuccess(),
+      tap((trainingStatus: TrainingStatusListWithStatus) => {
+        ctx.dispatch(new LoadTrainingStatusSuccess(trainingStatus.data));
       }),
       catchError(() => {
         ctx.patchState({
           traningStatusError: true,
+          trainings: [],
+          isLoading: false,
+          errorMessage: 'Failed to load overview training status data',
         });
 
         return of(null);
@@ -71,6 +78,8 @@ export class TrainingStatusState {
     ctx.patchState({
       trainings: trainingStatusList,
       traningStatusError: false,
+      errorMessage: '',
+      isLoading: false,
     });
   }
 

@@ -6,9 +6,11 @@ export interface SettingsCompanyDetailsModel {
 
 export interface SettingsCompanyDetailsData {
   accountId: number;
+  accountDNVId: number;
   address: string;
   city: string;
   country: string;
+  countryCode: string;
   countryId: number;
   organizationName: string;
   poNumberRequired: boolean;
@@ -18,7 +20,7 @@ export interface SettingsCompanyDetailsData {
 }
 
 export interface SettingsCompanyDetailsEditParams {
-  accountId: number;
+  accountDNVId: number;
   address: string;
   city: string;
   countryId: number;

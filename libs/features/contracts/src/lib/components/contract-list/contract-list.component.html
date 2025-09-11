@@ -2,10 +2,10 @@
   <section aria-labelledby="contract-title" class="head">
     <h1 id="contract-title">{{ t('contracts.title') }}</h1>
   </section>
-
   <section class="body" role="region" [attr.aria-label]="t('content')">
     @if (isPreferenceInitialized | async) {
       <shared-grid
+        #grid
         class="table-list"
         dataKey="contractId"
         [columns]="cols"
@@ -16,6 +16,7 @@
         [filterOptions]="contractsListStoreService.filterOptions()"
         [filteringConfig$]="contractsListStoreService.filteringConfig"
         [hasActiveFilters]="contractsListStoreService.hasActiveFilters()"
+        [isLoading]="contractsListStoreService.isLoading()"
         [paginator]="true"
         [preferenceData]="preferenceData()"
         [rowHover]="true"
@@ -35,6 +36,7 @@
         <ng-template #buttonsCustomTemplate>
           @if (shouldDisplayDownloadBtn) {
             <shared-button
+              #bulkDownloadBtn
               [icon]="'download'"
               [label]="t('contracts.contractsList.download')"
               [type]="sharedButtonType.Secondary"

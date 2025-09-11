@@ -2,16 +2,12 @@ import { importProvidersFrom } from '@angular/core';
 import { InlineLoader, provideTranslocoScope } from '@jsverse/transloco';
 import { NgxsModule } from '@ngxs/store';
 
-import { AuditListState } from '@customer-portal/data-access/audit';
-import { FindingsListState } from '@customer-portal/data-access/findings';
 import {
   OverviewFinancialStatusState,
-  OverviewState,
-  OverviewStoreService,
+  OverviewListState,
   OverviewUpcomingAuditsState,
   TrainingStatusState,
 } from '@customer-portal/data-access/overview';
-import { ScheduleListState } from '@customer-portal/data-access/schedules';
 import { Language } from '@customer-portal/shared';
 
 export const loader = [Language.English, Language.Italian].reduce(
@@ -27,44 +23,26 @@ export const OVERVIEW_ROUTES = [
   {
     path: '',
     loadComponent: () =>
-      import('./lib/components/overview/overview.component').then(
-        (m) => m.OverviewComponent,
+      import('./lib/components/overview-list/overview-list.component').then(
+        (m) => m.OverviewListComponent,
       ),
     data: {
       breadcrumb: null,
     },
     title: 'Overview',
     providers: [
-      OverviewStoreService,
       provideTranslocoScope({
         scope: 'overview',
         loader,
       }),
       importProvidersFrom(
         NgxsModule.forFeature([
-          OverviewState,
+          OverviewListState,
           TrainingStatusState,
           OverviewFinancialStatusState,
-          AuditListState,
-          FindingsListState,
-          ScheduleListState,
+          OverviewUpcomingAuditsState,
         ]),
       ),
-    ],
-    children: [
-      {
-        path: '',
-        loadComponent: () =>
-          import(
-            './lib/components/overview-upcoming-audits/overview-upcoming-audits.component'
-          ).then((m) => m.OverviewUpcomingAuditsComponent),
-        title: 'Overview Upcoming Audits',
-        providers: [
-          importProvidersFrom(
-            NgxsModule.forFeature([OverviewUpcomingAuditsState]),
-          ),
-        ],
-      },
     ],
   },
 ];

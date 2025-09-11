@@ -13,4 +13,14 @@ export class OverviewUpcomingAuditsSelectors {
   ): OverviewUpcomingAuditEvent[] {
     return event?.events || [];
   }
+
+  @Selector([OverviewUpcomingAuditsSelectors._isLoading])
+  static isLoading(_isLoading: boolean): boolean {
+    return _isLoading;
+  }
+
+  @Selector([OverviewUpcomingAuditsState])
+  private static _isLoading(state: OverviewUpcomingAuditsStateModel): boolean {
+    return state.isLoading;
+  }
 }

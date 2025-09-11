@@ -31,15 +31,23 @@ export interface MemberAreasPermissions {
 
 export enum MemberAreaPermissions {
   Contracts = 'contracts',
-  ScheduleAuditsFindings = 'scheduleAuditsFindings',
+  Schedules = 'schedules',
+  Audits = 'audits',
+  Findings = 'findings',
   Certificates = 'certificates',
   Financials = 'financials',
 }
 
 export enum AccessAreaRoleNames {
   CONTRACTS_VIEW = 'Contracts_View',
-  SAF_VIEW = 'SAF_View',
-  SAF_EDIT = 'SAF_Edit',
+  CONTRACTS_EDIT = 'Contracts_Edit',
+  SCHEDULE_VIEW = 'Schedule_View',
+  SCHEDULE_EDIT = 'Schedule_Edit',
+  AUDITS_VIEW = 'Audits_View',
+  AUDITS_EDIT = 'Audits_Edit',
+  FINDINGS_VIEW = 'Findings_View',
+  FINDINGS_EDIT = 'Findings_Edit',
+  FINDINGS_SUBMIT = 'Findings_Submit',
   CERTIFICATES_VIEW = 'Certificates_View',
   CERTIFICATES_EDIT = 'Certificates_Edit',
   FINANCIALS_EDIT = 'Financials_Edit',

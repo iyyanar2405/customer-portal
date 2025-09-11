@@ -2,6 +2,7 @@
   <h3>{{ t('audit.auditDetailsDescription.subAudits') }}</h3>
 
   <shared-grid
+    #grid
     [columns]="cols"
     [data]="auditDetailsStoreService.subAuditItems()"
     [displayClearButton]="auditDetailsStoreService.subAuditHasActiveFilters()"
@@ -10,6 +11,7 @@
     [filterOptions]="auditDetailsStoreService.subAuditFilterOptions()"
     [filteringConfig$]="auditDetailsStoreService.subAuditFilteringConfig"
     [hasActiveFilters]="auditDetailsStoreService.subAuditHasActiveFilters()"
+    [isLoading]="auditDetailsStoreService.isLoadingSubAudits()"
     [paginator]="true"
     [route]="'/audit/'"
     [rowHover]="true"

@@ -57,6 +57,8 @@ export class UpdateScheduleCalendarReschedule {
 
 export class UpdateScheduleCalendarRescheduleSuccess {
   static readonly type = '[Schedule Calendar Action] Reschedule Success';
+
+  public constructor(public siteAuditId: number) {}
 }
 
 export class UpdateScheduleCalendarRescheduleError {
@@ -71,6 +73,8 @@ export class UpdateScheduleCalendarConfirm {
 
 export class UpdateScheduleCalendarConfirmSuccess {
   static readonly type = '[Schedule Calendar Action] Confirm Success';
+
+  public constructor(public siteAuditId: number) {}
 }
 
 export class UpdateScheduleCalendarConfirmError {

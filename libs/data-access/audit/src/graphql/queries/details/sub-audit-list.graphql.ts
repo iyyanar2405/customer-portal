@@ -5,7 +5,6 @@ export const SUB_AUDIT_LIST_QUERY = gql`
     viewSubAudits(auditId: $auditId) {
       data {
         auditId
-        cities
         sites
         services
         status

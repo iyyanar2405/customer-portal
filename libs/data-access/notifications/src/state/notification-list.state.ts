@@ -3,18 +3,20 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { Navigate } from '@ngxs/router-plugin';
 import { Action, State, StateContext } from '@ngxs/store';
 import { TreeNode } from 'primeng/api';
-import { catchError, of, tap } from 'rxjs';
+import { catchError, EMPTY, of, tap } from 'rxjs';
 
+import { SharedSelectMultipleDatum } from '@customer-portal/shared/components/select/multiple';
+import { DEFAULT_GRID_CONFIG, Routes } from '@customer-portal/shared/constants';
 import {
   constructNavigation,
-  DEFAULT_GRID_CONFIG,
+  throwIfNotSuccess,
+} from '@customer-portal/shared/helpers';
+import { SharedSelectTreeChangeEventOutput } from '@customer-portal/shared/models';
+import {
   FilterOptions,
   FilterValue,
   GridConfig,
-  Routes,
-  SharedSelectMultipleDatum,
-  SharedSelectTreeChangeEventOutput,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/models/grid';
 
 import { NotificationFilterKey } from '../constants';
 import {
@@ -81,6 +83,8 @@ export interface NotificationsListStateModel {
   selectedCompanyList: number[];
   selectedSiteList: number[];
   isFilterApplied: boolean;
+  isLoading: boolean;
+  error: string | null;
 }
 
 const defaultState: NotificationsListStateModel = {
@@ -108,6 +112,8 @@ const defaultState: NotificationsListStateModel = {
   selectedCompanyList: [],
   selectedSiteList: [],
   isFilterApplied: false,
+  isLoading: false,
+  error: null,
 };
 
 @State<NotificationsListStateModel>({
@@ -121,8 +127,13 @@ export class NotificationListState {
     private domSanitizer: DomSanitizer,
   ) {}
 
-  @Action(LoadNotificationsList)
+  @Action(LoadNotificationsList, { cancelUncompleted: true })
   loadNotificationList(ctx: StateContext<NotificationsListStateModel>) {
+    ctx.patchState({
+      isLoading: true,
+      notifications: [],
+      error: '',
+    });
     const state = ctx.getState();
     const {
       pageSize,
@@ -158,19 +169,31 @@ export class NotificationListState {
         currentpageSize,
       )
       .pipe(
+        throwIfNotSuccess(),
         tap((notificationsList: NotificationListDto) => {
-          if (notificationsList) {
-            const notifications =
-              NotificationsListMapperService.mapToNotificationsListModel(
-                notificationsList,
-                this.domSanitizer,
-              );
+          const notifications =
+            NotificationsListMapperService.mapToNotificationsListModel(
+              notificationsList,
+              this.domSanitizer,
+            );
 
-            const { totalItems } = notificationsList;
-            ctx.patchState({ notifications, totalItems });
-          } else {
-            ctx.patchState({ notifications: [], totalItems: 0 });
-          }
+          const { totalItems } = notificationsList.data;
+          ctx.patchState({
+            notifications,
+            totalItems,
+            isLoading: false,
+            error: '',
+          });
+        }),
+        catchError(() => {
+          ctx.patchState({
+            notifications: [],
+            totalItems: 0,
+            isLoading: false,
+            error: 'Failed to load notification data',
+          });
+
+          return EMPTY;
         }),
       );
   }
@@ -183,7 +206,28 @@ export class NotificationListState {
     return this.notificationListService.updateNotification(action.id).pipe(
       tap((isSuccess) => {
         if (isSuccess) {
+          const state = ctx.getState();
+          const updatedNotifications: NotificationModel[] =
+            state.notifications.map((notification: NotificationModel) => {
+              if (notification.id === action.id) {
+                return {
+                  ...notification,
+                  isRead: true,
+                  iconTooltip: {
+                    ...notification.iconTooltip,
+                    displayIcon: false,
+                  },
+                };
+              }
+
+              return notification;
+            });
           ctx.dispatch(new LoadUnreadNotifications());
+
+          ctx.patchState({
+            ...state,
+            notifications: updatedNotifications,
+          });
         }
       }),
       catchError(() => {
@@ -251,7 +295,7 @@ export class NotificationListState {
     return ctx.dispatch(new LoadNotificationsList());
   }
 
-  @Action(LoadNotificationFilterList)
+  @Action(LoadNotificationFilterList, { cancelUncompleted: true })
   loadNotificationFilterList(ctx: StateContext<NotificationsListStateModel>) {
     ctx.dispatch([
       new LoadNotificationFilterCategories(),
@@ -271,7 +315,7 @@ export class NotificationListState {
     });
   }
 
-  @Action(LoadNotificationFilterServices)
+  @Action(LoadNotificationFilterServices, { cancelUncompleted: true })
   loadNotificationFilterServices(
     ctx: StateContext<NotificationsListStateModel>,
   ) {
@@ -317,7 +361,7 @@ export class NotificationListState {
     });
   }
 
-  @Action(LoadNotificationFilterCategories)
+  @Action(LoadNotificationFilterCategories, { cancelUncompleted: true })
   loadNotificationFilterCategories(
     ctx: StateContext<NotificationsListStateModel>,
   ) {
@@ -363,7 +407,7 @@ export class NotificationListState {
     });
   }
 
-  @Action(LoadNotificationFilterCompanies)
+  @Action(LoadNotificationFilterCompanies, { cancelUncompleted: true })
   loadNotificationFilterCompanies(
     ctx: StateContext<NotificationsListStateModel>,
   ) {
@@ -409,7 +453,7 @@ export class NotificationListState {
     });
   }
 
-  @Action(LoadNotificationFilterSites)
+  @Action(LoadNotificationFilterSites, { cancelUncompleted: true })
   loadNotificationFilterSites(ctx: StateContext<NotificationsListStateModel>) {
     const { selectedCategoryList, selectedCompanyList, selectedServiceList } =
       ctx.getState();
@@ -482,8 +526,8 @@ export class NotificationListState {
     };
     ctx.dispatch(actionsMap[key]);
 
-    const hasValues = (map: { [key: string]: any[] }) =>
-      Object.values(map).some((array) =>
+    const hasValues = (mapAction: { [key: string]: any[] }) =>
+      Object.values(mapAction).some((array) =>
         array.some((item) => {
           if (
             item instanceof UpdateNotificationFilterCategories ||

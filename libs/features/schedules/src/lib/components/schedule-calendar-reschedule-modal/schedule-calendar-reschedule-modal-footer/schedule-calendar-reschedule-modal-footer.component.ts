@@ -1,17 +1,22 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed } from '@angular/core';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { Observable } from 'rxjs';
 
-import { SettingsCompanyDetailsStoreService } from '@customer-portal/data-access/settings';
+import {
+  SettingsCoBrowsingStoreService,
+  SettingsCompanyDetailsStoreService,
+} from '@customer-portal/data-access/settings';
+import {
+  SharedButtonComponent,
+  SharedButtonType,
+} from '@customer-portal/shared/components/button';
+import { Roles } from '@customer-portal/shared/constants';
 import {
   ADMIN_PERMISSION_CHECKER,
   HasAdminPermissionDirective,
-  Roles,
-  SharedButtonComponent,
-  SharedButtonType,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/directives/permissions';
 
 import { SCHEDULE_LIST_SUPPORT } from '../../../constants';
 import { RequestChangesModel } from '../../../models';
@@ -39,9 +44,14 @@ export class ScheduleCalendarRescheduleModalFooterComponent {
   sharedButtonType = SharedButtonType;
   public roles = Roles;
 
+  public isDnvUser = computed(() =>
+    this.settingsCoBrowsingStoreService.isDnvUser(),
+  );
+
   constructor(
     private readonly config: DynamicDialogConfig,
     private readonly ref: DynamicDialogRef,
+    private settingsCoBrowsingStoreService: SettingsCoBrowsingStoreService,
   ) {
     this.isFormValid = this.config.data.formValid.asObservable();
   }

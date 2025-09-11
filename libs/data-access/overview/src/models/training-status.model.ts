@@ -13,4 +13,5 @@ export interface TrainingStatusModel {
 export interface TrainingStatusListWithStatus {
   data: TrainingStatusModel[];
   isSuccess: boolean;
+  message: string;
 }

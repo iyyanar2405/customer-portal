@@ -17,6 +17,10 @@ const SEQ_SERVICE_INFO_MAP: Record<number, { name: string; textInfo: string }> =
       name: 'Findings',
       textInfo: 'overview.cardTexts.findings',
     },
+    4: {
+      name: 'Certificates',
+      textInfo: 'overview.cardTexts.certificates',
+    },
   };
 
 export class OverviewMapperService {

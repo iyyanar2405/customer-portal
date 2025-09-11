@@ -2,11 +2,13 @@ import { Selector } from '@ngxs/store';
 
 import {
   applyGridConfig,
-  FilteringConfig,
-  FilterOptions,
   getNumberOfFilteredRecords,
   isAnyFilterActive,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/helpers/grid';
+import {
+  FilteringConfig,
+  FilterOptions,
+} from '@customer-portal/shared/models/grid';
 
 import { AuditListItemModel } from '../../models';
 import { AuditListState, AuditListStateModel } from '../audit-list.state';
@@ -37,6 +39,11 @@ export class AuditListSelectors {
     return hasActiveFilters;
   }
 
+  @Selector([AuditListSelectors._isLoading])
+  static isLoading(_isLoading: boolean): boolean {
+    return _isLoading;
+  }
+
   @Selector([AuditListState])
   private static _auditItems(state: AuditListStateModel): AuditListItemModel[] {
     const { auditItems, gridConfig } = state;
@@ -64,5 +71,10 @@ export class AuditListSelectors {
   @Selector([AuditListState])
   private static _hasActiveFilters(state: AuditListStateModel): boolean {
     return isAnyFilterActive(state.gridConfig.filtering);
+  }
+
+  @Selector([AuditListState])
+  private static _isLoading(state: AuditListStateModel): boolean {
+    return state.isLoading;
   }
 }

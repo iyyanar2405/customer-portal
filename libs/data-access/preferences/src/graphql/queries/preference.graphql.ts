@@ -11,13 +11,15 @@ export const GET_PREFERENCE_QUERY = gql`
       objectName: $objectName
       pageName: $pageName
     ) {
-      isSuccess
       data {
         pageName
         objectType
         objectName
         preferenceDetail
       }
+      isSuccess
+      message
+      errorCode
     }
   }
 `;

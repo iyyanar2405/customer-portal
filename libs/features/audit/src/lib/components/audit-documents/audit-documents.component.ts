@@ -1,10 +1,14 @@
 import { CommonModule } from '@angular/common';
 import {
+  ChangeDetectionStrategy,
   Component,
   computed,
   DestroyRef,
+  ElementRef,
   inject,
   OnDestroy,
+  OnInit,
+  ViewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
@@ -16,6 +20,7 @@ import {
   DynamicDialogRef,
 } from 'primeng/dynamicdialog';
 import { MessagesModule } from 'primeng/messages';
+import { map, Observable, take } from 'rxjs';
 
 import {
   AuditDetailsStoreService,
@@ -24,9 +29,17 @@ import {
 } from '@customer-portal/data-access/audit';
 import {
   DocType,
+  DownloadType,
+  DownloadTypeName,
+} from '@customer-portal/data-access/documents';
+import {
+  DocumentQueueService,
+  DocumentsService,
+} from '@customer-portal/data-access/documents/services';
+import {
   DocumentsStoreService,
   UploadDocumentsSuccess,
-} from '@customer-portal/data-access/documents';
+} from '@customer-portal/data-access/documents/state';
 import {
   ProfileStoreService,
   SettingsCoBrowsingStoreService,
@@ -40,17 +53,20 @@ import {
   PermissionsList,
 } from '@customer-portal/permissions';
 import {
-  buttonStyleClass,
+  SharedButtonComponent,
+  SharedButtonType,
+} from '@customer-portal/shared/components/button';
+import { buttonStyleClass } from '@customer-portal/shared/components/custom-confirm-dialog';
+import { GridComponent } from '@customer-portal/shared/components/grid';
+import { modalBreakpoints } from '@customer-portal/shared/constants';
+import { animateFlyToDownload } from '@customer-portal/shared/helpers';
+import { ErrorMessages } from '@customer-portal/shared/helpers/upload';
+import {
   ColumnDefinition,
-  ErrorMessages,
-  GridComponent,
   GridConfig,
   GridFileActionEvent,
   GridFileActionType,
-  modalBreakpoints,
-  SharedButtonComponent,
-  SharedButtonType,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/models';
 
 import { AUDIT_DOCUMENTS_COLUMNS } from '../../constants';
 
@@ -77,11 +93,13 @@ const FILE_UPLOAD_SUCCESS = 'audit.fileUpload.fileUploadSuccess';
   providers: [DialogService, AuditFileUploadService],
   templateUrl: './audit-documents.component.html',
   styleUrl: './audit-documents.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AuditDocumentsComponent implements OnDestroy {
+export class AuditDocumentsComponent implements OnDestroy, OnInit {
   private actions$ = inject(Actions);
   private destroyRef = inject(DestroyRef);
-
+  @ViewChild('bulkDownloadBtn', { read: ElementRef })
+  bulkDownloadBtn!: ElementRef;
   auditId = this.auditDetailsStoreService.auditId();
   cols: ColumnDefinition[] = AUDIT_DOCUMENTS_COLUMNS;
   ref: DynamicDialogRef | undefined;
@@ -108,6 +126,8 @@ export class AuditDocumentsComponent implements OnDestroy {
     private documentsStoreService: DocumentsStoreService,
     private profileStoreService: ProfileStoreService,
     private settingsCoBrowsingStoreService: SettingsCoBrowsingStoreService,
+    private documentQueueService: DocumentQueueService,
+    private documentsService: DocumentsService,
   ) {
     this.auditDetailsStoreService.loadAuditDocumentsList();
 
@@ -127,6 +147,10 @@ export class AuditDocumentsComponent implements OnDestroy {
       });
   }
 
+  ngOnInit(): void {
+    this.registerDownloadHandlers();
+  }
+
   ngOnDestroy(): void {
     if (this.ref) {
       this.ref.close();
@@ -134,24 +158,29 @@ export class AuditDocumentsComponent implements OnDestroy {
   }
 
   openAddDocumentsDialog(): void {
-    this.ref = this.dialogService.open(AddDocumentsComponent, {
-      header: this.ts.translate('audit.attachedDocuments.addDocument'),
-      width: '50vw',
-      contentStyle: { overflow: 'auto' },
-      breakpoints: modalBreakpoints,
-      data: {
-        canUploadData: false,
-        errorMessages: {
-          wrongFileSize: 'audit.fileUpload.fileUploadWrongSize',
-          wrongFileType: 'audit.fileUpload.fileUploadWrongType',
-          wrongFileNameLength: 'audit.fileUpload.fileUploadWrongNameLength',
-          wrongTotalFileSize: 'audit.fileUpload.fileUploadWrongSize',
-        } as ErrorMessages,
-      },
-      templates: {
-        footer: AddDocumentsFooterComponent,
-      },
-    });
+    this.dialogService
+      .open(AddDocumentsComponent, {
+        header: this.ts.translate('audit.attachedDocuments.addDocument'),
+        width: '50vw',
+        contentStyle: { overflow: 'auto' },
+        breakpoints: modalBreakpoints,
+        data: {
+          canUploadData: false,
+          errorMessages: {
+            wrongFileSize: 'audit.fileUpload.fileUploadWrongSize',
+            wrongFileType: 'audit.fileUpload.fileUploadWrongType',
+            wrongFileNameLength: 'audit.fileUpload.fileUploadWrongNameLength',
+            wrongTotalFileSize: 'audit.fileUpload.fileUploadWrongSize',
+          } as ErrorMessages,
+        },
+        templates: {
+          footer: AddDocumentsFooterComponent,
+        },
+      })
+      .onClose.pipe(take(1))
+      .subscribe((_) => {
+        // TODO
+      });
   }
 
   onGridConfigChanged(gridConfig: GridConfig): void {
@@ -170,7 +199,16 @@ export class AuditDocumentsComponent implements OnDestroy {
     documentId: number;
   }): void {
     if (event.actionType === GridFileActionType.Download) {
-      this.documentsStoreService.downloadDocument(documentId, fileName);
+      this.documentQueueService.addDownloadTask(
+        DownloadType.AuditDetails,
+        DownloadTypeName.AuditDetails,
+        fileName,
+        { documentId },
+      );
+
+      if (event.element) {
+        animateFlyToDownload(event.element);
+      }
     } else if (event.actionType === GridFileActionType.Delete) {
       this.confirmationService.confirm({
         header: this.ts.translate('audit.deleteDocument.header'),
@@ -209,9 +247,67 @@ export class AuditDocumentsComponent implements OnDestroy {
   }
 
   downloadSelectedDocuments(): void {
-    this.documentsStoreService.downloadAllDocuments(
-      this.selectedDocumentsIds,
-      DocType.Audit,
+    this.documentQueueService.addDownloadTask(
+      DownloadType.AuditDetailBulk,
+      DownloadTypeName.AuditDetailBulk,
+      'Audit List.zip',
+      { ids: this.selectedDocumentsIds, docType: DocType.Audit },
     );
+
+    if (this.bulkDownloadBtn?.nativeElement) {
+      animateFlyToDownload(this.bulkDownloadBtn.nativeElement);
+    }
+  }
+
+  private registerDownloadHandlers(): void {
+    this.documentQueueService.registerDownloadHandler(
+      DownloadType.AuditDetails,
+      this.createAuditDownloadHandler(),
+    );
+    this.documentQueueService.registerDownloadHandler(
+      DownloadType.AuditDetailBulk,
+      this.createBulkAuditDownloadHandler(),
+    );
+  }
+
+  private createAuditDownloadHandler(): (
+    data: any,
+    fileName: string,
+  ) => Observable<{ blob: Blob; fileName: string }> {
+    return (data, fileName) =>
+      this.documentsService
+        .downloadDocument(data.documentId, fileName, true)
+        .pipe(map((response) => this.mapDownloadResponse(response, fileName)));
+  }
+
+  private createBulkAuditDownloadHandler(): (
+    data: any,
+    fileName: string,
+  ) => Observable<{ blob: Blob; fileName: string }> {
+    return (data, fileName) =>
+      this.documentsService
+        .downloadAllDocuments(data.ids, data.docType, true)
+        .pipe(map((response) => this.mapDownloadResponse(response, fileName)));
+  }
+
+  private mapDownloadResponse(
+    response: any,
+    fallbackFileName: string,
+  ): { blob: Blob; fileName: string } {
+    if (!response.body) {
+      throw new Error('Document download failed: Blob is null');
+    }
+    const contentDisposition = response.headers.get('content-disposition');
+
+    if (!contentDisposition && response.headers) {
+      throw new Error('Content-Disposition header is missing');
+    }
+
+    return {
+      blob: response.body,
+      fileName:
+        this.documentQueueService.extractFileName(contentDisposition ?? '') ||
+        fallbackFileName,
+    };
   }
 }

@@ -11,6 +11,7 @@ import {
 
 import { AuditListItemModel } from '../../models';
 import {
+  ApplyNavigationFiltersFromOverview,
   ExportAuditsExcel,
   LoadAuditList,
   ResetAuditListState,
@@ -42,6 +43,14 @@ export class AuditListStoreService {
     return this.store.select(AuditListSelectors.filteringConfig);
   }
 
+  get filteringConfigSignal(): Signal<FilteringConfig> {
+    return this.store.selectSignal(AuditListSelectors.filteringConfig);
+  }
+
+  get isLoading(): Signal<boolean> {
+    return this.store.selectSignal(AuditListSelectors.isLoading);
+  }
+
   @Dispatch()
   loadAuditList = () => new LoadAuditList();
 
@@ -54,4 +63,8 @@ export class AuditListStoreService {
 
   @Dispatch()
   resetAuditListState = () => new ResetAuditListState();
+
+  @Dispatch()
+  applyNavigationFiltersFromOverview = () =>
+    new ApplyNavigationFiltersFromOverview();
 }

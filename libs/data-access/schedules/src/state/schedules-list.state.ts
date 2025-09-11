@@ -1,57 +1,77 @@
 import { Injectable } from '@angular/core';
-import { TranslocoService } from '@jsverse/transloco';
 import { Action, State, StateContext } from '@ngxs/store';
 import { MessageService } from 'primeng/api';
-import { catchError, filter, tap } from 'rxjs';
+import { catchError, take, tap } from 'rxjs';
 
-import { NavigateFromActionsListToScheduleListView } from '@customer-portal/data-access/actions';
-import { NavigateFromNotificationsListToScheduleListView } from '@customer-portal/data-access/notifications';
+import { NavigateFromActionsListToScheduleListView } from '@customer-portal/data-access/actions/state/actions';
+import {
+  GlobalServiceMasterStoreService,
+  GlobalSiteMasterStoreService,
+} from '@customer-portal/data-access/global';
+import { NavigateFromNotificationsListToScheduleListView } from '@customer-portal/data-access/notifications/state';
 import {
   ProfileStoreService,
   SettingsCoBrowsingStoreService,
   SettingsCompanyDetailsStoreService,
 } from '@customer-portal/data-access/settings';
-import { NavigateFromOverviewCardToScheduleListView } from '@customer-portal/overview-shared';
+import {
+  ClearNavigationFilters,
+  OverviewSharedStoreService,
+} from '@customer-portal/overview-shared';
 import {
   PermissionCategories,
   PermissionsList,
 } from '@customer-portal/permissions';
+import { DEFAULT_GRID_CONFIG } from '@customer-portal/shared/constants';
 import {
-  DEFAULT_GRID_CONFIG,
   downloadFileFromByteArray,
-  FilterableColumnDefinition,
-  FilterOptions,
-  FilterValue,
   getFilterOptions,
   getToastContentBySeverity,
-  GridConfig,
-  ToastSeverity,
+  throwIfNotSuccess,
   updateGridConfigBasedOnFilters,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/helpers';
+import {
+  FilterableColumnDefinition,
+  ToastSeverity,
+} from '@customer-portal/shared/models';
+import {
+  FilterOptions,
+  FilterValue,
+  GridConfig,
+} from '@customer-portal/shared/models/grid';
 
+import { ScheduleStatusTypes } from '../constants';
 import { ScheduleListItemModel } from '../models';
 import { ScheduleListMapperService, ScheduleListService } from '../services';
 import {
+  ApplyNavigationFiltersFromOverview,
   ExportSchedulesExcel,
   ExportSchedulesExcelFail,
   ExportSchedulesExcelSuccess,
   LoadScheduleList,
+  LoadScheduleListFail,
   LoadScheduleListSuccess,
   ResetScheduleListState,
   UpdateFilterOptions,
   UpdateGridConfig,
+  UpdateScheduleListForReschedule,
+  UpdateScheduleListStatusToConfirmed,
 } from './actions';
 
 export interface ScheduleListStateModel {
   schedules: ScheduleListItemModel[];
   gridConfig: GridConfig;
   filterOptions: FilterOptions;
+  isLoading: boolean;
+  error: string | null;
 }
 
 const defaultState: ScheduleListStateModel = {
   schedules: [],
   gridConfig: DEFAULT_GRID_CONFIG,
   filterOptions: {},
+  isLoading: false,
+  error: null,
 };
 
 @State<ScheduleListStateModel>({
@@ -66,13 +86,21 @@ export class ScheduleListState {
     private profileStoreService: ProfileStoreService,
     private settingsCoBrowsingStoreService: SettingsCoBrowsingStoreService,
     private settingsCompanyDetailsStoreService: SettingsCompanyDetailsStoreService,
-    private ts: TranslocoService,
+    private globalSiteMasterStoreService: GlobalSiteMasterStoreService,
+    private globalServiceMasterStoreService: GlobalServiceMasterStoreService,
+    private overviewSharedStore: OverviewSharedStoreService,
   ) {}
 
   @Action(LoadScheduleList)
   loadScheduleList(ctx: StateContext<ScheduleListStateModel>) {
+    ctx.patchState({
+      isLoading: true,
+      error: '',
+      schedules: [],
+    });
+
     return this.scheduleListService.getScheduleList().pipe(
-      filter((scheduleListDto) => scheduleListDto.isSuccess),
+      throwIfNotSuccess(),
       tap((scheduleListDto) => {
         const hasScheduleEditPermisssion =
           this.profileStoreService.hasPermission(
@@ -81,6 +109,10 @@ export class ScheduleListState {
           )();
 
         const isDnvUser = this.settingsCoBrowsingStoreService.isDnvUser();
+        const siteMasterList =
+          this.globalSiteMasterStoreService.siteMasterList();
+        const serviceMasterList =
+          this.globalServiceMasterStoreService.serviceMasterList();
         const isAdminUser =
           this.settingsCompanyDetailsStoreService.isUserAdmin();
         const schedules = ScheduleListMapperService.mapToScheduleListItemModel(
@@ -88,6 +120,8 @@ export class ScheduleListState {
           hasScheduleEditPermisssion,
           isDnvUser,
           isAdminUser,
+          siteMasterList,
+          serviceMasterList,
         );
 
         if (schedules) {
@@ -95,6 +129,7 @@ export class ScheduleListState {
           ctx.dispatch(new UpdateFilterOptions());
         }
       }),
+      catchError(() => ctx.dispatch(new LoadScheduleListFail())),
     );
   }
 
@@ -105,6 +140,17 @@ export class ScheduleListState {
   ) {
     ctx.patchState({
       schedules,
+      isLoading: false,
+      error: '',
+    });
+  }
+
+  @Action(LoadScheduleListFail)
+  loadScheduleListFail(ctx: StateContext<any>) {
+    ctx.patchState({
+      isLoading: false,
+      error: 'Failed to load schedule data',
+      schedules: [],
     });
   }
 
@@ -183,21 +229,23 @@ export class ScheduleListState {
     );
   }
 
-  @Action(NavigateFromOverviewCardToScheduleListView)
-  navigateFromOverviewCardToAuditListView(
+  @Action(ApplyNavigationFiltersFromOverview)
+  applyNavigationFiltersFromOverview(
     ctx: StateContext<ScheduleListStateModel>,
-    { overviewCardFilters }: NavigateFromOverviewCardToScheduleListView,
   ) {
-    const { gridConfig } = ctx.getState();
-
-    const updatedGridConfig = updateGridConfigBasedOnFilters(
-      gridConfig,
-      overviewCardFilters,
-    );
-
-    ctx.patchState({
-      gridConfig: updatedGridConfig,
-    });
+    return this.overviewSharedStore.overviewNavigationFilters$
+      .pipe(take(1))
+      .subscribe((overviewCardFilters) => {
+        if (overviewCardFilters) {
+          const { gridConfig } = ctx.getState();
+          const updatedGridConfig = updateGridConfigBasedOnFilters(
+            gridConfig,
+            overviewCardFilters,
+          );
+          ctx.patchState({ gridConfig: updatedGridConfig });
+          ctx.dispatch(new ClearNavigationFilters());
+        }
+      });
   }
 
   @Action(NavigateFromNotificationsListToScheduleListView)
@@ -214,6 +262,42 @@ export class ScheduleListState {
     { notificationsFilters }: NavigateFromActionsListToScheduleListView,
   ) {
     this.updateGridConfigWithNavigationFilters(ctx, notificationsFilters);
+  }
+
+  @Action(UpdateScheduleListForReschedule)
+  updateScheduleListForReschedule(
+    ctx: StateContext<ScheduleListStateModel>,
+    { siteAuditId }: UpdateScheduleListForReschedule,
+  ) {
+    const state = ctx.getState();
+
+    const schedules = state.schedules.map((item) =>
+      item.siteAuditId === siteAuditId
+        ? { ...item, status: ScheduleStatusTypes.ToBeConfirmedByDNV }
+        : item,
+    );
+
+    ctx.patchState({
+      schedules,
+    });
+  }
+
+  @Action(UpdateScheduleListStatusToConfirmed)
+  updateScheduleListStatusToConfirmed(
+    ctx: StateContext<ScheduleListStateModel>,
+    { siteAuditId }: UpdateScheduleListStatusToConfirmed,
+  ) {
+    const state = ctx.getState();
+
+    const schedules = state.schedules.map((item) =>
+      item.siteAuditId === siteAuditId
+        ? { ...item, status: ScheduleStatusTypes.Confirmed }
+        : item,
+    );
+
+    ctx.patchState({
+      schedules,
+    });
   }
 
   private updateGridConfigWithNavigationFilters(

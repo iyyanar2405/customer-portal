@@ -21,3 +21,9 @@ export class UpdateProfileLanguageSuccess {
 
   constructor(public languageLabel: Language) {}
 }
+
+export class SetProfileLanguage {
+  static readonly type = '[Profile] Set Language';
+
+  constructor(public languageLabel: string) {}
+}

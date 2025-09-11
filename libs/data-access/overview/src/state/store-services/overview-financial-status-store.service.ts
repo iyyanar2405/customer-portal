@@ -23,6 +23,10 @@ export class OverviewFinancialStatusStoreService {
     );
   }
 
+  get isLoading(): Signal<boolean> {
+    return this.store.selectSignal(OverviewFinancialStatusSelectors.isLoading);
+  }
+
   @Dispatch()
   loadOverviewFinancialStatusData = () => new LoadOverviewFinancialStatusData();
 }

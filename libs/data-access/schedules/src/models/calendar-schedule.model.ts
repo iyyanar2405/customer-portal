@@ -11,6 +11,15 @@ export interface CalendarScheduleModel {
   siteRepresentative: string;
   startDate: string;
   status: string;
+  siteAuditId: number;
+  siteAddress: string;
+  auditID: number;
+  siteZip: string;
+  siteCountry: string;
+  siteState: string;
+  reportingCountry: string;
+  projectNumber: string;
+  accountDNVId: number;
 }
 
 export interface CalendarScheduleParams {

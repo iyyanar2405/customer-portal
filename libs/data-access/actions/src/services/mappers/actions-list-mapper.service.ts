@@ -4,7 +4,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import {
   convertToUtcDate,
   mapApiResponseToPageName,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/helpers';
 
 import { iconMap } from '../../constants';
 import { ActionsDto, ActionsListDto } from '../../dtos';
@@ -23,10 +23,11 @@ export class ActionsListMapperService {
 
     return items.map((actions: ActionsDto) => ({
       id: actions.id,
-      actionName: actions.action,
+      actionName: actions.subject,
       dueDate: convertToUtcDate(actions.dueDate),
       message:
         domSanitizer.sanitize(SecurityContext.HTML, actions.message) ?? '',
+      language: actions.language,
       service: actions.service,
       site: actions.site,
       entityType: mapApiResponseToPageName(actions.entityType),
@@ -35,7 +36,7 @@ export class ActionsListMapperService {
       actions: [
         {
           actionType: 'redirect',
-          iconClass: 'pi-arrow-right',
+          iconClass: 'pi-angle-right',
           label: 'angle-right',
           url: '',
         },

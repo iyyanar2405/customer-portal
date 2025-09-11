@@ -16,6 +16,12 @@ export class LoadPreferenceSuccess {
   constructor(public preference: PreferenceModel | null) {}
 }
 
+export class LoadPreferenceFail {
+  static readonly type = '[Preferences] Load Preferences Fail';
+
+  constructor(public error: string) {}
+}
+
 export class SavePreference {
   static readonly type = '[Preferences] Save Preference';
 

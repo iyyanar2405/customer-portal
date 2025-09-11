@@ -2,6 +2,8 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 
+import { LoggingService } from '@customer-portal/core/app-insights';
+
 import { AppInitializerService } from '../services';
 
 export const appInitializer = (): Observable<any> => {
@@ -14,3 +16,9 @@ export const appInitializer = (): Observable<any> => {
     }),
   );
 };
+
+export function loggingInitializer(): Promise<void> {
+  const loggingService = inject(LoggingService);
+
+  return loggingService.init();
+}

@@ -9,4 +9,6 @@ export interface OverviewUpcomingAuditsStateModel {
   events: OverviewUpcomingAuditEvent[];
   selectedMonth: number;
   selectedYear: number;
+  isLoading: boolean;
+  errorMessage: string | null;
 }

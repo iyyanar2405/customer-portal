@@ -19,6 +19,11 @@ export class UnreadNotificationsService {
       .query({
         query: NOTIFICATIONS_COUNT_QUERY,
         fetchPolicy: 'no-cache',
+        context: {
+          headers: {
+            SKIP_LOADING: 'true',
+          },
+        },
       })
       .pipe(map((results: any) => results?.data?.informationCount));
   }

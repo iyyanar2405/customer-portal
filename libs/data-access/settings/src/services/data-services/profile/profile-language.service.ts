@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
-import { map, Observable } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 
 import { Language } from '@customer-portal/shared';
 
@@ -16,14 +16,28 @@ export class ProfileLanguageService {
 
   constructor(private readonly apollo: Apollo) {}
 
-  getProfileLanguage(): Observable<ProfileLanguageDto> {
+  getProfileLanguage(): Observable<ProfileLanguageDto | null> {
     return this.apollo
       .use(this.clientName)
       .query({
         query: PROFILE_LANGUAGE_QUERY,
         variables: {},
+        fetchPolicy: 'no-cache',
       })
-      .pipe(map((results: any) => results?.data?.userProfile));
+      .pipe(
+        map((result: any) => {
+          if (
+            result === undefined ||
+            result?.data === undefined ||
+            result.data?.userProfile?.isSuccess === false
+          ) {
+            return null;
+          }
+
+          return result.data?.userProfile;
+        }),
+        catchError((_) => of(null)),
+      );
   }
 
   updateProfileLanguage(language: Language): Observable<ProfileLanguageDto> {

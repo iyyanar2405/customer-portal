@@ -1,17 +1,16 @@
 import { TreeNode } from 'primeng/api';
 
+import { EMPTY_GRAPH_DATA } from '@customer-portal/shared/constants';
+import {
+  buildStatusColorPalette,
+  getPaletteColorOrFallback,
+} from '@customer-portal/shared/helpers/chart';
 import {
   BarChartModel,
-  buildStatusColorPalette,
   DoughnutChartModel,
-  EMPTY_GRAPH_DATA,
-  getPaletteColorOrFallback,
-  SharedSelectMultipleDatum,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/models/chart';
 
 import {
-  AuditGraphsFilterCompaniesDataDto,
-  AuditGraphsFilterServicesDataDto,
   AuditGraphsFilterSitesDataDto,
   AuditsDaysGraphDto,
   AuditsStatusDoughnutGraphDto,
@@ -210,43 +209,6 @@ export class AuditGraphsMapperService {
       key: `${datum.id}-${datum.label}`,
       label: datum.label,
       children: this.mapToChartFilterSites(datum.children, depth + 1),
-    }));
-  }
-
-  static mapToAuditGraphsFilterCompanies(
-    data: AuditGraphsFilterCompaniesDataDto[],
-  ): SharedSelectMultipleDatum<number>[] {
-    return data.map((datum) => ({
-      label: datum.label,
-      value: datum.id,
-    }));
-  }
-
-  static mapToAuditGraphsFilterServices(
-    data: AuditGraphsFilterServicesDataDto[],
-  ): SharedSelectMultipleDatum<number>[] {
-    return data.map((datum) => ({
-      label: datum.label,
-      value: datum.id,
-    }));
-  }
-
-  static mapToAuditGraphsFilterSites(
-    data: AuditGraphsFilterSitesDataDto[],
-  ): TreeNode[] {
-    return this.getAuditGraphsFilterSites(data);
-  }
-
-  private static getAuditGraphsFilterSites(
-    data: AuditGraphsFilterSitesDataDto[],
-  ): TreeNode[] {
-    return data.map((datum) => ({
-      data: datum.id,
-      key: `${datum.id}-${datum.label}`,
-      label: datum.label,
-      children: datum.children
-        ? this.getAuditGraphsFilterSites(datum.children)
-        : undefined,
     }));
   }
 }

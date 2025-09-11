@@ -1,14 +1,21 @@
 import {
-  COLUMN_DELIMITER,
-  convertToUtcDate,
-  EventAction,
-  EventActionItem,
+  ServiceMasterListItemModel,
+  SiteMasterListItemModel,
+} from '@customer-portal/data-access/global';
+import { COLUMN_DELIMITER } from '@customer-portal/shared/constants';
+import {
+  formatUtcToLocal,
+  isDateInPast,
+  utcDateInFuture,
+  utcDateInPast,
+  utcDateToPayloadFormat,
+} from '@customer-portal/shared/helpers/date';
+import { mapFilterConfigToValues } from '@customer-portal/shared/helpers/grid';
+import { EventAction, EventActionItem } from '@customer-portal/shared/models';
+import {
   FilteringConfig,
   GridEventActionType,
-  isDateInPast,
-  mapFilterConfigToValues,
-  utcDateToPayloadFormat,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/models/grid';
 
 import { ScheduleStatus } from '../../constants';
 import {
@@ -24,6 +31,8 @@ export class ScheduleListMapperService {
     hasScheduleEditPermission: boolean,
     isDnvUser: boolean,
     isAdminUser: boolean,
+    siteMasterList: SiteMasterListItemModel[],
+    serviceMasterList: ServiceMasterListItemModel[],
   ): ScheduleListItemModel[] {
     if (!dto.data) {
       return [];
@@ -37,6 +46,8 @@ export class ScheduleListMapperService {
         hasScheduleEditPermission,
         isDnvUser,
         isAdminUser,
+        siteMasterList,
+        serviceMasterList,
       ),
     );
   }
@@ -79,25 +90,48 @@ export class ScheduleListMapperService {
     hasScheduleEditPermission: boolean,
     isDnvUser: boolean,
     isAdminUser: boolean,
+    siteMasterList: SiteMasterListItemModel[],
+    serviceMasterList: ServiceMasterListItemModel[],
   ): ScheduleListItemModel {
+    const serviceMap = new Map(
+      serviceMasterList.map((s) => [String(s.id), s.serviceName]),
+    );
+    const companyMap = new Map(
+      siteMasterList.map((s) => [String(s.companyId), s]),
+    );
+    const siteMap = new Map(siteMasterList.map((s) => [String(s.id), s]));
+
+    const companyName =
+      companyMap.get(String(item.companyId))?.companyName ?? '';
+    const site = siteMap.get(String(item.siteId));
+    const services = Array.from(
+      new Set(
+        (item.serviceIds || [])
+          .map((serviceId) => serviceMap.get(String(serviceId)))
+          .filter(Boolean),
+      ),
+    ).join(COLUMN_DELIMITER);
+    const localZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
     return {
       scheduleId: item.siteAuditId,
-      startDate: convertToUtcDate(item.startDate),
-      endDate: convertToUtcDate(item.endDate),
+      startDate: formatUtcToLocal(item.startDate, localZone),
+      endDate: formatUtcToLocal(item.endDate, localZone),
       status: item.status,
-      service: this.joinUnique(item.services),
-      site: item.site,
-      city: item.city,
+      service: services,
+      site: site?.siteName ?? '',
+      city: site?.city ?? '',
       auditType: item.auditType,
       leadAuditor: item.leadAuditor,
       siteRepresentative: this.joinUnique(item.siteRepresentatives),
-      company: item.company,
+      company: companyName,
       siteAuditId: item.siteAuditId,
-      siteAddress: item.siteAddress,
+      siteAddress: site?.formattedAddress ?? '',
       auditID: item.auditID,
-      siteZip: item.siteZip,
-      siteCountry: item.siteCountry,
-      siteState: item.siteState,
+      accountDNVId: item.accountDNVId,
+      siteZip: site?.siteZip ?? '',
+      siteCountry: site?.countryName ?? '',
+      siteState: site?.siteState ?? '',
       reportingCountry: item.reportingCountry,
       projectNumber: item.projectNumber,
       eventActions: this.buildEventActions(
@@ -163,42 +197,80 @@ export class ScheduleListMapperService {
       return [];
     }
 
-    const isScheduleInPast = isDateInPast(item.startDate);
+    if (!isAdminUser) {
+      return [];
+    }
+    const isScheduleInPast = utcDateInPast(item.startDate);
+    const isScheduleInFuture = utcDateInFuture(item.startDate);
+    const isConfirmed = this.areEqualStatuses(
+      item.status,
+      ScheduleStatus.Confirmed,
+    );
+    const isToBeConfirmed = this.areEqualStatuses(
+      item.status,
+      ScheduleStatus.ToBeConfirmed,
+    );
+    const isToBeConfirmedByDnv = this.areEqualStatuses(
+      item.status,
+      ScheduleStatus.ToBeConfirmedByDnv,
+    );
 
-    const actions = [
+    const allActions: EventActionItem[] = [
       {
         label: GridEventActionType.Reschedule,
         i18nKey: 'gridEvent.reschedule',
         icon: 'pi pi-calendar',
-        disabled: isScheduleInPast,
+        disabled: false,
       },
       {
         label: GridEventActionType.ShareInvite,
         i18nKey: 'gridEvent.shareInvite',
         icon: 'pi pi-share-alt',
-        disabled: isScheduleInPast,
+        disabled: false,
       },
       {
         label: GridEventActionType.AddToCalendar,
         i18nKey: 'gridEvent.addToCalendar',
         icon: 'pi pi-calendar-plus',
-        disabled: isScheduleInPast,
+        disabled: false,
       },
       {
         label: GridEventActionType.RequestChanges,
         i18nKey: 'gridEvent.requestChanges',
         icon: 'pi pi-pencil',
-        disabled: !isAdminUser || isDnvUser,
+        disabled: isDnvUser,
       },
     ];
 
-    const shouldExcludeReschedule =
-      isDnvUser ||
-      !hasScheduleEditPermission ||
-      this.areEqualStatuses(item.status, ScheduleStatus.Confirmed);
+    return allActions.filter((action) => {
+      switch (action.label) {
+        case GridEventActionType.Reschedule:
+          if (
+            isScheduleInPast &&
+            (isToBeConfirmed || isToBeConfirmedByDnv || isConfirmed)
+          ) {
+            return false;
+          }
 
-    return shouldExcludeReschedule
-      ? actions.filter((a) => a.label !== GridEventActionType.Reschedule)
-      : actions;
+          return isScheduleInFuture && !isDnvUser && hasScheduleEditPermission;
+        case GridEventActionType.ShareInvite:
+        case GridEventActionType.AddToCalendar:
+          if (isConfirmed && isScheduleInPast) {
+            return false;
+          }
+
+          if (isScheduleInPast && (isToBeConfirmed || isToBeConfirmedByDnv)) {
+            return false;
+          }
+
+          return !isScheduleInPast;
+
+        case GridEventActionType.RequestChanges:
+          return true;
+
+        default:
+          return false;
+      }
+    });
   }
 }

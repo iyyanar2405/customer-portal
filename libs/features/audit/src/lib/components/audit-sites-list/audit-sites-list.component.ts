@@ -1,14 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { TranslocoDirective } from '@jsverse/transloco';
 
 import { AuditDetailsStoreService } from '@customer-portal/data-access/audit';
-import {
-  ColumnDefinition,
-  GridComponent,
-  GridConfig,
-  STATUS_STATES_MAP,
-} from '@customer-portal/shared';
+import { GridComponent } from '@customer-portal/shared/components/grid';
+import { STATUS_STATES_MAP } from '@customer-portal/shared/constants';
+import { ColumnDefinition, GridConfig } from '@customer-portal/shared/models';
 
 import { AUDIT_SITES_LIST_COLUMNS } from '../../constants';
 
@@ -18,6 +15,7 @@ import { AUDIT_SITES_LIST_COLUMNS } from '../../constants';
   providers: [],
   templateUrl: './audit-sites-list.component.html',
   styleUrl: './audit-sites-list.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AuditSitesListComponent {
   statusStatesMap = STATUS_STATES_MAP;

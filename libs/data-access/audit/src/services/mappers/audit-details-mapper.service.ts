@@ -1,12 +1,20 @@
 import {
+  ServiceMasterListItemModel,
+  SiteMasterListItemModel,
+} from '@customer-portal/data-access/global';
+import {
   COLUMN_DELIMITER,
-  convertToUtcDate,
   CURRENT_DATE_FORMAT,
+} from '@customer-portal/shared/constants';
+import {
+  convertToUtcDate,
+  utcDateToPayloadFormat,
+} from '@customer-portal/shared/helpers/date';
+import { mapFilterConfigToValues } from '@customer-portal/shared/helpers/grid';
+import {
   FilteringConfig,
   GridFileActionType,
-  mapFilterConfigToValues,
-  utcDateToPayloadFormat,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/models/grid';
 
 import {
   AuditDetailsDto,
@@ -18,9 +26,9 @@ import {
   AuditSiteListItemDto,
   SitesListDto,
   SubAuditExcelPayloadDto,
-  SubAuditListDto,
   SubAuditListItemDto,
 } from '../../dtos';
+import { SubAuditListDto } from '../../dtos/sub-audit-list.dto';
 import {
   AuditDetailsModel,
   AuditDocumentListItemModel,
@@ -34,6 +42,8 @@ export const STRING_DELIMITER = ', ';
 export class AuditDetailsMapperService {
   static mapToAuditFindingListItemModel(
     dto: AuditFindingListDto,
+    siteMasterList: SiteMasterListItemModel[],
+    serviceMasterList: ServiceMasterListItemModel[],
   ): AuditFindingListItemModel[] {
     if (!dto?.data) {
       return [];
@@ -41,25 +51,34 @@ export class AuditDetailsMapperService {
 
     const { data } = dto;
 
+    const serviceMap = new Map(
+      serviceMasterList.map((s) => [s.id, s.serviceName]),
+    );
+    const companyMap = new Map(siteMasterList.map((s) => [s.companyId, s]));
+    const siteMap = new Map(siteMasterList.map((s) => [s.id, s]));
+
     return data.map((finding: AuditFindingListItemDto) => {
-      const cities = Array.from(new Set(finding.cities)).join(COLUMN_DELIMITER);
-      const sites = Array.from(new Set(finding.sites)).join(COLUMN_DELIMITER);
-      const services = Array.from(new Set(finding.services)).join(
-        COLUMN_DELIMITER,
-      );
+      const companyName = companyMap.get(finding.companyId)?.companyName ?? '';
+      const site = siteMap.get(finding.siteId);
+      const services = Array.from(
+        new Set(
+          (finding.services || [])
+            .map((serviceId) => serviceMap.get(serviceId))
+            .filter(Boolean),
+        ),
+      ).join(COLUMN_DELIMITER);
 
       return {
         findingNumber: String(finding.findingNumber),
         status: finding.status,
         title: finding.title,
         category: finding.category,
-        companyName: finding.companyName,
+        companyName,
         services,
-        site: sites,
-        city: cities,
+        site: site?.siteName ?? '',
+        city: site?.city ?? '',
         auditNumber: String(finding.auditId),
         openDate: convertToUtcDate(finding.openDate, CURRENT_DATE_FORMAT),
-        dueDate: convertToUtcDate(finding.dueDate, CURRENT_DATE_FORMAT),
         closeDate: convertToUtcDate(finding.closedDate, CURRENT_DATE_FORMAT),
         acceptedDate: convertToUtcDate(
           finding.acceptedDate,
@@ -91,12 +110,6 @@ export class AuditDetailsMapperService {
           null,
           utcDateToPayloadFormat,
         ),
-        dueDate: mapFilterConfigToValues(
-          filterConfig,
-          'dueDate',
-          null,
-          utcDateToPayloadFormat,
-        ),
         acceptedDate: mapFilterConfigToValues(
           filterConfig,
           'acceptedDate',
@@ -113,7 +126,11 @@ export class AuditDetailsMapperService {
     };
   }
 
-  static mapToSubAuditItemModel(dto: SubAuditListDto): SubAuditListItemModel[] {
+  static mapToSubAuditItemModel(
+    dto: SubAuditListDto,
+    siteMasterList: SiteMasterListItemModel[],
+    serviceMasterList: ServiceMasterListItemModel[],
+  ): SubAuditListItemModel[] {
     if (!dto?.data) {
       return [];
     }
@@ -121,11 +138,25 @@ export class AuditDetailsMapperService {
     const { data } = dto;
 
     return data.map((audit: SubAuditListItemDto) => {
-      const city = Array.from(new Set(audit.cities)).join(COLUMN_DELIMITER);
-      const site = Array.from(new Set(audit.sites)).join(COLUMN_DELIMITER);
-      const service = Array.from(new Set(audit.services)).join(
-        COLUMN_DELIMITER,
-      );
+      const service = (audit.services || [])
+        .map(
+          (serviceId) =>
+            serviceMasterList.find((s) => s.id === serviceId)?.serviceName,
+        )
+        .filter(Boolean)
+        .join(COLUMN_DELIMITER);
+
+      const matchedSites = (audit.sites || [])
+        .map((siteId) => siteMasterList.find((s) => s.id === siteId))
+        .filter(Boolean);
+
+      const siteNames = Array.from(
+        new Set(matchedSites.map((site) => site?.siteName).filter(Boolean)),
+      ).join(COLUMN_DELIMITER);
+      const cities = Array.from(
+        new Set(matchedSites.map((site) => site?.city).filter(Boolean)),
+      ).join(COLUMN_DELIMITER);
+
       const auditorTeam = Array.from(new Set(audit.auditorTeam)).join(
         COLUMN_DELIMITER,
       );
@@ -134,8 +165,8 @@ export class AuditDetailsMapperService {
         auditNumber: String(audit.auditId),
         status: audit.status,
         service,
-        site,
-        city,
+        site: siteNames,
+        city: cities,
         startDate: convertToUtcDate(audit.startDate),
         endDate: convertToUtcDate(audit.endDate),
         auditorTeam,
@@ -182,34 +213,12 @@ export class AuditDetailsMapperService {
 
   static mapToAuditDetailsModel(
     dto: AuditDetailsDto,
-    reports: AuditDocumentsListDto,
   ): AuditDetailsModel | null {
     if (!dto?.data) {
       return null;
     }
 
     const { data } = dto;
-    const customerTypeSecurity = '10';
-    const { auditPlanDocId, auditReportDocId } = reports?.data?.reduce(
-      (acc, item) => {
-        if (item.currentSecurity === customerTypeSecurity) {
-          if (item.type?.toLowerCase().includes('audit plan')) {
-            acc.auditPlanDocId.push(item.documentId);
-          } else if (item.type?.toLowerCase().includes('audit report')) {
-            acc.auditReportDocId.push(item.documentId);
-          }
-        }
-
-        return acc;
-      },
-      {
-        auditPlanDocId: [] as number[],
-        auditReportDocId: [] as number[],
-      },
-    ) ?? {
-      auditPlanDocId: [],
-      auditReportDocId: [],
-    };
 
     const services = data.services
       .map((service) => service)
@@ -233,12 +242,42 @@ export class AuditDetailsMapperService {
         auditor: data.leadAuditor,
         auditorTeam,
         services,
-        auditPlanDocId,
-        auditReportDocId,
+        auditPlanDocId: [] as number[],
+        auditReportDocId: [] as number[],
       },
     };
 
     return resultModel;
+  }
+
+  static extractPlanAndReportDocIds(reports: AuditDocumentsListDto): {
+    auditPlanDocId: number[];
+    auditReportDocId: number[];
+  } {
+    const customerTypeSecurity = '10';
+
+    return (
+      reports?.data?.reduce(
+        (acc, item) => {
+          if (item.currentSecurity === customerTypeSecurity) {
+            if (item.type?.toLowerCase().includes('audit plan')) {
+              acc.auditPlanDocId.push(item.documentId);
+            } else if (item.type?.toLowerCase().includes('audit report')) {
+              acc.auditReportDocId.push(item.documentId);
+            }
+          }
+
+          return acc;
+        },
+        {
+          auditPlanDocId: [] as number[],
+          auditReportDocId: [] as number[],
+        },
+      ) ?? {
+        auditPlanDocId: [],
+        auditReportDocId: [],
+      }
+    );
   }
 
   static mapToAuditSitesItemModel(dto: SitesListDto): AuditSiteListItemModel[] {

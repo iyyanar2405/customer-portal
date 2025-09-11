@@ -1,7 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
-import { map, Observable } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
 
 import { BaseApolloService } from '@customer-portal/core';
 import { environment } from '@customer-portal/environments';
@@ -44,12 +44,30 @@ export class AuditListService extends BaseApolloService {
 
           return result.data?.viewAudits;
         }),
+        catchError((err) =>
+          of({
+            isSuccess: false,
+            data: [],
+            errorCode: '',
+            message: err.message,
+            __typename: 'AuditListDto',
+          } as AuditListDto),
+        ),
       );
   }
 
-  exportAuditsExcel({ filters }: AuditExcelPayloadDto): Observable<number[]> {
+  exportAuditsExcel(
+    { filters }: AuditExcelPayloadDto,
+    skipLoading?: boolean,
+  ): Observable<number[]> {
+    let headers = new HttpHeaders();
+
+    if (skipLoading) {
+      headers = headers.append('SKIP_LOADING', 'true');
+    }
+
     return this.http
-      .post<{ data: number[] }>(this.exportAuditExcelUrl, { filters })
+      .post<{ data: number[] }>(this.exportAuditExcelUrl, filters, { headers })
       .pipe(map((response) => response.data));
   }
 }

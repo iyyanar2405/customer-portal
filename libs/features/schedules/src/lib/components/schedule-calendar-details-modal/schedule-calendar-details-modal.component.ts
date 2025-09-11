@@ -16,11 +16,11 @@ import {
   ScheduleStatus,
 } from '@customer-portal/data-access/schedules';
 import {
-  CustomDatePipe,
   SharedButtonComponent,
   SharedButtonType,
-  StatusComponent,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/components/button';
+import { StatusComponent } from '@customer-portal/shared/components/grid';
+import { CustomDatePipe } from '@customer-portal/shared/pipes/custom-date.pipe';
 
 @Component({
   selector: 'lib-schedule-calendar-details-modal',

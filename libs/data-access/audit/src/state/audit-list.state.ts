@@ -2,28 +2,39 @@ import { Injectable } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { Action, State, StateContext } from '@ngxs/store';
 import { MessageService } from 'primeng/api';
-import { catchError, tap } from 'rxjs';
+import { catchError, take, tap } from 'rxjs';
 
-import { NavigateFromOverviewCardToAuditListView } from '@customer-portal/overview-shared';
 import {
-  DEFAULT_GRID_CONFIG,
-  downloadFileFromByteArray,
-  FilterableColumnDefinition,
-  FilterOptions,
+  GlobalServiceMasterStoreService,
+  GlobalSiteMasterStoreService,
+} from '@customer-portal/data-access/global';
+import {
+  ClearNavigationFilters,
+  OverviewSharedStoreService,
+} from '@customer-portal/overview-shared';
+import { DEFAULT_GRID_CONFIG } from '@customer-portal/shared/constants';
+import { throwIfNotSuccess } from '@customer-portal/shared/helpers/custom-operators';
+import { getToastContentBySeverity } from '@customer-portal/shared/helpers/custom-toast';
+import { downloadFileFromByteArray } from '@customer-portal/shared/helpers/download';
+import {
   getFilterOptions,
-  getToastContentBySeverity,
-  GridConfig,
-  ToastSeverity,
   updateGridConfigBasedOnFilters,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/helpers/grid';
+import {
+  FilterableColumnDefinition,
+  ToastSeverity,
+} from '@customer-portal/shared/models';
+import { FilterOptions, GridConfig } from '@customer-portal/shared/models/grid';
 
 import { AuditListItemModel } from '../models';
 import { AuditListMapperService, AuditListService } from '../services';
 import {
+  ApplyNavigationFiltersFromOverview,
   ExportAuditsExcel,
   ExportAuditsExcelFail,
   ExportAuditsExcelSuccess,
   LoadAuditList,
+  LoadAuditListFail,
   LoadAuditListSuccess,
   ResetAuditListState,
   SetNavigationGridConfig,
@@ -35,12 +46,16 @@ export interface AuditListStateModel {
   auditItems: AuditListItemModel[];
   gridConfig: GridConfig;
   filterOptions: FilterOptions;
+  isLoading: boolean;
+  error: string | null;
 }
 
 const defaultState: AuditListStateModel = {
   auditItems: [],
   gridConfig: DEFAULT_GRID_CONFIG,
   filterOptions: {},
+  isLoading: false,
+  error: null,
 };
 
 @State<AuditListStateModel>({
@@ -53,26 +68,34 @@ export class AuditListState {
     private auditService: AuditListService,
     private messageService: MessageService,
     private ts: TranslocoService,
+    private globalSiteMasterStoreService: GlobalSiteMasterStoreService,
+    private globalServiceMasterStoreService: GlobalServiceMasterStoreService,
+    private overviewSharedStore: OverviewSharedStoreService,
   ) {}
 
   @Action(LoadAuditList)
   loadAuditList(ctx: StateContext<AuditListStateModel>) {
-    return this.auditService.getAuditList().pipe(
-      tap((auditListDto) => {
-        if (!auditListDto?.isSuccess) {
-          const message = getToastContentBySeverity(ToastSeverity.Error);
-          const entityType = this.ts.translate('audit');
-          message.summary = this.ts.translate('error.loading', { entityType });
-          this.messageService.add(message);
+    ctx.patchState({
+      isLoading: true,
+    });
 
-          return;
-        }
-        const auditItems =
-          AuditListMapperService.mapToAuditItemModel(auditListDto);
+    return this.auditService.getAuditList().pipe(
+      throwIfNotSuccess(),
+      tap((auditListDto) => {
+        const siteMasterList =
+          this.globalSiteMasterStoreService.siteMasterList();
+        const serviceMasterList =
+          this.globalServiceMasterStoreService.serviceMasterList();
+        const auditItems = AuditListMapperService.mapToAuditItemModel(
+          auditListDto,
+          siteMasterList,
+          serviceMasterList,
+        );
         ctx.dispatch(new LoadAuditListSuccess(auditItems));
 
         ctx.dispatch(new UpdateFilterOptions());
       }),
+      catchError(() => ctx.dispatch(new LoadAuditListFail())),
     );
   }
 
@@ -81,7 +104,24 @@ export class AuditListState {
     ctx: StateContext<AuditListStateModel>,
     { auditItems }: LoadAuditListSuccess,
   ): void {
-    ctx.patchState({ auditItems });
+    ctx.patchState({
+      auditItems,
+      error: '',
+      isLoading: false,
+    });
+  }
+
+  @Action(LoadAuditListFail)
+  loadAuditListFail(ctx: StateContext<any>) {
+    const message = getToastContentBySeverity(ToastSeverity.Error);
+    const entityType = this.ts.translate('audit');
+    message.summary = this.ts.translate('error.loading', { entityType });
+    this.messageService.add(message);
+    ctx.patchState({
+      error: 'Failed to load audit data',
+      isLoading: false,
+      auditItems: [],
+    });
   }
 
   @Action(UpdateGridConfig, { cancelUncompleted: true })
@@ -177,11 +217,15 @@ export class AuditListState {
     });
   }
 
-  @Action(NavigateFromOverviewCardToAuditListView)
-  navigateFromOverviewCardToAuditListView(
-    ctx: StateContext<AuditListStateModel>,
-    { overviewCardFilters }: NavigateFromOverviewCardToAuditListView,
-  ) {
-    ctx.dispatch(new SetNavigationGridConfig(overviewCardFilters));
+  @Action(ApplyNavigationFiltersFromOverview)
+  applyNavigationFiltersFromOverview(ctx: StateContext<AuditListStateModel>) {
+    return this.overviewSharedStore.overviewNavigationFilters$
+      .pipe(take(1))
+      .subscribe((overviewCardFilters) => {
+        if (overviewCardFilters) {
+          ctx.dispatch(new SetNavigationGridConfig(overviewCardFilters));
+          ctx.dispatch(new ClearNavigationFilters());
+        }
+      });
   }
 }

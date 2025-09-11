@@ -27,10 +27,12 @@ export const ACTIONS_LIST_QUERY = gql`
           highPriority
           id
           message
+          language
           service
           site
           entityType
           entityId
+          subject
         }
         totalItems
         totalPages

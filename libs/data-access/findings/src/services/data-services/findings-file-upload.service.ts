@@ -5,7 +5,8 @@ import { MessageService } from 'primeng/api';
 import { Observable, tap } from 'rxjs';
 
 import { environment } from '@customer-portal/environments';
-import { FileUpload, FileUploadToastHelper } from '@customer-portal/shared';
+import { FileUploadToastHelper } from '@customer-portal/shared/helpers/toast';
+import { FileUpload } from '@customer-portal/shared/models';
 
 enum FileUploadErrors {
   Error_001 = 'findings.fileUpload.fileUploadWrongName',
