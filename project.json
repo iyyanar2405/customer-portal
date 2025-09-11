@@ -1,6 +1,5 @@
 {
   "name": "customer-portal",
-  "$schema": "../node_modules/nx/schemas/project-schema.json",
   "includedScripts": [],
   "projectType": "application",
   "prefix": "app",
@@ -11,6 +10,7 @@
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/customer-portal",
+        "index": "src/index.html",
         "browser": "./src/main.ts",
         "polyfills": ["polyfills.ts"],
         "tsConfig": "tsconfig.app.json",

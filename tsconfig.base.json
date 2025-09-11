@@ -186,11 +186,15 @@
       ],
       "@customer-portal/data-access/global/*": [
         "libs/data-access/global/src/*"
-      ],
+      ]
     }
   },
   "exclude": [
     "node_modules",
     "tmp"
+  ],
+  "include": [
+    "src/**/*.d.ts",
+    "../../libs/shared/src/**/*.ts"
   ]
 }
