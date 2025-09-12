@@ -113,7 +113,7 @@
         "libs/data-access/settings/src/*"
       ],
       "@customer-portal/environments/*": [
-        "libs/environments/src/index.ts"
+        "libs/environments/src/*"
       ],
       "@customer-portal/features/actions": [
         "libs/features/actions/src/index.ts"

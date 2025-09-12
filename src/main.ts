@@ -19,5 +19,4 @@ if (environment.production) {
     loader.classList.remove('loader-visible');
     loader.classList.add('loader-hidden');
     }
-    }
-    .catch((err) => console.error(err));
+    }).catch((err) => console.error(err));
