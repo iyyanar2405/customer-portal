@@ -1,6 +1,6 @@
 import { Route } from '@angular/router';
 import { allowNonDnvUserGuard } from '@customer-portal/data-access/settings';
-import { pagePermissionGuard } from '@customer-portal/permissions';
+import { pagePermissionGuard } from '@customer-portal/data-access/permissions';
 import { authGuard, RouteConfig } from '@customer-portal/shared';
 import { ErrorComponent } from './components/error';
 import { LogoutComponent, WelcomeComponent } from './components';
