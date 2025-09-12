@@ -18,12 +18,11 @@ import { SharedButtonComponent, SharedButtonType } from '../../button';
 })
 export class EmptyGridComponent {
   @Input() isDocumentsGrid = false;
+  @Input() isShowAddDocument = false;
   @Input({ required: true }) hasActiveFilters = false;
   @Input({ required: true }) isGridEmpty = false;
-
-  @Output() addDocuments = new EventEmitter<void>();
-
   sharedButtonType = SharedButtonType;
+  @Output() addDocuments = new EventEmitter<void>();
 
   onAddDocuments(): void {
     this.addDocuments.emit();

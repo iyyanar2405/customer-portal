@@ -30,10 +30,6 @@ export const constructNavigation = (
   const filterMap: Record<string, FilterValue[]> = {
     scheduleList: [
       createFilter(
-        NavigationFiltersTypesAndValues.ScheduleListTypeStatus,
-        NavigationFiltersTypesAndValues.ScheduleListTypeStatusValue,
-      ),
-      createFilter(
         NavigationFiltersTypesAndValues.ScheduleListTypeSiteAuditId,
         `${id}`,
       ),

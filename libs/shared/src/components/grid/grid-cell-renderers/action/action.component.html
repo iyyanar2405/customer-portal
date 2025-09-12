@@ -8,9 +8,9 @@
           tabindex="0"
           [attr.aria-label]="t('download')"
           [ngClass]="action.iconClass"
-          (click)="onDownloadClick(action)"
-          (keydown.enter)="onDownloadClick(action)"
-          (keydown.space)="onDownloadClick(action)">
+          (click)="onDownloadClick(action, $event)"
+          (keydown.enter)="onDownloadClick(action, $event)"
+          (keydown.space)="onDownloadClick(action, $event)">
         </i>
       }
       @if (action.actionType === GridActionType.Delete) {

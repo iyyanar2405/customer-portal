@@ -16,3 +16,9 @@ export const SHARED_SELECT_DATE_RANGE_DEFAULT_DATA: TimeRange[] = [
   TimeRange.MonthNext,
   TimeRange.Custom,
 ];
+
+export const DATE_RANGE_EMPTY_OPTION = {
+  id: '',
+  label: 'select.dateRange.choosePeriod',
+  range: [],
+};

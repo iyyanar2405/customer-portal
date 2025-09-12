@@ -16,11 +16,12 @@ export const chartTotalPlugin = (id: string) => ({
     ctx.fillStyle = '#003591';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
+    const total = data.datasets[0].data.reduce(
+      (accumulator: number, currentValue: number) => accumulator + currentValue,
+      0,
+    );
     ctx.fillText(
-      data.datasets[0].data.reduce(
-        (accumulator: number, currentValue: number) =>
-          accumulator + currentValue,
-      ),
+      Number.isInteger(total) ? total.toString() : total.toFixed(2),
       xCoor,
       yCoor + 14, // 14 is the distance between the two lines
     );

@@ -4,11 +4,17 @@ import { TranslocoDirective } from '@jsverse/transloco';
 import { TreeNode, TreeTableNode } from 'primeng/api';
 import { TreeTableModule } from 'primeng/treetable';
 
+import { TippyTooltipDirective } from '../../directives/tippy-tooltip/tippy-tooltip.directive';
 import { FilterValue, TreeColumnDefinition, TreeNodeClick } from '../../models';
 
 @Component({
   selector: 'shared-tree-table',
-  imports: [CommonModule, TranslocoDirective, TreeTableModule],
+  imports: [
+    CommonModule,
+    TranslocoDirective,
+    TreeTableModule,
+    TippyTooltipDirective,
+  ],
   templateUrl: './tree-table.component.html',
   styleUrl: './tree-table.component.scss',
 })
@@ -32,6 +38,7 @@ export class TreeTableComponent<T extends { field: string }> {
   @Input() hideZeroValues = false;
   @Input() isCellClickable = false;
 
+  @Input() isLoading = false;
   @Output() cellClicked = new EventEmitter<FilterValue>();
   @Output() rowClicked = new EventEmitter<T>();
   @Output() cellClickedSendTreeNode = new EventEmitter<TreeNodeClick>();
@@ -41,7 +48,20 @@ export class TreeTableComponent<T extends { field: string }> {
       return this.globalCategories.get(value) || '';
     }
 
-    return this.categoriesByColumn[property]?.get(value) || '';
+    const existingClass = this.categoriesByColumn[property]?.get(value) || '';
+
+    const fieldClass = property;
+
+    let categoryClass = '';
+
+    if (this.categoriesByColumn[property]?.get(-1)) {
+      categoryClass = `category-${property
+        .toLowerCase()
+        .replace(/[^a-z0-9-]/g, '-')
+        .replace(/^-+|-+$/g, '')}`;
+    }
+
+    return [existingClass, fieldClass, categoryClass].filter(Boolean).join(' ');
   }
 
   onCellClick(rowData: T, field: string, rowNode?: TreeTableNode<T>): void {
@@ -69,10 +89,13 @@ export class TreeTableComponent<T extends { field: string }> {
     col: TreeColumnDefinition,
     rowNode: TreeTableNode<T>,
   ): Record<string, boolean> {
+    const isParent = this.hasChildren(rowNode) && rowNode.parent === null;
+
     return {
       'parent-cell': this.hasChildren(rowNode),
       underlined: !!col.hasNavigationEnabled,
       'first-cell': rowNode.parent === null,
+      'clickable-cell': this.isCellClickable && isParent,
     };
   }
 
@@ -80,7 +103,7 @@ export class TreeTableComponent<T extends { field: string }> {
     return typeof input === 'boolean';
   }
 
-  private hasChildren(rowNode: TreeTableNode<T>): boolean {
+  public hasChildren(rowNode: TreeTableNode<T>): boolean {
     return !!rowNode.node?.children && rowNode.node.children.length > 0;
   }
 }

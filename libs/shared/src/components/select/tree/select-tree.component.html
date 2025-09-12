@@ -23,7 +23,7 @@
           <span>{{ selectedTooltip }}</span>
         } @else {
           <span>{{
-            t('select.multiSelect.overflowLabel', { count: value.length })
+            t('select.multiSelect.overflowLabel', { count: getMultiSelectedCount(value) })
           }}</span>
         }
       } @else {

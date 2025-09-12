@@ -11,6 +11,7 @@ export interface GridRowAction {
   };
   title: string;
   message: string;
+  language?: string;
   receivedOn: string;
   actions: {
     actionType: string;

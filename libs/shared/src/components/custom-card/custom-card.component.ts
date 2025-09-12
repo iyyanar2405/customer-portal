@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { CardModule } from 'primeng/card';
 
@@ -8,6 +8,7 @@ import { CardModule } from 'primeng/card';
   imports: [CommonModule, CardModule, TranslocoDirective],
   templateUrl: './custom-card.component.html',
   styleUrl: './custom-card.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CustomCardComponent {
   @Input() title!: string;

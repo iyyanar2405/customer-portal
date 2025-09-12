@@ -51,6 +51,7 @@ export class ChartComponent implements OnDestroy, AfterViewInit {
     }
   }
 
+  @Input() isLoading = false;
   @Input() options!: any;
   @Input() type: ChartType = ChartTypeEnum.Bar;
   @Input() plugins: Plugin[] = [];

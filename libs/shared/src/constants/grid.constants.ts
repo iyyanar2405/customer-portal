@@ -36,4 +36,4 @@ export const DEFAULT_GRID_CONFIG: GridConfig = {
   filtering: {},
 };
 
-export const BLANK_FILTER = 'BLANK';
+export const BLANK_FILTER = 'Blank';

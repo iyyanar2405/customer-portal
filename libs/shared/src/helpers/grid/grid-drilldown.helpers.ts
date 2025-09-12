@@ -12,6 +12,14 @@ import { dateToFormat } from '../date/date.helpers';
 export const checkIsDateType = (s: string | Date): boolean =>
   typeof s !== 'string';
 
+export const formatDateOnly = (date: Date): string => {
+  const d = date.getUTCDate().toString().padStart(2, '0');
+  const m = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+  const y = date.getUTCFullYear();
+
+  return `${d}-${m}-${y}`;
+};
+
 // TODO: refactor this
 const isDateRange = (value: any[]): boolean =>
   value.length === 2 &&
@@ -37,6 +45,19 @@ export const formatFilter = (
 ): FilterValue[] => {
   const formattedFilter = payload.map((item) => {
     const value = checkIsDateType(item) ? dateToFormat(item as Date) : item;
+
+    return { label: value, value };
+  });
+
+  return [{ label: type, value: formattedFilter }];
+};
+
+export const formatFilterOnlyDate = (
+  payload: string[] | Date[],
+  type: string,
+): FilterValue[] => {
+  const formattedFilter = payload.map((item) => {
+    const value = checkIsDateType(item) ? formatDateOnly(item as Date) : item;
 
     return { label: value, value };
   });

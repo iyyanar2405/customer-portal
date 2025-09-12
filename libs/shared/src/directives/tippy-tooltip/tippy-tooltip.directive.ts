@@ -9,6 +9,7 @@ import {
 import tippy, { Props } from 'tippy.js';
 
 import { TooltipPlacements, TooltipThemes } from '../../constants';
+import { truncateTooltipText } from '../../helpers/type/string.helpers';
 import { TOOLTIP_CONSTANTS, TooltipState } from './tippy-tooltip.model';
 
 @Directive({
@@ -186,8 +187,10 @@ export class TippyTooltipDirective implements AfterViewInit, OnDestroy {
   }
 
   private getTooltipConfig(): Partial<Props> {
+    const rawContent = this.content || this.el.nativeElement.textContent || '';
+
     return {
-      content: this.content || this.el.nativeElement.textContent,
+      content: truncateTooltipText(rawContent),
       delay: [TOOLTIP_CONSTANTS.SHOW_TOOLTIP_DELAY_MS, 0],
       theme: this.tooltipTheme,
       arrow: true,

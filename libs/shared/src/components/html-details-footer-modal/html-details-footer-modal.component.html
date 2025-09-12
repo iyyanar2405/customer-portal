@@ -1,4 +1,4 @@
-<ng-container *transloco="let t">
+<ng-container *transloco="let t;">
   <shared-button
     [icon]="'question-circle'"
     [iconPos]="'left'"
@@ -6,7 +6,8 @@
     [type]="sharedButtonType.Outline"
      (clickEvent)="onHelpClick()">
   </shared-button>
-
+</ng-container>
+<ng-container *transloco="let t">
   <shared-button
     [label]="t('viewDetails')"
     [type]="sharedButtonType.Primary"

@@ -22,6 +22,9 @@
     "paths": {
       "@customer-portal/core": ["libs/core/src/index.ts"],
       "@customer-portal/core/*": ["libs/core/src/*"],
+      "@customer-portal/environments": ["libs/environments/src/index.ts"],
+      "@customer-portal/environments/*": ["libs/environments/src/*"],
+
       "@customer-portal/data-access/actions": [
         "libs/data-access/actions/src/index.ts"
       ],
@@ -111,10 +114,7 @@
       ],
       "@customer-portal/data-access/settings/*": [
         "libs/data-access/settings/src/*"
-      ],
-      "@customer-portal/environments/*": [
-        "libs/environments/src/*"
-      ],
+      ],      
       "@customer-portal/features/actions": [
         "libs/features/actions/src/index.ts"
       ],

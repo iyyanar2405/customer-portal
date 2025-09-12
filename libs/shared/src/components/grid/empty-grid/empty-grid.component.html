@@ -11,14 +11,16 @@
           {{ t('grid.noDocumentsDetailedMessage') }}
         </p>
       </div>
-      <div class="empty-state__actions">
-        <shared-button
-          [icon]="'plus'"
-          [label]="t('grid.addDocuments')"
+      @if (isShowAddDocument){
+        <div class="empty-state__actions">
+          <shared-button
+            [icon]="'plus'"
+            [label]="t('grid.addDocuments')"
           [type]="sharedButtonType.Secondary"
           (clickEvent)="onAddDocuments()">
-        </shared-button>
-      </div>
+          </shared-button>
+        </div>
+      }
     </div>
   } @else if (isGridEmpty && hasActiveFilters) {
     <div class="empty-state empty-state--no-data-matches-filters">

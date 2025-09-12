@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnDestroy } from '@angular/core';
 import { TranslocoDirective } from '@jsverse/transloco';
-import { DynamicDialogRef } from 'primeng/dynamicdialog';
+import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 
 import { NOTIFICATION_HELP_SUPPORT } from '../../constants/notification-help.constant';
 import { HelpClickedModal } from '../../models';
@@ -16,8 +16,14 @@ import { SharedButtonComponent, SharedButtonType } from '../button';
 })
 export class HtmlDetailsFooterModalComponent implements OnDestroy {
   sharedButtonType = SharedButtonType;
+  languagePreference = '';
 
-  constructor(private ref: DynamicDialogRef) {}
+  constructor(
+    private ref: DynamicDialogRef,
+    private config: DynamicDialogConfig,
+  ) {
+    this.languagePreference = this.config?.data?.footerButtonLanguage;
+  }
 
   closeDialog(data: boolean): void {
     this.ref.close(data);

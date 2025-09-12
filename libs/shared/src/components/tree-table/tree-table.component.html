@@ -26,6 +26,7 @@
           <tr [ttRow]="rowNode">
             @for (col of columns; let i = $index; track col.field) {
               <td [style.width]="col.width || 'inherit'">
+                <div  [ngClass]="{'icon-with-alignment': i === 0}">
                 @if (i === 0) {
                   <p-treeTableToggler
                     [ngClass]="getRowClasses(rowNode)"
@@ -58,6 +59,7 @@
                     }
                   }
                 }
+                </div>
               </td>
             }
           </tr>
@@ -93,7 +95,14 @@
                         isCellClickable &&
                           onCellClick(rowData, col.field, rowNode)
                       ">
-                      {{ rowData[col.field] }}
+                      @if (!hasChildren(rowNode)){
+                        <span [sharedTippyTooltip]="rowData[col.field]">
+                          {{ rowData[col.field] }}
+                        </span>
+                      }
+                      @else{
+                        {{ rowData[col.field] }}
+                      }
                     </span>
                   } @else {
                     @if (rowData[col.field] === true) {
@@ -109,9 +118,11 @@
         </ng-template>
       </p-treeTable>
     } @else {
-      <h3 class="grid-message">
-        {{ t('certificatesBySite.noDataNotification') }}
-      </h3>
+        @if(!isLoading){
+          <h3 class="grid-message">
+            {{ t('certificatesBySite.noDataNotification') }}
+          </h3>
+        }
     }
   </div>
 </ng-container>

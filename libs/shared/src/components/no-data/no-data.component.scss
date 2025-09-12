@@ -1,0 +1,58 @@
+@use 'pattern/typography';
+@use 'pattern/colors';
+@use 'pattern/utility';
+
+// .no-data-container {
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   justify-content: center;
+//   min-height: 300px;
+//   padding: utility.get-rem(40) 0;
+//   border-radius: utility.get-rem(10);
+//   background: colors.get-color('UiWhite');
+
+//   img {
+//     width: 120px;
+//     margin-bottom: utility.get-rem(20);
+//   }
+.no-data-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  width: 100%;
+  padding: 2rem 0;
+  border-radius: 10px;
+  background: #fff;
+
+  img {
+    display: block;
+    margin: 0 auto 1.25rem auto;
+    max-width: 100%;
+    height: auto;
+  }
+  
+ img[src$="api-error.png"] {
+    width: 100%;
+    max-width: 400px;
+    object-fit: contain;
+  }
+
+  .no-data-info {
+    @extend %#{typography.$button-l-pattern};
+    font-size: var(--dnv-font-heading-m);
+    color: colors.get-color('DarkBlue');
+    padding: utility.get-rem(20) 0 utility.get-rem(10) 0;
+    text-align: center;
+  }
+
+  .no-data-text {
+    font-size: var(--dnv-font-text-l);
+    color: colors.get-color('DarkBlue');
+    text-align: center;
+    max-width: 55%;
+    line-height: utility.get-rem(20);
+  }
+}

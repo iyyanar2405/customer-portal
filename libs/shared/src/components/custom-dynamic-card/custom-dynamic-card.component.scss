@@ -116,7 +116,7 @@
 
 .card-content .card-tab-content {
   display: grid;
-  grid-template-columns: repeat(3, calc((100% - utility.get-rem(36)) / 3));
+  grid-template-columns: repeat(4, calc((100% - utility.get-rem(36)) / 4));
   gap: utility.get-rem(8);
 
   @include mixins.respond-to(phone) {

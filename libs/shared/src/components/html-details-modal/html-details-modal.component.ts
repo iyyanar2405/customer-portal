@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { DynamicDialogConfig } from 'primeng/dynamicdialog';
 
 @Component({
@@ -7,6 +7,7 @@ import { DynamicDialogConfig } from 'primeng/dynamicdialog';
   imports: [CommonModule],
   templateUrl: './html-details-modal.component.html',
   styleUrl: './html-details-modal.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HtmlDetailsModalComponent {
   constructor(public config: DynamicDialogConfig) {}

@@ -138,6 +138,12 @@ export class SharedSelectTreeComponent {
     this.treeSelect().hide();
   }
 
+  getMultiSelectedCount(value: TreeNode[] = []): number {
+    return value.filter(
+      (data: TreeNode) => !data.children || data.children.length === 0,
+    ).length;
+  }
+
   private applyPrefillSelection(): void {
     this.selected = this.getCheckedNodes(this.prefill());
   }
@@ -176,7 +182,10 @@ export class SharedSelectTreeComponent {
   }
 
   private getSelectedTooptip(): string {
-    return this.selected.map((s) => s.label).join(', ');
+    return this.selected
+      .filter((item: TreeNode) => !item.children?.length)
+      .map((s) => s.label)
+      .join(', ');
   }
 
   private getTriState(): boolean | null {

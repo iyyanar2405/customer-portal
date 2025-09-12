@@ -22,12 +22,27 @@ export class ActionComponent {
 
   GridActionType = GridFileActionType;
 
-  onDownloadClick({ url, actionType }: GridFileAction): void {
-    this.triggerFileAction.emit({ url, actionType });
+  onDownloadClick({ url, actionType }: GridFileAction, event?: Event): void {
+    let element: HTMLElement | undefined;
+
+    if (
+      event &&
+      'currentTarget' in event &&
+      event.currentTarget instanceof HTMLElement
+    ) {
+      element = event.currentTarget;
+    }
+    this.triggerFileAction.emit({
+      url,
+      actionType,
+      element,
+    });
   }
 
   onDeleteClick({ actionType }: GridFileAction): void {
-    this.triggerFileAction.emit({ actionType });
+    this.triggerFileAction.emit({
+      actionType,
+    });
   }
 
   onRedirectClick({ actionType }: GridFileAction): void {

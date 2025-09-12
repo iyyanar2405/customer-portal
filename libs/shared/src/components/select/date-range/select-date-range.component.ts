@@ -19,6 +19,7 @@ import {
 } from 'primeng/dropdown';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 
+import { SHORT_MONTH_DATE_FORMAT } from '../../../constants';
 import { getTimeRange } from '../../../helpers';
 import { TimeRange } from '../../../models';
 import {
@@ -67,6 +68,7 @@ export class SharedSelectDateRangeComponent {
   public rangeCustomLabel = computed<any>(() => this.getRangeLabel());
   public scrollHeight = `${SHARED_SELECT_DATE_RANGE_SCROLL_HEIGHT_PX}px`;
   public selected = signal<SharedSelectDateRangeDatum>(this.options()[0]);
+  public placeholder = `${SHORT_MONTH_DATE_FORMAT} - ${SHORT_MONTH_DATE_FORMAT}`;
 
   constructor(private readonly datePipe: DatePipe) {
     effect(() => {

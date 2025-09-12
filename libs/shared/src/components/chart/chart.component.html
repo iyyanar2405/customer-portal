@@ -10,8 +10,9 @@
   #chartCanvas
   tabindex="0"
   [style.display]="hasData ? 'block' : 'none'"></canvas>
-
-@if (!hasData) {
-  <shared-empty-chart [hasBorderIfNoData]="hasBorderIfNoData" [type]="type">
-  </shared-empty-chart>
+@if (!isLoading) {
+  @if (!hasData) {
+    <shared-empty-chart [hasBorderIfNoData]="hasBorderIfNoData" [type]="type">
+    </shared-empty-chart>
+  }
 }

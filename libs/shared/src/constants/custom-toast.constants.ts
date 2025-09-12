@@ -86,4 +86,9 @@ export const TOAST_OPTIONS_MAP: { [key: string]: ToastOptionModel } = {
     summary: ToastSeveritySummary.SomethingWentWrong,
     icon: ToastSeverityIcons.ExclamationCircle,
   },
+  [ToastSeverity.InitializationError]: {
+    severity: ToastSeverity.Error,
+    summary: ToastSeveritySummary.InitializationError,
+    icon: ToastSeverityIcons.ExclamationCircle,
+  },
 };

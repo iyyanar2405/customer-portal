@@ -91,12 +91,13 @@ export class CustomFullCalendarComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.calendarApi = this.fullcalendar.getApi();
-    this.scrollToToday();
-    this.handleScrollOnViewChange();
+    // this.scrollToToday();
+    // this.handleScrollOnViewChange();
 
     if (this.selectedDate) {
       this.calendarApi.gotoDate(this.selectedDate);
     }
+    this.handleEvents();
   }
 
   handleEvents(): void {
@@ -133,15 +134,25 @@ export class CustomFullCalendarComponent implements AfterViewInit {
       });
   }
 
-  handleScrollOnViewChange(): void {
-    this.onViewChange$
-      .pipe(delay(100), takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        this.scrollToToday();
-      });
-  }
+  // handleScrollOnViewChange(): void {
+  //   this.onViewChange$
+  //     .pipe(delay(100), takeUntilDestroyed(this.destroyRef))
+  //     .subscribe(() => {
+  //       this.scrollToToday();
+  //     });
+  // }
 
   private setCalendarOptions(): void {
+    let initialDate: Date;
+
+    if (this.calendarViewType === CalendarViewType.Year) {
+      const year =
+        this.selectedDate?.getUTCFullYear() ?? new Date().getUTCFullYear();
+      initialDate = new Date(Date.UTC(year, 0, 1));
+    } else {
+      initialDate = this.selectedDate ?? new Date();
+    }
+
     this.calendarOptions.set({
       // Localization & Plugins
       locales: allLocales,
@@ -189,7 +200,7 @@ export class CustomFullCalendarComponent implements AfterViewInit {
       events: this._events?.map((event: CustomCalendarEvent) => ({
         title: `${event.service}, ${event.city}, ${event.site}`,
         start: event.startDate,
-        end: `${event.endDate}T24:00:00.000Z`,
+        end: event.endDate,
         id: event.scheduleId,
         className: this.scheduleStatusMap
           ? this.scheduleStatusMap[event.status.toLocaleLowerCase()]

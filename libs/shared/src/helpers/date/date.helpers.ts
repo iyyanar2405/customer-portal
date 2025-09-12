@@ -1,4 +1,4 @@
-import { DateTime } from 'luxon';
+import { DateTime, IANAZone } from 'luxon';
 
 import { DEFAULT_DATE_FORMAT } from '../../constants';
 
@@ -192,3 +192,85 @@ export const getDateWithoutTimezone = (date: Date): string => {
 
   return withoutTimezone;
 };
+
+export const formatUtcToLocal = (
+  inputDateTime: string,
+  localZone: string,
+  dateFormat = DEFAULT_DATE_FORMAT,
+): string => {
+  if (!inputDateTime) return '';
+
+  const dt = DateTime.fromISO(inputDateTime, { zone: 'utc' });
+
+  if (!dt.isValid) {
+    console.error('Invalid date:', inputDateTime, dt.invalidReason);
+
+    return '';
+  }
+
+  if (!IANAZone.isValidZone(localZone)) {
+    console.error('Invalid timezone:', localZone);
+
+    return dt.toFormat(dateFormat);
+  }
+
+  return dt.setZone(localZone).toFormat(dateFormat);
+};
+
+export const utcDateInPast = (date: string): boolean => {
+  const targetDateUtc = DateTime.fromISO(date, {
+    zone: 'utc',
+    setZone: true,
+  }).startOf('day');
+  const todayUtc = DateTime.now().setZone('utc').startOf('day');
+
+  return targetDateUtc < todayUtc;
+};
+
+export const utcDateInFuture = (date: string): boolean => {
+  const targetDateUtc = DateTime.fromISO(date, {
+    zone: 'utc',
+    setZone: true,
+  }).startOf('day');
+  const todayUtc = DateTime.now().setZone('utc').startOf('day');
+
+  return targetDateUtc > todayUtc;
+};
+
+export function formatCustomDate(value: string): string {
+  if (!value) return '';
+
+  const isoMatch = value.match(/^\d{4}-\d{2}-\d{2}T/);
+
+  if (isoMatch) {
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+    const day = String(date.getDate()).padStart(2, '0');
+    const monthShort = date.toLocaleString('en-US', { month: 'short' });
+    const year = String(date.getFullYear());
+
+    return `${day}-${monthShort}-${year}`;
+  }
+
+  const parts = value.includes('-') ? value.split('-') : value.split('.');
+  if (parts.length !== 3) return value;
+
+  const [day, month, year] = parts;
+  const date = new Date(Number(year), Number(month) - 1, Number(day));
+
+  if (
+    Number.isNaN(date.getTime()) ||
+    date.getFullYear() !== Number(year) ||
+    date.getMonth() !== Number(month) - 1 ||
+    date.getDate() !== Number(day)
+  ) {
+    return value;
+  }
+
+  const monthShort = date.toLocaleString('en-US', { month: 'short' });
+
+  return `${day.padStart(2, '0')}-${monthShort}-${year}`;
+}

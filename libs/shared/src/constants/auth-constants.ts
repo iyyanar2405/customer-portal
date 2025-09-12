@@ -4,4 +4,5 @@ export const AuthTokenConstants = {
   LAST_ACTIVITY_KEY: 'last_activity',
   SESSION_SYNC: 'session_sync',
   SHOW_MODAL_KEY: 'show_timeout_modal',
+  AUTH_LOGGING_OUT: 'auth_logging_out',
 };

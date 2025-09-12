@@ -19,10 +19,14 @@ export const enum FindingsStatusStates {
   Open = 'Open',
   Accepted = 'Accepted',
   Closed = 'Closed',
+  Responded = 'Responded',
+  Reverted = 'Reverted',
 }
 
 export const FINDINGS_STATUS_STATES_MAP: Record<string, string> = {
   [FindingsStatusStates.Open.toLowerCase()]: StatesClasses.SunflowerYellow,
   [FindingsStatusStates.Accepted.toLowerCase()]: StatesClasses.FernGreen,
   [FindingsStatusStates.Closed.toLowerCase()]: StatesClasses.AshGrey,
+  [FindingsStatusStates.Responded.toLowerCase()]: StatesClasses.SummerSky,
+  [FindingsStatusStates.Reverted.toLowerCase()]: StatesClasses.CrimsonFlame,
 };
