@@ -1,44 +1,40 @@
 {
-  // Visit https://aka.ms/tsconfig to read more about this file
+  "compileOnSave": false,
   "compilerOptions": {
-    // File Layout
-    // "rootDir": "./src",
-    // "outDir": "./dist",
-
-    // Environment Settings
-    // See also https://aka.ms/tsconfig/module
-    "module": "nodenext",
-    "target": "esnext",
-    "types": [],
-    // For nodejs:
-    // "lib": ["esnext"],
-    // "types": ["node"],
-    // and npm install -D @types/node
-
-    // Other Outputs
+  "baseUrl": "./",
+  "paths": {    
+    "@customer-portal/environments": ["libs/environments/index.ts"],
+    "@customer-portal/core": ["libs/core/index.ts"],
+    "@customer-portal/data-access/*": ["libs/data-access/*/src/index.ts"],
+    "@customer-portal/features/action/*": ["libs/features/action/*/src/index.ts"],
+    "@customer-portal/features/audit/*": ["libs/features/audit/*/src/index.ts"],
+    "@customer-portal/features/certificates/*": ["libs/features/certificates/*/src/index.ts"],
+    "@customer-portal/features/contracts/*": ["libs/features/contracts/*/src/index.ts"],
+    "@customer-portal/features/external-apps/*": ["libs/features/external-apps/*/src/index.ts"],
+    "@customer-portal/features/findings/*": ["libs/features/findings/*/src/index.ts"],
+    "@customer-portal/features/notifications/*": ["libs/features/notifications/*/src/index.ts"],
+    "@customer-portal/features/overview/*": ["libs/features/overview/*/src/index.ts"],
+    "@customer-portal/features/schedules/*": ["libs/features/schedules/*/src/index.ts"],
+    "@customer-portal/features/settings/*": ["libs/features/settings/*/src/index.ts"],
+        "@customer-portal/features/upload/*": ["libs/features/upload/*/src/index.ts"],
+    "@customer-portal/shared": ["libs/shared/src/index.ts"]
+    },
+    "outDir": "./dist/out-tsc",
     "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
-
-    // Stricter Typechecking Options
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-
-    // Style Options
-    // "noImplicitReturns": true,
-    // "noImplicitOverride": true,
-    // "noUnusedLocals": true,
-    // "noUnusedParameters": true,
-    // "noFallthroughCasesInSwitch": true,
-    // "noPropertyAccessFromIndexSignature": true,
-
-    // Recommended Options
-    "strict": true,
-    "jsx": "react-jsx",
-    "verbatimModuleSyntax": true,
-    "isolatedModules": true,
-    "noUncheckedSideEffectImports": true,
-    "moduleDetection": "force",
+    "declaration": false,
+    "downlevelIteration": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "importHelpers": true,
+    "target": "es2018",
+    "module": "es2020",
+    "lib": [
+      "es2018",
+      "dom",
+      "esnext.asynciterable"
+    ],
     "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "types": ["jest"]
   }
 }
