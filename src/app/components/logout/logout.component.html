@@ -3,10 +3,9 @@
     <div class="header">
       <img
         alt="DNV logo"
-        class="logo-lg"
+        class="logo--lg"
         src="../../../assets/logos/dnv-logo-color.svg" />
     </div>
-    
     <div class="content">
       <div class="card">
         <div class="card-text-container">
@@ -17,18 +16,17 @@
             {{ t('logout.description') }}
           </p>
         </div>
-        
         <div class="logout-actions">
           <shared-button
-            [label]="t('logout.gobackButton')"
+            [label]="t('logout.goBackButton')"
             [type]="sharedButtonType.Secondary"
             (clickEvent)="onLoginClick()">
           </shared-button>
-          
+
           <shared-button
-            [label]="t('logout.goToDnwButton')"
+            [label]="t('logout.goToDnvButton')"
             [type]="sharedButtonType.Outline"
-            (clickEvent)="onGoToDnwClick()">
+            (clickEvent)="onGoToDnvClick()">
           </shared-button>
         </div>
       </div>

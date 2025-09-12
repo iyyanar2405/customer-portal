@@ -1,4 +1,5 @@
 @use 'sass:color';
+
 @use 'pattern/colors';
 @use 'pattern/mixins';
 @use 'pattern/typography';
@@ -58,13 +59,13 @@ img {
   @include mixins.respond-to(tablet) {
     margin-bottom: utility.get-rem(40);
   }
+}
 
-  .close {
-    display: none;
-    
-    @include mixins.respond-to(tablet) {
-      display: flex;
-    }
+.close {
+  display: none;
+
+  @include mixins.respond-to(tablet) {
+    display: flex;
   }
 }
 
@@ -96,7 +97,7 @@ p-button.p-element:not(.close)::ng-deep {
   opacity: 0.8;
 
   .p-button-text {
-    @extend %#{typography.$text-1-pattern};
+    @extend %#{typography.$text-l-pattern};
     font-weight: 700;
     display: flex;
     gap: utility.get-rem(10);
@@ -120,7 +121,7 @@ p-button.p-element.close::ng-deep {
     padding: 0;
     color: colors.get-color('UiWhite');
   }
-  
+
   .p-button-icon {
     font-size: utility.get-rem(24);
   }

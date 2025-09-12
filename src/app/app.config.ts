@@ -6,6 +6,7 @@ import {
   importProvidersFrom,
   isDevMode,
   LOCALE_ID,
+  provideAppInitializer,
 } from '@angular/core';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideRouter, withDisabledInitialNavigation } from '@angular/router';
@@ -19,7 +20,7 @@ import {
 } from '@ngxs/router-plugin';
 import { NgxsModule } from '@ngxs/store';
 import { NgxsDispatchPluginModule } from '@ngxs-labs/dispatch-decorator';
-import { APOLLO_NAMED_OPTIONS, NamedOptions } from 'apollo-angular';
+import { Apollo, APOLLO_NAMED_OPTIONS, NamedOptions } from 'apollo-angular';
 import { HttpLink } from 'apollo-angular/http';
 import { MessageService } from 'primeng/api';
 import { DialogService } from 'primeng/dynamicdialog';
@@ -29,20 +30,23 @@ import {
   spinnerInterceptor,
   SpinnerService,
 } from '@customer-portal/core';
-import { UnreadActionsState } from '@customer-portal/data-access/actions';
-import { DocumentsState } from '@customer-portal/data-access/documents';
-import { UnreadNotificationsState } from '@customer-portal/data-access/notifications';
-import { SettingsState } from '@customer-portal/data-access/settings';
+import { UnreadActionsState } from '@customer-portal/data-access/actions/state/unread-actions.state';
+import { GlobalState } from '@customer-portal/data-access/global/state/global.state';
+import { UnreadNotificationsState } from '@customer-portal/data-access/notifications/state/unread-notifications.state';
+import { SettingsState } from '@customer-portal/data-access/settings/state/settings.state';
 import { environment } from '@customer-portal/environments';
 import { OverviewSharedState } from '@customer-portal/overview-shared';
-import { appInitializer } from '@customer-portal/permissions';
-import { PreferencesState } from '@customer-portal/preferences';
-import { CustomRouterStateSerializer } from '@customer-portal/router';
 import {
-  Language,
+  appInitializer,
+  loggingInitializer,
+} from '@customer-portal/permissions';
+import { PreferenceState } from '@customer-portal/preferences/state/preference.state';
+import { CustomRouterStateSerializer } from '@customer-portal/router';
+import { Language } from '@customer-portal/shared/models';
+import {
   LocaleService,
   registerLocales,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/services/locale';
 
 import { appRoutes } from './app.routes';
 import {
@@ -53,17 +57,20 @@ import {
 import { TranslocoHttpLoader } from './transloco-http.loader';
 
 declare global {
+  /* eslint-disable no-var, vars-on-top */
   var dnvRandomNonce: string;
 }
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   const loggingService = new LoggingService();
+
   if (graphQLErrors)
     graphQLErrors.forEach(({ message, locations, path }) =>
       loggingService.logTrace(
-        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
-      )
+        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`,
+      ),
     );
+
   if (networkError) {
     loggingService.logTrace(`[Network error]: ${networkError}`);
   }
@@ -73,43 +80,58 @@ registerLocales();
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideAppInitializer(loggingInitializer),
     provideHttpClient(
       withInterceptors([
         customHeaderInterceptor,
         errorInterceptor,
         spinnerInterceptor,
-      ])
+      ]),
     ),
+
+    provideAppInitializer(appInitializer),
     provideRouter(appRoutes, withDisabledInitialNavigation()),
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
     { provide: DialogService },
     provideAnimations(),
+    provideHttpClient(),
     importProvidersFrom(
       NgxsModule.forRoot(
         [
           UnreadActionsState,
-          DocumentsState,
-          PreferencesState,
+          PreferenceState,
           SettingsState,
           OverviewSharedState,
           UnreadNotificationsState,
+          GlobalState,
         ],
         {
           developmentMode: !environment.production,
           compatibility: {
             strictContentSecurityPolicy: true,
           },
-        }
+        },
       ),
       NgxsDispatchPluginModule.forRoot(),
       NgxsReduxDevtoolsPluginModule.forRoot(),
-      NgxsRouterPluginModule.forRoot()
+      NgxsRouterPluginModule.forRoot(),
     ),
     {
       provide: CSP_NONCE,
       useValue: globalThis.dnvRandomNonce,
     },
     { provide: RouterStateSerializer, useClass: CustomRouterStateSerializer },
+    provideHttpClient(),
+    provideTransloco({
+      config: {
+        availableLangs: [Language.English, Language.Italian],
+        defaultLang: Language.English,
+        // Remove this option if your application doesn't support changing language in runtime.
+        reRenderOnLangChange: true,
+        prodMode: !isDevMode(),
+      },
+      loader: TranslocoHttpLoader,
+    }),
     {
       provide: LOCALE_ID,
       useFactory: (localeService: LocaleService): string =>
@@ -117,7 +139,7 @@ export const appConfig: ApplicationConfig = {
       deps: [LocaleService],
     },
     {
-      provide: APOLLO_NAMED_OPTIONS,
+      provide: APOLLO_NAMED_OPTIONS, // <-- Different from standard initialization
       useFactory(httpLink: HttpLink): NamedOptions {
         return {
           audit: {
@@ -125,7 +147,7 @@ export const appConfig: ApplicationConfig = {
             link: ApolloLink.from([
               errorLink,
               httpLink.create({
-                url: environment.auditGraphqlHost,
+                uri: environment.auditGraphqlHost,
                 withCredentials: true,
               }),
             ]),
@@ -140,7 +162,7 @@ export const appConfig: ApplicationConfig = {
             link: ApolloLink.from([
               errorLink,
               httpLink.create({
-                url: environment.findingsGraphqlHost,
+                uri: environment.findingGraphqlHost,
                 withCredentials: true,
               }),
             ]),
@@ -155,7 +177,7 @@ export const appConfig: ApplicationConfig = {
             link: ApolloLink.from([
               errorLink,
               httpLink.create({
-                url: environment.certificateGraphqlHost,
+                uri: environment.certificateGraphqlHost,
                 withCredentials: true,
               }),
             ]),
@@ -170,7 +192,7 @@ export const appConfig: ApplicationConfig = {
             link: ApolloLink.from([
               errorLink,
               httpLink.create({
-                url: environment.scheduleGraphqlHost,
+                uri: environment.scheduleGraphqlHost,
                 withCredentials: true,
               }),
             ]),
@@ -185,7 +207,7 @@ export const appConfig: ApplicationConfig = {
             link: ApolloLink.from([
               errorLink,
               httpLink.create({
-                url: environment.invoicesGraphqlHost,
+                uri: environment.invoicesGraphqlHost,
                 withCredentials: true,
               }),
             ]),
@@ -200,7 +222,7 @@ export const appConfig: ApplicationConfig = {
             link: ApolloLink.from([
               errorLink,
               httpLink.create({
-                url: environment.contactGraphqlHost,
+                uri: environment.contactGraphqlHost,
                 withCredentials: true,
               }),
             ]),
@@ -215,7 +237,7 @@ export const appConfig: ApplicationConfig = {
             link: ApolloLink.from([
               errorLink,
               httpLink.create({
-                url: environment.notificationGraphqlHost,
+                uri: environment.notificationGraphqlHost,
                 withCredentials: true,
               }),
             ]),
@@ -229,15 +251,6 @@ export const appConfig: ApplicationConfig = {
       },
       deps: [HttpLink],
     },
-    provideTransloco({
-      config: {
-        availableLangs: [Language.English, Language.Italian],
-        defaultLang: Language.English,
-        reRenderOnLangChange: true,
-        prodMode: !isDevMode(),
-      },
-      loader: TranslocoHttpLoader,
-    }),
     Apollo,
     SpinnerService,
     MessageService,

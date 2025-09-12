@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { TranslocoDirective, TranslocoService } from '@ngneat/transloco';
+import { TranslocoDirective, TranslocoService } from '@jsverse/transloco';
 import { OverlayPanel, OverlayPanelModule } from 'primeng/overlaypanel';
 
 import {
@@ -10,13 +10,14 @@ import {
   SettingsTab,
 } from '@customer-portal/data-access/settings';
 import { environment } from '@customer-portal/environments';
-import { AppPagesEnum, AuthService, Language } from '@customer-portal/shared';
+import { AppPagesEnum } from '@customer-portal/shared/constants';
+import { Language } from '@customer-portal/shared/models';
+import { AuthService } from '@customer-portal/shared/services';
 
-import { NavbarButtonComponent } from './navbar-button';
+import { NavbarButtonComponent } from '../navbar-button';
 
 @Component({
   selector: 'customer-portal-navbar-settings',
-  standalone: true,
   imports: [
     CommonModule,
     TranslocoDirective,
@@ -24,7 +25,7 @@ import { NavbarButtonComponent } from './navbar-button';
     NavbarButtonComponent,
   ],
   templateUrl: './navbar-settings.component.html',
-  styleUrls: ['./navbar-settings.component.scss'],
+  styleUrl: './navbar-settings.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NavbarSettingsComponent {
@@ -32,19 +33,20 @@ export class NavbarSettingsComponent {
   public isLanguagePickerVisible = false;
   public languages = signal([Language.English, Language.Italian]);
   public settingsTab = SettingsTab;
-  public isDnwUser = this.settingsCoBrowsingStoreService.isDnwUser;
+  public isDnvUser = this.settingsCoBrowsingStoreService.isDnvUser;
 
   constructor(
     private readonly authService: AuthService,
     private readonly profileLanguageStoreService: ProfileLanguageStoreService,
     private readonly settingsCoBrowsingStoreService: SettingsCoBrowsingStoreService,
     private readonly router: Router,
-    private readonly translocoService: TranslocoService
+    private readonly translocoService: TranslocoService,
   ) {}
 
   onChangeLanguage(language: Language): void {
     this.translocoService.setActiveLang(language);
-    if (!this.isDnwUser()) {
+
+    if (!this.isDnvUser()) {
       this.profileLanguageStoreService.updateProfileLanguage(language);
     }
   }
@@ -64,7 +66,7 @@ export class NavbarSettingsComponent {
     route: string,
     tab: string,
     overlayPanel: OverlayPanel,
-    event: MouseEvent
+    event: MouseEvent,
   ): void {
     overlayPanel.onCloseClick(event);
     this.router.navigate([`/${route}`], { queryParams: { tab } });
@@ -72,6 +74,7 @@ export class NavbarSettingsComponent {
 
   onToggleButtonSettingsActive(value: boolean): void {
     this.isButtonSettingsActive.set(value);
+
     if (!value) {
       this.onChangeLanguagePickerVisibility(false);
     }

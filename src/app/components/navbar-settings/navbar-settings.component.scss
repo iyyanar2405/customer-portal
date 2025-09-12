@@ -1,6 +1,7 @@
 @use 'pattern/colors';
 @use 'pattern/mixins';
 @use 'pattern/mixture';
+
 @use 'pattern/utility';
 
 :host {
@@ -43,8 +44,8 @@ tr {
   gap: utility.get-rem(2);
 }
 
-customer-portal-navbar-button.back:ng-deep {
-  background-color: colors.get-color('Sandstones');
+customer-portal-navbar-button.back::ng-deep {
+  background-color: colors.get-color('Sandstone95');
 
   @include mixins.respond-to(tablet) {
     background-color: colors.get-color('DarkBlue');

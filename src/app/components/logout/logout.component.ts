@@ -1,31 +1,36 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { TranslocoModule } from '@jsverse/transloco';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { TranslocoDirective } from '@jsverse/transloco';
+
 import { environment } from '@customer-portal/environments';
-import { 
-  AuthService, 
-  SharedButtonComponent, 
-  SharedButtonType 
-} from '@customer-portal/shared';
+import {
+  SharedButtonComponent,
+  SharedButtonType,
+} from '@customer-portal/shared/components/button';
+import { AuthService } from '@customer-portal/shared/services';
 
 @Component({
   selector: 'customer-portal-logout',
-  standalone: true,
-  imports: [CommonModule, SharedButtonComponent, TranslocoModule],
+  imports: [CommonModule, SharedButtonComponent, TranslocoDirective],
   templateUrl: './logout.component.html',
-  styleUrls: ['./logout.component.scss'],
+  styleUrl: './logout.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LogoutComponent {
-  dwLink = environment.dnwLink;
+export class LogoutComponent implements OnInit {
+  dnvLink = environment.dnvLink;
   sharedButtonType = SharedButtonType;
 
   constructor(private readonly authService: AuthService) {}
+
+  ngOnInit(): void {
+    this.authService.resetLogoutState();
+  }
 
   onLoginClick(): void {
     this.authService.login();
   }
 
-  onGoToDnwClick(): void {
-    window.open(this.dwLink, '_self');
+  onGoToDnvClick(): void {
+    window.open(this.dnvLink, '_self');
   }
 }

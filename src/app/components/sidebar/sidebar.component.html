@@ -7,7 +7,7 @@
         icon="pi pi-times"
         role="button"
         tabindex="0"
-        [attr.aria-label]="t('closeMenu')"
+        [ariaLabel]="t('closeMenu')"
         [rounded]="true"
         [text]="true"
         (keydown.enter)="onClose()"
@@ -16,28 +16,32 @@
       </p-button>
     </div>
 
-    <nav role="navigation" [attr.aria-label]="t('asideNavigation')">
-      @for (group of profileStoreService.sidebarMenu(); track group.id; let last = $last) {
+    <nav role="navigation" [ariaLabel]="t('asideNavigation')">
+      @for (
+        group of profileStoreService.sidebarMenu();
+        track group.id;
+        let last = $last
+      ) {
         <div class="grouping">
           @for (item of group.items; track item.id) {
             @if (item.isVisible) {
               @if (item.externalUrl) {
                 <p-button
-                  [attr.aria-current]="item.isActive ? 'page' : null"
+                  ariaCurrentWhenActive="page"
                   [attr.aria-label]="t(item.i18nKey)"
                   [disabled]="item.isDisabled"
-                  [icon]="'pi pi-' + item.icon"
+                  icon="pi pi-{{ item.icon }}"
                   [label]="t(item.i18nKey)"
                   [text]="true"
                   (onClick)="onNavigateTo(item.externalUrl)">
                 </p-button>
               } @else {
                 <p-button
-                  [attr.aria-current]="item.isActive ? 'page' : null"
+                  ariaCurrentWhenActive="page"
                   routerLinkActive="is-active"
                   [attr.aria-label]="t(item.i18nKey)"
                   [disabled]="item.isDisabled"
-                  [icon]="'pi pi-' + item.icon"
+                  icon="pi pi-{{ item.icon }}"
                   [label]="t(item.i18nKey)"
                   [routerLink]="item.url"
                   [text]="true"

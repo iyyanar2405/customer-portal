@@ -6,9 +6,10 @@
           role="link"
           tabindex="0"
           target="_blank"
-          [attr.aria-label]="t(link.label)"
+          [ariaLabel]="link.label"
           [href]="link.url"
-        >{{ t(link.label) }}</a>
+          >{{ t(link.label) }}</a
+        >
       }
     </div>
     <div>
@@ -19,8 +20,7 @@
             tabindex="0"
             target="_blank"
             [attr.aria-label]="t(link.label)"
-            [href]="link.url"
-          >
+            [href]="link.url">
             <i [class]="link.icon"></i>
           </a>
         } @else {
@@ -28,9 +28,10 @@
             role="link"
             tabindex="0"
             target="_blank"
-            [attr.aria-label]="t(link.label)"
+            [ariaLabel]="link.label"
             [href]="link.url"
-          >{{ t(link.label) }}</a>
+            >{{ t(link.label) }}</a
+          >
         }
       }
     </div>
