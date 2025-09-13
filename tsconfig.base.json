@@ -18,7 +18,7 @@
     ],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "baseUrl": "",
+    "baseUrl": ".",
     "paths": {
       "@customer-portal/core": ["libs/core/src/index.ts"],
       "@customer-portal/core/*": ["libs/core/src/*"],

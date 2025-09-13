@@ -9,7 +9,7 @@ import { take } from 'rxjs';
 import {
   SettingsCoBrowsingStoreService,
   SettingsCompanyDetailsStoreService,
-  SettingsMembersStoreService,
+  
 } from '@customer-portal/data-access/settings';
 import {
   AppPagesEnum,
@@ -27,6 +27,7 @@ import {
 } from '../settings-tabs-members';
 import { NewMemberModalFooterComponent } from '../settings-tabs-members/new-member';
 import { NewMemberModalComponent } from '../settings-tabs-members/new-member/new-member.component';
+import { SettingsMembersStoreService } from '@customer-portal/data-access/settings/state/store-services';
 
 @Component({
   selector: 'lib-co-browsing-members-select',

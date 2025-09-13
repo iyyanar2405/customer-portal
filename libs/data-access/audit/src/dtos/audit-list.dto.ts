@@ -1,8 +1,9 @@
-import { BaseApolloResponse } from '@customer-portal/core';
 
+
+import { BaseApolloResponse } from '@customer-portal/shared';
 import { AuditListItemDto } from './audit-list-item.dto';
 
-export interface AuditListDto extends BaseApolloResponse {
+export interface AuditListDto extends BaseApolloResponse<AuditListItemDto[]> {
   data: AuditListItemDto[];
 }
 

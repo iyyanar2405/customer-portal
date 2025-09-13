@@ -5,4 +5,5 @@ export interface NotificationListModel {
 }
 export interface NotificationModel extends GridRowAction {
   entityId: string;
+  snowLink: string;
 }

@@ -9,9 +9,9 @@ import { SharedSelectMultipleDatum } from '@customer-portal/shared/components/se
 import { DEFAULT_GRID_CONFIG, Routes } from '@customer-portal/shared/constants';
 import {
   constructNavigation,
-  throwIfNotSuccess,
 } from '@customer-portal/shared/helpers';
 import { SharedSelectTreeChangeEventOutput } from '@customer-portal/shared/models';
+import { throwIfNotSuccess } from '@customer-portal/shared/helpers/custom-operators';
 import {
   FilterOptions,
   FilterValue,

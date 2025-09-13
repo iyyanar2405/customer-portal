@@ -16,8 +16,7 @@ import { DEFAULT_GRID_CONFIG } from '@customer-portal/shared/constants';
 import {
   downloadFileFromByteArray,
   getFilterOptions,
-  getToastContentBySeverity,
-  throwIfNotSuccess,
+  getToastContentBySeverity,  
   updateGridConfigBasedOnFilters,
 } from '@customer-portal/shared/helpers';
 import {
@@ -42,6 +41,7 @@ import {
   UpdateFilterOptions,
   UpdateGridConfig,
 } from './actions';
+import { throwIfNotSuccess } from '@customer-portal/shared/helpers/custom-operators';
 
 export interface FindingsListStateModel {
   findingsItems: FindingListItemModel[];

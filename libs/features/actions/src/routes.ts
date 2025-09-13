@@ -2,8 +2,9 @@ import { importProvidersFrom } from '@angular/core';
 import { InlineLoader, provideTranslocoScope } from '@jsverse/transloco';
 import { NgxsModule } from '@ngxs/store';
 
-import { ActionsListState } from '@customer-portal/data-access/actions';
+
 import { Language } from '@customer-portal/shared';
+import { ActionsListState } from '@customer-portal/data-access/actions/state';
 
 export const loader = [Language.English, Language.Italian].reduce(
   (acc: InlineLoader, lang: string) => {

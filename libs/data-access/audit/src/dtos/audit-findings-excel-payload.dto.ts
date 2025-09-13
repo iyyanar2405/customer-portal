@@ -9,7 +9,6 @@ export interface AuditFindingsExcelPayloadDto {
     city: string[] | null;
     site: string[] | null;
     openDate: string[] | null;
-    dueDate: string[] | null;
     acceptedDate: string[] | null;
     closeDate: string[] | null;
     audit: string[] | null;

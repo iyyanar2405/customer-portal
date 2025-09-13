@@ -74,7 +74,7 @@ export const CERTIFICATES_ROUTES: Routes = [
             path: 'status',
             loadComponent: () =>
               import(
-                './lib/components/certificate-list-graph/certificate-status'
+                './lib/components/certificate-list-graph/certificate-list-status'
               ).then((m) => m.CertificateListStatusGraphComponent),
             title: 'Certificate Status Graph',
           },
@@ -82,7 +82,7 @@ export const CERTIFICATES_ROUTES: Routes = [
             path: 'site',
             loadComponent: () =>
               import(
-                './lib/components/certificate-list-graph/certificate-site'
+                './lib/components/certificate-list-graph/certificate-list-site'
               ).then((m) => m.CertificateListSiteGraphComponent),
             title: 'Certificate Site Graph',
           },

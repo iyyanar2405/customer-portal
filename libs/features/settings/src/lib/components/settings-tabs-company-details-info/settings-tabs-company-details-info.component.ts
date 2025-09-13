@@ -25,7 +25,7 @@ import {
 import { getToastContentBySeverity } from '@customer-portal/shared/helpers/custom-toast';
 import { ToastSeverity } from '@customer-portal/shared/models';
 
-import { AddressEntity } from '../../constants/settings-tabs-company-details.model';
+// import { AddressEntity } from '../../constants/settings-tabs-company-details.model';
 
 @Component({
   selector: 'lib-settings-tab-company-details-info',
