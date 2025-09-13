@@ -10,5 +10,6 @@ export interface AccessAreas {
   permission: {
     view?: AccessAreasPermission;
     edit?: AccessAreasPermission;
+    submit?: AccessAreasPermission;
   };
 }

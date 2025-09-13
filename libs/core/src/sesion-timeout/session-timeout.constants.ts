@@ -1,4 +1,5 @@
-import { AuthTokenConstants } from '@customer-portal/shared/constants';
+import { AuthTokenConstants } from "../../../shared/src";
+
 
 export const SessionTimeout = {
   CHECK_INTERVAL_MS: 60 * 1000,

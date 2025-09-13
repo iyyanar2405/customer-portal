@@ -58,7 +58,7 @@ export class LayoutComponent implements OnInit {
   ) {
     this.breadcrumbService.breadcrumbVisibility$
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((visibility) => {
+      .subscribe((visibility: boolean) => {
         this.breadcrumbVisibility = visibility;
       });
   }

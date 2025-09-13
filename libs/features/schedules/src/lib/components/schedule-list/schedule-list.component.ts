@@ -137,7 +137,7 @@ export class ScheduleListComponent
       [GridEventActionType.Reschedule]: () =>
         this.scheduleCalendarEventService.onOpenRescheduleModal(
           Number(id),
-          ScheduleCalendarActionLocationTypes.List,
+          ScheduleCalendarActionLocationTypes.List, '', ''
         ),
       [GridEventActionType.Confirm]: () =>
         this.scheduleCalendarEventService.onOpenConfirmModal(
@@ -188,6 +188,8 @@ export class ScheduleListComponent
         reportingCountry: schedule.reportingCountry,
         projectNumber: schedule.projectNumber,
         language: this.profileLanguageStoreService.languageLabel(),
+        service: schedule.service,
+        accountDNVId: schedule.accountDNVId,
       };
 
       this.serviceNowService.openScheduleSupport(scheduleServiceNowParams);

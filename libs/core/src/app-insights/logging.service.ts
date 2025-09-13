@@ -1,7 +1,8 @@
 /* eslint-disable no-console */
 import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/src';
 
-import { environment } from '@customer-portal/environments';
+
 
 @Injectable({
   providedIn: 'root',

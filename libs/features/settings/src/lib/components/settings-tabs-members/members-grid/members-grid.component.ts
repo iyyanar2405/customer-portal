@@ -11,8 +11,7 @@ import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { filter, take, tap } from 'rxjs';
 
 import {
-  SettingsCoBrowsingStoreService,
-  SettingsMembersStoreService,
+  SettingsCoBrowsingStoreService,  
 } from '@customer-portal/data-access/settings';
 import { BasePreferencesComponent } from '@customer-portal/preferences';
 import {
@@ -33,6 +32,7 @@ import {
   ManagePermissionsModalComponent,
   ManagePermissionsModalFooterComponent,
 } from '../manage-permissions-modal';
+import { SettingsMembersStoreService } from '@customer-portal/data-access/settings/state/store-services';
 
 @Component({
   selector: 'lib-members-grid',

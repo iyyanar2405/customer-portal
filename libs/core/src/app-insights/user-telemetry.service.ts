@@ -1,15 +1,10 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 
-import { ProfileStoreService } from '@customer-portal/data-access/settings';
-import { RouteStoreService } from '@customer-portal/router';
-import {
-  createRouteTitleMap,
-  getRouteDataByPath,
-  RouteConfig,
-} from '@customer-portal/shared/constants';
-
 import { LoggingService } from './logging.service';
+import { ProfileStoreService } from '../../../data-access/settings/src';
+import { RouteStoreService } from '../../../data-access/router/src';
+import { createRouteTitleMap,getRouteDataByPath,RouteConfig } from '../../../shared/src';
 
 @Injectable({
   providedIn: 'root',

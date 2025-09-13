@@ -13,9 +13,9 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { debounceTime, fromEvent, merge, Subscription, timer } from 'rxjs';
 
-import { AuthServiceResponse } from '@customer-portal/shared';
-import { SessionTimeoutModalComponent } from '@customer-portal/shared/components/session-timeout-modal';
-import { AuthService } from '@customer-portal/shared/services';
+import { AuthServiceResponse } from "../../../shared/src";
+import { SessionTimeoutModalComponent } from "../../../shared/src";
+import { AuthService } from "../../../shared/src";
 
 import { LoggingService } from '../app-insights/logging.service';
 import { ServiceNowService } from '../service-now/service-now.service';

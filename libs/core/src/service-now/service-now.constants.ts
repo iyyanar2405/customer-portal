@@ -1,4 +1,5 @@
-import { environment } from '@customer-portal/environments';
+import { environment } from "../../../environments/src";
+
 
 export enum ServiceNowFeature {
   HOME = 'HOME',
