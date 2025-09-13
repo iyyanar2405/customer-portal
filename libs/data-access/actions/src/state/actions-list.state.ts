@@ -80,7 +80,6 @@ const defaultState: ActionsListStateModel = {
       actionName: '',
       dueDate: '',
       message: '',
-      language: '',
       service: '',
       site: '',
       highPriority: false,

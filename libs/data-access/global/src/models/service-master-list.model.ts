@@ -1,7 +1,5 @@
-import {
-  BaseApolloResponse,
-  ServiceDetailsMaster,
-} from '@customer-portal/shared';
+import { BaseApolloResponse, ServiceDetailsMaster } from "../../../../shared/src";
+
 
 export interface ServiceMasterListModel
   extends BaseApolloResponse<ServiceMasterListItemModel[]> {
@@ -10,5 +8,5 @@ export interface ServiceMasterListModel
 
 export interface ServiceMasterListItemModel {
   id: number;
-  serviceName: number;
+  serviceName: string;
 }

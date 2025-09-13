@@ -1,4 +1,5 @@
-import { BaseApolloResponse } from '@customer-portal/shared';
+import { BaseApolloResponse } from "../../../../shared/src";
+
 
 export interface SiteMasterListModel
   extends BaseApolloResponse<SiteMasterListItemModel[]> {

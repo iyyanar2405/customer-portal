@@ -1,8 +1,10 @@
+import { BaseApolloResponse } from '@customer-portal/shared';
 import { SidebarGroup } from '../models';
 
-export interface ProfileDto {
+
+
+export interface ProfileDto extends BaseApolloResponse<ProfileInformationDto> {
   data: ProfileInformationDto;
-  isSuccess: boolean;
 }
 
 export interface ProfileInformationDto {

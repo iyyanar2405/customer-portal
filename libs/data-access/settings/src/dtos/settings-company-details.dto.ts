@@ -1,6 +1,7 @@
-export interface SettingsCompanyDetailsDto {
+import { BaseApolloResponse } from "@customer-portal/shared";
+
+export interface SettingsCompanyDetailsDto extends BaseApolloResponse<SettingsCompanyDetailsDataDto> {
   data: SettingsCompanyDetailsDataDto;
-  isSuccess: boolean;
 }
 
 export interface SettingsCompanyDetailsDataDto {
