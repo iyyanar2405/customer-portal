@@ -22,4 +22,5 @@ export interface ScheduleListItemDto {
   siteState: string;
   reportingCountry: string;
   projectNumber: string;
+  accountDNVId: number;  
 }

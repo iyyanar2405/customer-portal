@@ -72,11 +72,11 @@ export class AuditSubListComponent implements OnInit {
       { payload },
     );
 
-    const exportBtnEl = this.gridComponent.getExportButtonElement();
+    // const exportBtnEl = this.gridComponent.getExportButtonElement();
 
-    if (exportBtnEl) {
-      animateFlyToDownload(exportBtnEl);
-    }
+    // if (exportBtnEl) {
+    //   animateFlyToDownload(exportBtnEl);
+    // }
   }
 
   private registerDownloadHandlers(): void {

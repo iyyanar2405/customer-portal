@@ -232,11 +232,11 @@ export class InvoiceListComponent
       { payload },
     );
 
-    const exportBtnEl = this.gridComponent.getExportButtonElement();
+    // const exportBtnEl = this.gridComponent.getExportButtonElement();
 
-    if (exportBtnEl) {
-      animateFlyToDownload(exportBtnEl);
-    }
+    // if (exportBtnEl) {
+    //   animateFlyToDownload(exportBtnEl);
+    // }
   }
 
   ngOnDestroy(): void {

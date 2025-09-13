@@ -21,6 +21,8 @@ export interface SettingsCompanyDetailsLegalEntityDto {
   poNumberRequired: boolean;
   vatNumber: string;
   zipCode: string;
+  accountDNVId: number;
+  countryCode: string;
 }
 
 export interface SettingsCompanyDetailsCountryListDto {
