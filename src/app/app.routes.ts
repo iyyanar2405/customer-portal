@@ -1,8 +1,8 @@
 import { Route } from '@angular/router';
 
 import { allowNonDnvUserGuard } from '@customer-portal/data-access/settings/guards';
-import { RouteConfig } from '@customer-portal/shared/constants';
-import { authGuard } from '@customer-portal/shared/guards';
+import { authGuard, RouteConfig } from '../../libs/shared/src';
+
 
 export const appRoutes: Route[] = [
   {

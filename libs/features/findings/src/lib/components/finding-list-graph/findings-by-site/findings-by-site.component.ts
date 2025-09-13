@@ -8,8 +8,9 @@ import {
   TreeNodeClick,
   TreeTableComponent,
 } from '@customer-portal/shared';
+import { FINDINGS_CATEGORIES } from '../../../constants';
 
-import { FINDINGS_CATEGORIES } from '../../constants';
+
 
 const FINDINGS_BY_SITE_COLUMNS = [
   {

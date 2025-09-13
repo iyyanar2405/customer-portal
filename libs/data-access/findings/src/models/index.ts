@@ -9,3 +9,4 @@ export * from './finding-tabs.enum';
 export * from './finding-trends-graph.model';
 export * from './open-findings-months-period.model';
 export * from './finding-status.enum';
+export * from './open-findings-response.enum';
