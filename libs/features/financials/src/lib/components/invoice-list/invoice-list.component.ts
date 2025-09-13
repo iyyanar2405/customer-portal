@@ -35,7 +35,7 @@ import {
   SettingsCoBrowsingStoreService,
 } from '@customer-portal/data-access/settings/state/store-services';
 import { OverviewSharedStoreService } from '@customer-portal/overview-shared';
-import { BasePreferencesComponent } from '@customer-portal/preferences/helpers';
+import { BasePreferencesComponent } from '@customer-portal/preferences';
 import {
   SharedButtonComponent,
   SharedButtonType,

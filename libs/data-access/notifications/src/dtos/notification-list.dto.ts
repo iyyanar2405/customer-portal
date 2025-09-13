@@ -14,4 +14,6 @@ export interface NotificationsDto {
   subject: string;
   entityType: string;
   entityId: string;
+  language: string;
+  snowLink: string;
 }
