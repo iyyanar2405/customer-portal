@@ -1,1 +1,1 @@
-export * from './certificate-documents.component';
+export * from './certificate-details.component';
