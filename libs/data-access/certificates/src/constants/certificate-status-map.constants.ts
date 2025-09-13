@@ -15,6 +15,6 @@ export const CERTIFICATE_STATUS_MAP: Record<string, string> = {
   [CertificateStatus.Issued.toLowerCase()]: StatesClasses.ForestGreen,
   [CertificateStatus.OutstandingInvoices.toLowerCase()]:
     StatesClasses.CrimsonFlame,
-  [CertificateStatus.Suspended.toLowerCase()]: StatesClasses.CrimsonFlame,
-  [CertificateStatus.Withdrawn.toLowerCase()]: StatesClasses.PewterGray,
+  [CertificateStatus.Suspended.toLowerCase()]: StatesClasses.GraphOrange,
+  [CertificateStatus.Withdrawn.toLowerCase()]: StatesClasses.SummerSky,
 };

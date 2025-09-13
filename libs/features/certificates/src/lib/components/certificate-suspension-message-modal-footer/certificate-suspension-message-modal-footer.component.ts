@@ -3,6 +3,7 @@ import { Component, OnDestroy } from '@angular/core';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { DynamicDialogRef } from 'primeng/dynamicdialog';
 
+import { SettingsCoBrowsingStoreService } from '@customer-portal/data-access/settings';
 import {
   SharedButtonComponent,
   SharedButtonType,
@@ -18,8 +19,12 @@ export class CertificateSuspensionMessageModalFooterComponent
   implements OnDestroy
 {
   sharedButtonType = SharedButtonType;
+  isDnvUser = this.settingsCoBrowsingStoreService.isDnvUser;
 
-  constructor(private ref: DynamicDialogRef) {}
+  constructor(
+    private ref: DynamicDialogRef,
+    private settingsCoBrowsingStoreService: SettingsCoBrowsingStoreService,
+  ) {}
 
   closeDialog(data: boolean): void {
     this.ref.close(data);

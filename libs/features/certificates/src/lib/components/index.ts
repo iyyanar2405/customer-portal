@@ -1,5 +1,4 @@
 export * from './certificate';
-export * from './certificate-chart';
 export * from './certificate-details';
 export * from './certificate-documents';
 export * from './certificate-download-dialog';
@@ -7,5 +6,4 @@ export * from './certificate-list';
 export * from './certificate-sites-list';
 export * from './certificate-tab-view';
 export * from './certificate-mark-download-list-dialog';
-export * from './certificate-status';
-export * from './certificate-by-site';
+export * from './certificate-list-graph';

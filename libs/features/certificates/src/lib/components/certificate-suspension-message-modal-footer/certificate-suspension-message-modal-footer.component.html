@@ -1,5 +1,6 @@
 <ng-container *transloco="let t">
   <shared-button
+    [isDisabled]="isDnvUser()"
     [label]="t('certificate.certificateSuspension.contactUs')"
     [type]="sharedButtonType.Outline"
     (clickEvent)="closeDialog(true)">
