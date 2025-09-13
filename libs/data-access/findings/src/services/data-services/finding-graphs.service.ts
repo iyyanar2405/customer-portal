@@ -3,8 +3,8 @@ import { Apollo } from 'apollo-angular';
 import { map, Observable } from 'rxjs';
 
 import {
-  FindingbyClauseListDto,
-  FindingsSiteResponse,
+  FindingByClauseListDto,
+  FindingResponsesDto,
   FindingsTrendsGraphDto,
   OpenFindingsGraphDto,
 } from '../../dtos';
@@ -98,7 +98,7 @@ export class FindingGraphsService {
     companies: number[],
     services: number[],
     sites: number[],
-  ): Observable<FindingbyClauseListDto> {
+  ): Observable<FindingByClauseListDto> {
     return this.apollo
       .use(this.clientName)
       .query({
@@ -125,7 +125,7 @@ export class FindingGraphsService {
     companies: number[],
     services: number[],
     country: number[],
-  ): Observable<FindingsSiteResponse> {
+  ): Observable<FindingResponsesDto[]> {
     return this.apollo
       .use(this.clientName)
       .query({

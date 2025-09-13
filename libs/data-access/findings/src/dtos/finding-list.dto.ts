@@ -1,5 +1,9 @@
+import { ServiceDetailsMaster, SiteDetailsMaster } from "@customer-portal/shared";
+
 export interface FindingListDto {
   data: FindingListItemDto[];
+  isSuccess: boolean;
+  message: string;
 }
 
 export interface FindingListItemDto {
@@ -8,12 +12,17 @@ export interface FindingListItemDto {
   status: string;
   title: string;
   category: string;
-  companyName: string;
-  services: string[];
-  sites: string[];
-  cities: string[];
+  response: string;
+  companyId: number;
+  services: number[];
+  siteId: number[];
   openDate: string;
   closedDate: string;
   acceptedDate: string;
-  countries: string[];
+}
+
+export interface FindingListItemEnrichedDto extends FindingListItemDto {
+  companyName: string;
+  serviceDetails: ServiceDetailsMaster[];
+  siteDetails: SiteDetailsMaster[];
 }

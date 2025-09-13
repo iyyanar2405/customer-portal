@@ -1,6 +1,7 @@
 export interface ContractsListDto {
   data: ContractListItemDto[];
   isSuccess: boolean;
+  message: string;
 }
 
 export interface ContractListItemDto {

@@ -3,6 +3,7 @@ export interface InvoiceListDto {
     items: InvoiceListItemDto[];
   };
   isSuccess: boolean;
+  message: string;
 }
 
 export interface InvoiceListItemDto {

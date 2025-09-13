@@ -1,3 +1,5 @@
+import { ServiceDetailsMaster, SiteDetailsMaster } from "@customer-portal/shared";
+
 export interface AuditListItemDto {
   type: string;
   startDate?: string;
@@ -5,9 +7,13 @@ export interface AuditListItemDto {
   leadAuditor: string;
   auditId: number;
   status: string;
+  companyId: number;
+  sites: number[];
+  services: number[];
+}
+
+export interface AuditListItemEnrichedDto extends AuditListItemDto {
   companyName: string;
-  sites: string[];
-  services: string[];
-  cities: string[];
-  countries: string[];
+  siteDetails: SiteDetailsMaster[];
+  serviceDetails: ServiceDetailsMaster[];
 }

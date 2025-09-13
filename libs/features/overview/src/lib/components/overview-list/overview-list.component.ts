@@ -30,7 +30,7 @@ import { BreadcrumbService } from '@customer-portal/shared/services/breadcrumb';
 import { OverviewFinancialStatusComponent } from '../overview-financial-status';
 import { OverviewTrainingStatusComponent } from '../overview-training-status';
 import { OverviewUpcomingAuditsComponent } from '../overview-upcoming-audits';
-import { OverviewListFiltersComponent } from './overview-filters';
+import { OverviewListFiltersComponent } from './overview-list-filters';
 
 @Component({
   selector: 'lib-overview-list',

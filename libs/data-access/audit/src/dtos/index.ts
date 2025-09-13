@@ -17,3 +17,6 @@ export * from './audit-status-doughnut-graph.dto';
 export * from './sub-audit-excel-payload.dto';
 export * from './sub-audit-list-item.dto';
 export * from './sub-audit-list.dto';
+export * from './audit-graphs.dto';
+
+

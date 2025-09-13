@@ -4,16 +4,19 @@ export interface CalendarScheduleDto {
 }
 
 export interface CalendarScheduleDataDto {
-  auditType: string;
-  city: string;
-  company: string;
-  endDate: string;
-  leadAuditor: string;
-  services: string[];
-  site: string;
-  siteAddress: string;
-  siteAuditId: string;
-  siteRepresentatives: string[];
+  siteAuditId: number
   startDate: string;
+  endDate: string;
   status: string;
+  serviceIds: number[];
+  siteId: number;
+  auditType: string;
+  leadAuditor: string;
+  siteRepresentatives: string[];
+  companyId: number;
+  siteAddress: string; 
+  auditID:number 
+  reportingCountry: string;
+  projectNumber: string;
+  accountDNVId: string; 
 }

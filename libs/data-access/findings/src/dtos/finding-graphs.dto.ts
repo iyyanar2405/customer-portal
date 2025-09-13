@@ -1,33 +1,15 @@
-export interface FindingGraphsFilterCompaniesDto {
-  data: FindingGraphsFilterCompaniesDataDto[];
-  isSuccess: boolean;
-}
-
-export interface FindingGraphsFilterCompaniesDataDto {
-  id: number;
-  label: string;
-}
-
-export interface FindingGraphsFilterServicesDto {
-  data: FindingGraphsFilterServicesDataDto[];
-  isSuccess: boolean;
-}
-
-export interface FindingGraphsFilterServicesDataDto {
-  id: number;
-  label: string;
-}
-
-export interface FindingGraphsFilterSitesDto {
-  data: FindingGraphsFilterSitesDataDto[];
-  isSuccess: boolean;
-}
+import { BaseApolloResponse } from "@customer-portal/shared";
 
 export interface FindingGraphsFilterSitesDataDto {
   id: number;
   label: string;
   children?: FindingGraphsFilterSitesDataDto[];
 }
+
+export interface FindingStatusByCategoryGraphData extends BaseApolloResponse<FindingStatusByCategoryGraphData> {
+  data: FindingStatusByCategoryGraphData;
+}
+
 
 export interface FindingStatusByCategoryGraphDto {
   data: FindingStatusByCategoryGraphData;

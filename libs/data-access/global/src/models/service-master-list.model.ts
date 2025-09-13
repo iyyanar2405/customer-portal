@@ -10,5 +10,5 @@ export interface ServiceMasterListModel
 
 export interface ServiceMasterListItemModel {
   id: number;
-  serviceName: string;
+  serviceName: number;
 }

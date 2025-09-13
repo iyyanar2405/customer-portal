@@ -1,6 +1,7 @@
 import { OpenFindingsStatisticsDto } from './open-findings-statistics.dto';
+import { BaseApolloResponse } from '@customer-portal/shared';
 
-export interface OpenFindingsGraphDto {
+export interface OpenFindingsGraphDto extends BaseApolloResponse<OpenFindingsGraphData> {
   data: OpenFindingsGraphData;
 }
 

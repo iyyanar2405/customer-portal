@@ -10,3 +10,4 @@ export * from './certificate-sites-list.dto';
 export * from './certificate-documents-list.dto';
 export * from './certification-marks-list.dto';
 export * from './certificate-by-site.dto';
+export * from './certificate-graphs.dto';

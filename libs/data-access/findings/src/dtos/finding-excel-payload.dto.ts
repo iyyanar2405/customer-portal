@@ -14,5 +14,6 @@ export interface FindingExcelPayloadDto {
     closedDate: string[] | null;
     acceptedDate: string[] | null;
     findingsId: string[] | null;
+    response: string[] | null;
   };
 }

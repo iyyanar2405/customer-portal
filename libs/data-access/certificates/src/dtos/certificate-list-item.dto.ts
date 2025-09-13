@@ -1,12 +1,19 @@
+import { ServiceDetailsMaster, SiteDetailsMaster } from "@customer-portal/shared";
+
 export interface CertificateListItemDto {
   certificateId: number;
   certificateNumber: string;
-  companyName: string;
+  companyId: number;
   status: string;
   issuedDate: string;
   validUntil: string;
-  site: string;
-  city: string;
-  serviceName: string;
+  siteIds: number[];
+  serviceIds: number[];
   revisionNumber: number;
+}
+
+export interface CertificateListItemEnrichedDto extends CertificateListItemDto {
+  companyName: string;
+  siteDetails: SiteDetailsMaster[];
+  serviceDetails: ServiceDetailsMaster[];
 }

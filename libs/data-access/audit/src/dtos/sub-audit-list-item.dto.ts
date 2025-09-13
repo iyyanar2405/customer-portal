@@ -1,8 +1,7 @@
 export interface SubAuditListItemDto {
   auditId: number;
-  cities: string[];
-  sites: string[];
-  services: string[];
+  sites: number[];
+  services: number[];
   status: string;
   startDate: string;
   endDate: string;

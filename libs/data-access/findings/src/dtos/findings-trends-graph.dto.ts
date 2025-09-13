@@ -2,6 +2,9 @@ export interface FindingsTrendsGraphDto {
   data: {
     categories: FindingCategoryDto[];
   };
+  isSuccess: boolean;
+  message: string;
+  errorCode: string;
 }
 
 export interface FindingCategoryDto {

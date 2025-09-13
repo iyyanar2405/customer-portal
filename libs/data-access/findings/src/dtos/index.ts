@@ -11,3 +11,5 @@ export * from './findings-trends-graph.dto';
 export * from './manage-finding-details.dto';
 export * from './open-findings-graph.dto';
 export * from './open-findings-statistics.dto';
+export * from './finding-by-clause-list.dto';
+export * from './finding-site.dto';

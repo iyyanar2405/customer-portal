@@ -1,4 +1,11 @@
-export interface NotificationListDto {
+import { BaseApolloResponse } from '@customer-portal/shared';
+
+export interface NotificationListDto 
+extends BaseApolloResponse<NotificationListItemData> {
+  data: NotificationListItemData;
+}
+
+export interface NotificationListItemData {
   currentPage: number;
   items: NotificationsDto[];
   totalItems: number;

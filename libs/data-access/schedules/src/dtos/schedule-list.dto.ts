@@ -1,6 +1,9 @@
-export interface ScheduleListDto {
+import { BaseApolloResponse,
+  ServiceDetailsMaster, SiteDetailsMaster
+ } from '@customer-portal/shared';
+
+export interface ScheduleListDto extends BaseApolloResponse<ScheduleListItemDto[]> {
   data: ScheduleListItemDto[];
-  isSuccess: boolean;
 }
 
 export interface ScheduleListItemDto {
@@ -8,19 +11,25 @@ export interface ScheduleListItemDto {
   startDate: string;
   endDate: string;
   status: string;
-  services: string[];
-  site: string;
-  city: string;
+  serviceIds: number[];
+  siteId: number;
   auditType: string;
   leadAuditor: string;
   siteRepresentatives: string[];
-  company: string;
+  companyId: number;
   siteAddress: string;
-  auditID: number;
-  siteZip: number;
-  siteCountry: string;
-  siteState: string;
+  auditID: number;  
   reportingCountry: string;
   projectNumber: string;
   accountDNVId: number;  
+}
+
+export interface ScheduleListItemEnrichedDto extends ScheduleListItemDto {
+  serviceDetails: ServiceDetailsMaster[];
+  siteDetails: SiteDetailsMaster[];
+}
+export interface ScheduleListCalendarFilterSitesDataDto {
+  id: number;
+  label: string;
+  children?: ScheduleListCalendarFilterSitesDataDto[];
 }

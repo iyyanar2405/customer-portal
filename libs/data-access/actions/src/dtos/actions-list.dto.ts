@@ -9,9 +9,11 @@ export interface ActionsDto {
   action: string;
   dueDate: string;
   highPriority: boolean;
+  language: string;
   message: string;
   service: string;
   site: string;
   entityType: string;
   entityId: string;
+  subject: string;
 }

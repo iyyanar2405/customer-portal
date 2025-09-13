@@ -1,20 +1,20 @@
 export interface AuditFindingListDto {
   data: AuditFindingListItemDto[];
+  isSuccess: boolean;
+  message: string; 
 }
 
 export interface AuditFindingListItemDto {
   acceptedDate: string;
   auditId: string;
   category: string;
-  cities: string[];
   closedDate: string;
-  companyName: string;
-  dueDate: string;
+  companyId: number;
   findingNumber: string;
   findingsId: string;
   openDate: string;
   services: string[];
-  sites: string[];
+  siteId: number;
   status: string;
   title: string;
 }
