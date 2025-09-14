@@ -59,7 +59,7 @@ npx nx g @nx/angular:lib libs
 npx nx g @nx/angular:lib shared
 npx nx g @nx/angular:lib actions
 npx nx g @nx/angular:lib audit
-
+npx nx g @nx/angular:lib global
 npx nx g @nx/angular:lib certificates
 npx nx g @nx/angular:lib contracts
 npx nx g @nx/angular:lib documents

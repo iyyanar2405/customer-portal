@@ -12,19 +12,13 @@
     "importHelpers": true,
     "target": "es2022",
     "module": "esnext",
-    "lib": [
-      "es2020",
-      "dom"
-    ],
+    "lib": ["es2020", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
       "@customer-portal/core": ["libs/core/src/index.ts"],
       "@customer-portal/core/*": ["libs/core/src/*"],
-      "@customer-portal/environments": ["libs/environments/src/index.ts"],
-      "@customer-portal/environments/*": ["libs/environments/src/*"],
-
       "@customer-portal/data-access/actions": [
         "libs/data-access/actions/src/index.ts"
       ],
@@ -34,9 +28,7 @@
       "@customer-portal/data-access/audit": [
         "libs/data-access/audit/src/index.ts"
       ],
-      "@customer-portal/data-access/audit/*": [
-        "libs/data-access/audit/src/*"
-      ],
+      "@customer-portal/data-access/audit/*": ["libs/data-access/audit/src/*"],
       "@customer-portal/data-access/certificates": [
         "libs/data-access/certificates/src/index.ts"
       ],
@@ -67,23 +59,29 @@
       "@customer-portal/data-access/findings/*": [
         "libs/data-access/findings/src/*"
       ],
+      "@customer-portal/data-access/global": [
+        "libs/data-access/global/src/index.ts"
+      ],
+      "@customer-portal/data-access/global/*": [
+        "libs/data-access/global/src/*"
+      ],
       "@customer-portal/data-access/notifications": [
         "libs/data-access/notifications/src/index.ts"
       ],
       "@customer-portal/data-access/notifications/*": [
         "libs/data-access/notifications/src/*"
-      ],      
+      ],
       "@customer-portal/data-access/overview": [
         "libs/data-access/overview/src/index.ts"
-      ],
-      "@customer-portal/data-access/overview/*": [
-        "libs/data-access/overview/src/*"
       ],
       "@customer-portal/data-access/overview-shared": [
         "libs/data-access/overview-shared/src/index.ts"
       ],
       "@customer-portal/data-access/overview-shared/*": [
         "libs/data-access/overview-shared/src/*"
+      ],
+      "@customer-portal/data-access/overview/*": [
+        "libs/data-access/overview/src/*"
       ],
       "@customer-portal/data-access/permissions": [
         "libs/data-access/permissions/src/index.ts"
@@ -114,13 +112,13 @@
       ],
       "@customer-portal/data-access/settings/*": [
         "libs/data-access/settings/src/*"
-      ],      
+      ],
+      "@customer-portal/environments": ["libs/environments/src/index.ts"],
+      "@customer-portal/environments/*": ["libs/environments/src/*"],
       "@customer-portal/features/actions": [
         "libs/features/actions/src/index.ts"
       ],
-      "@customer-portal/features/audit": [
-        "libs/features/audit/src/index.ts"
-      ],
+      "@customer-portal/features/audit": ["libs/features/audit/src/index.ts"],
       "@customer-portal/features/certificates": [
         "libs/features/certificates/src/index.ts"
       ],
@@ -136,9 +134,7 @@
       "@customer-portal/features/findings": [
         "libs/features/findings/src/index.ts"
       ],
-      "@customer-portal/features/logout": [
-        "libs/features/logout/src/index.ts"
-      ],
+      "@customer-portal/features/logout": ["libs/features/logout/src/index.ts"],
       "@customer-portal/features/notifications": [
         "libs/features/notifications/src/index.ts"
       ],
@@ -154,12 +150,11 @@
       "@customer-portal/features/settings": [
         "libs/features/settings/src/index.ts"
       ],
-      "@customer-portal/features/upload": [
-        "libs/features/upload/src/index.ts"
-      ],
+      "@customer-portal/features/upload": ["libs/features/upload/src/index.ts"],
       "@customer-portal/features/welcome": [
         "libs/features/welcome/src/index.ts"
       ],
+      "@customer-portal/global": ["global/src/index.ts"],
       "@customer-portal/overview-shared": [
         "libs/data-access/overview-shared/src/index.ts"
       ],
@@ -169,32 +164,12 @@
       "@customer-portal/preferences": [
         "libs/data-access/preferences/src/index.ts"
       ],
-      "@customer-portal/router": [
-        "libs/data-access/router/src/index.ts"
-      ],
-      "@customer-portal/router/*": [
-        "libs/data-access/router/src/*"
-      ],
-      "@customer-portal/shared": [
-        "libs/shared/src/index.ts"
-      ],
-       "@customer-portal/shared/*": [
-        "libs/shared/src/*"
-      ],
-      "@customer-portal/data-access/global": [
-        "libs/data-access/global/src/index.ts"
-      ],
-      "@customer-portal/data-access/global/*": [
-        "libs/data-access/global/src/*"
-      ]
+      "@customer-portal/router": ["libs/data-access/router/src/index.ts"],
+      "@customer-portal/router/*": ["libs/data-access/router/src/*"],
+      "@customer-portal/shared": ["libs/shared/src/index.ts"],
+      "@customer-portal/shared/*": ["libs/shared/src/*"]
     }
   },
-  "exclude": [
-    "node_modules",
-    "tmp"
-  ],
-  "include": [
-    "src/**/*.d.ts",
-    "../../libs/shared/src/**/*.ts"
-  ]
+  "exclude": ["node_modules", "tmp"],
+  "include": ["src/**/*.d.ts", "../../libs/shared/src/**/*.ts"]
 }
