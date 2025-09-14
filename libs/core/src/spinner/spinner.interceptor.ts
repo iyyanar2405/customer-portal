@@ -10,7 +10,7 @@ import { finalize, Observable } from 'rxjs';
 import { CurrentRouteService } from '../route';
 import { SpinnerService } from './spinner.service';
 
-export const spinnerInterceptor: HttpInterceptorFn = (
+export const mySpinnerInterceptor: HttpInterceptorFn = (
   req: HttpRequest<any>,
   next: HttpHandlerFn,
 ): Observable<HttpEvent<unknown>> => {

@@ -65,6 +65,9 @@ import { environment } from '../../libs/environments/src';
 import { UnreadActionsState } from '../../libs/data-access/actions/src';
 import { UnreadNotificationsState } from '../../libs/data-access/notifications/src';
 import { GlobalState } from '../../libs/data-access/global/src/state/global.state';
+import { mySpinnerInterceptor } from '../../libs/core/src/spinner/spinner.interceptor';
+import { LoggingService, SpinnerService } from '../../libs/core/src';
+
 
 declare global {
   /* eslint-disable no-var, vars-on-top */
@@ -95,7 +98,7 @@ export const appConfig: ApplicationConfig = {
       withInterceptors([
         customHeaderInterceptor,
         errorInterceptor,
-        spinnerInterceptor,
+        mySpinnerInterceptor,
       ]),
     ),
 
