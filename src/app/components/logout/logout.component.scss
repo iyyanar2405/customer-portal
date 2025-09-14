@@ -1,7 +1,7 @@
-@use 'variables';
-@use 'pattern/utility';
-@use 'pattern/typography';
-@use 'pattern/colors';
+@use '../../../styles/pattern/variables';
+@use '../../../styles/pattern/utility';
+@use '../../../styles/pattern/typography';
+@use '../../../styles/pattern/colors';
 
 .container {
   position: fixed;

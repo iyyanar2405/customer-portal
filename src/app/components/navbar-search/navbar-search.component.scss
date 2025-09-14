@@ -1,6 +1,6 @@
-@use 'pattern/mixins';
-@use 'pattern/mixture';
-@use 'pattern/utility';
+@use '../../../styles/pattern/mixins';
+@use '../../../styles/pattern/mixture';
+@use '../../../styles/pattern/utility';
 
 :host {
   display: flex;

@@ -1,5 +1,5 @@
-@use 'pattern/utility';
-@use 'pattern/colors';
+@use '/src/styles/pattern/utility';
+@use '/src/styles/pattern/mixins';
 
 :host {
   display: flex;

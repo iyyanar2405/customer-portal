@@ -1,8 +1,8 @@
-@use 'pattern/colors';
-@use 'pattern/mixture';
-@use 'pattern/typography';
+@use '../../../styles/pattern/colors';
+@use '../../../styles/pattern/mixture';
+@use '../../../styles/pattern/typography';
 
-@use 'pattern/utility';
+@use '../../../styles/pattern/utility';
 
 :host {
   height: utility.get-rem(40);

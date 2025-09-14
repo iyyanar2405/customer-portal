@@ -1,7 +1,7 @@
-@use 'pattern/colors';
-@use 'pattern/mixins';
-@use 'pattern/utility';
-@use 'pattern/mixture';
+@use '../../../styles/pattern/colors';
+@use '../../../styles/pattern/mixins';
+@use '../../../styles/pattern/utility';
+@use '../../../styles/pattern/mixture';
 
 .overlay-container {
   @extend %#{mixture.$shadow-modal-pattern};

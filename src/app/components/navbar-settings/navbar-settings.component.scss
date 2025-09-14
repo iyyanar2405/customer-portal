@@ -1,8 +1,8 @@
-@use 'pattern/colors';
-@use 'pattern/mixins';
-@use 'pattern/mixture';
+@use '../../../styles/pattern/colors';
+@use '../../../styles/pattern/mixins';
+@use '../../../styles/pattern/mixture';
 
-@use 'pattern/utility';
+@use '../../../styles/pattern/utility';
 
 :host {
   display: flex;

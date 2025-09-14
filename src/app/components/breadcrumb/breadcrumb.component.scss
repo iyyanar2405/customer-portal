@@ -1,7 +1,7 @@
-@use 'pattern/colors';
-@use 'pattern/mixins';
-@use 'pattern/typography';
-@use 'pattern/utility';
+@use '../../../styles/pattern/colors';
+@use '../../../styles/pattern/mixins';
+@use '../../../styles/pattern/typography';
+@use '../../../styles/pattern/utility';
 
 :host {
   max-height: utility.get-rem(40);

@@ -1,7 +1,7 @@
-@use 'pattern/colors';
-@use 'pattern/mixins';
+@use '../../../styles/pattern/colors';
+@use '../../../styles/pattern/mixins';
 
-@use 'pattern/utility';
+@use '../../../styles/pattern/utility';
 
 p-sidebar.p-element::ng-deep {
   .p-sidebar {
