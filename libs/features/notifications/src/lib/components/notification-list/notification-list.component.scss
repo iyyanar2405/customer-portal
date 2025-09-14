@@ -1,8 +1,8 @@
-@use 'pattern/mixins';
+@use '../../../../../../../../src/styles/pattern/mixture' as mixture;
 @use 'pattern/mixture';
-@use 'pattern/colors';
-@use 'pattern/typography';
-@use 'pattern/utility';
+@use '../../../../../../../../src/styles/pattern/colors' as colors;
+@use '../../../../../../../../src/styles/pattern/typography' as typography;
+@use '../../../../../../../../src/styles/pattern/utility' as typography;
 
 shared-grid ::ng-deep {
   @include mixins.gutter-for(right, left);

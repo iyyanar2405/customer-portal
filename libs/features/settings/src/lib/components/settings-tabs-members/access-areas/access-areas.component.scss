@@ -1,8 +1,8 @@
-@use 'variables';
-@use 'pattern/colors';
+@use '../../../../../../../../src/styles/variables' as variables;
+@use '../../../../../../../../src/styles/pattern/colors' as colors;
 @use 'pattern/mixture';
-@use 'pattern/typography';
-@use 'pattern/utility';
+@use '../../../../../../../../src/styles/pattern/typography' as typography;
+@use '../../../../../../../../src/styles/pattern/utility' as typography;
 
 :host {
   display: flex;

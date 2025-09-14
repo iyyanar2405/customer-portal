@@ -1,7 +1,7 @@
-@use 'variables';
-@use 'pattern/mixins';
-@use 'pattern/utility';
-@use 'pattern/typography';
+@use '../../../../../../../../src/styles/variables' as variables;
+@use '../../../../../../../../src/styles/pattern/mixture' as mixture;
+@use '../../../../../../../../src/styles/pattern/utility' as typography;
+@use '../../../../../../../../src/styles/pattern/typography' as typography;
 
 ::ng-deep {
   .p-tooltip .p-tooltip-text {

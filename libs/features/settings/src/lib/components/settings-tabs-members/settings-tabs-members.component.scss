@@ -1,6 +1,6 @@
-@use 'pattern/colors';
-@use 'pattern/mixins';
-@use 'pattern/typography';
+@use '../../../../../../../../src/styles/pattern/colors' as colors;
+@use '../../../../../../../../src/styles/pattern/mixture' as mixture;
+@use '../../../../../../../../src/styles/pattern/typography' as typography;
 
 :host {
   display: flex;

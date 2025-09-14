@@ -1,7 +1,7 @@
-@use 'pattern/colors';
+@use '../../../../../../../../src/styles/pattern/colors' as colors;
 @use 'pattern/layout';
-@use 'pattern/typography';
-@use 'pattern/utility';
+@use '../../../../../../../../src/styles/pattern/typography' as typography;
+@use '../../../../../../../../src/styles/pattern/utility' as typography;
 
 :host {
   @extend %#{layout.$page-base-body-subhead-pattern};

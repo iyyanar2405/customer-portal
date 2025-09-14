@@ -12,7 +12,7 @@ export interface FindingStatusByCategoryGraphData extends BaseApolloResponse<Fin
 
 
 export interface FindingStatusByCategoryGraphDto {
-  data: FindingStatusByCategoryGraphData;
+  data: FindingStatusByCategoryGraphData;  
   isSuccess: boolean;
   message: string;  
   errorcode: string;

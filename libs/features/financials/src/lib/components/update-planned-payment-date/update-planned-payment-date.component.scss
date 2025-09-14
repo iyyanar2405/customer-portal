@@ -1,5 +1,5 @@
-@use 'variables';
-@use 'pattern/utility';
+@use '../../../../../../../../src/styles/variables' as variables;
+@use '../../../../../../../../src/styles/pattern/utility' as typography;
 
 .update-payment-date {
   &__header {

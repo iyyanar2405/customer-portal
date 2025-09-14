@@ -1,6 +1,6 @@
-@use 'pattern/colors';
-@use 'pattern/typography';
-@use 'pattern/utility';
+@use '../../../../../../../../src/styles/pattern/colors' as colors;
+@use '../../../../../../../../src/styles/pattern/typography' as typography;
+@use '../../../../../../../../src/styles/pattern/utility' as typography;
 
 :host {
   display: grid;

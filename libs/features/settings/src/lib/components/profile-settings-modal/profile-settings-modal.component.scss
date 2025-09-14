@@ -1,5 +1,5 @@
-@use 'variables';
-@use 'pattern/utility';
+@use '../../../../../../../../src/styles/variables' as variables;
+@use '../../../../../../../../src/styles/pattern/utility' as typography;
 
 .profile-settings {
   padding: utility.get-rem(32) utility.get-rem(24);
