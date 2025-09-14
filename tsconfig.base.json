@@ -59,12 +59,6 @@
       "@customer-portal/data-access/findings/*": [
         "libs/data-access/findings/src/*"
       ],
-      "@customer-portal/data-access/global": [
-        "libs/data-access/global/src/index.ts"
-      ],
-      "@customer-portal/data-access/global/*": [
-        "libs/data-access/global/src/*"
-      ],
       "@customer-portal/data-access/notifications": [
         "libs/data-access/notifications/src/index.ts"
       ],
@@ -154,7 +148,8 @@
       "@customer-portal/features/welcome": [
         "libs/features/welcome/src/index.ts"
       ],
-      "@customer-portal/global": ["global/src/index.ts"],
+      "@customer-portal/data-access/global": ["libs/data-access/global/src/index.ts"],
+      "@customer-portal/data-access/global/*": ["libs/data-access/global/src/*"],
       "@customer-portal/overview-shared": [
         "libs/data-access/overview-shared/src/index.ts"
       ],

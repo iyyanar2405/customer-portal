@@ -25,8 +25,10 @@ export interface ScheduleListItemDto {
 }
 
 export interface ScheduleListItemEnrichedDto extends ScheduleListItemDto {
+  companyName: string;
   serviceDetails: ServiceDetailsMaster[];
   siteDetails: SiteDetailsMaster[];
+  statusId: number;
 }
 export interface ScheduleListCalendarFilterSitesDataDto {
   id: number;

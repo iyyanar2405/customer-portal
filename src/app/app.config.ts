@@ -1,4 +1,4 @@
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { HttpEvent, HttpHandlerFn, HttpRequest, provideHttpClient, withInterceptors } from '@angular/common/http';
 import {
   ApplicationConfig,
   CSP_NONCE,
@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideRouter, withDisabledInitialNavigation } from '@angular/router';
-import { ApolloLink, InMemoryCache } from '@apollo/client/core';
+import { ApolloLink, InMemoryCache, Observable } from '@apollo/client/core';
 import { onError } from '@apollo/client/link/error';
 import { provideTransloco } from '@jsverse/transloco';
 import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
@@ -64,6 +64,7 @@ import { CustomRouterStateSerializer } from '../../libs/data-access/router/src';
 import { environment } from '../../libs/environments/src';
 import { UnreadActionsState } from '../../libs/data-access/actions/src';
 import { UnreadNotificationsState } from '../../libs/data-access/notifications/src';
+import { GlobalState } from '../../libs/data-access/global/src/state/global.state';
 
 declare global {
   /* eslint-disable no-var, vars-on-top */
@@ -265,3 +266,7 @@ export const appConfig: ApplicationConfig = {
     MessageService,
   ],
 };
+function spinnerInterceptor(req: HttpRequest<unknown>, next: HttpHandlerFn): Observable<HttpEvent<unknown>> {
+  throw new Error('Function not implemented.');
+}
+

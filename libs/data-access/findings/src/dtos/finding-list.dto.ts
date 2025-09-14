@@ -15,7 +15,7 @@ export interface FindingListItemDto {
   response: string;
   companyId: number;
   services: number[];
-  siteId: number[];
+  siteId: number;
   openDate: string;
   closedDate: string;
   acceptedDate: string;
