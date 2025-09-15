@@ -10,12 +10,14 @@
     [showToggleAll]="false"
     [style]="{ width: width + 'px' }"
     [styleClass]="filterFlag ? 'filter-header' : ''"
+    [virtualScroll]="options.length > virtualScrollLimit"
+    [virtualScrollItemSize]="virtualScrollSize"
     [(ngModel)]="selectedItems"
     (onChange)="onChangeOption($event)">
     <ng-template pTemplate="header">
       <div class="checkbox-filter-header">
         <p-triStateCheckbox
-          [attr.aria-label]="t('selectAll')"
+          [attr.aria-label]="t('selectAllOptions')"
           [checkboxFalseIcon]="'pi pi-minus'"
           [label]="t('all')"
           [(ngModel)]="selectAll"

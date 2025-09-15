@@ -41,6 +41,8 @@ export class CheckboxFilterComponent implements OnInit {
   @Input() filter: any;
   @Input() field = '';
   @Input() filteringConfig$!: Observable<FilteringConfig>;
+  @Input() virtualScrollSize = 20;
+  @Input() virtualScrollLimit = 500;
 
   selectedItems: ListboxItem<string>[] = [];
   selectAll: boolean | null = null;

@@ -5,6 +5,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   ContentChild,
+  ElementRef,
   EventEmitter,
   HostListener,
   Input,
@@ -27,7 +28,6 @@ import { ProgressBarModule } from 'primeng/progressbar';
 import { SliderModule } from 'primeng/slider';
 import { Table, TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
-// For dynamic progressbar demo
 import { ToastModule } from 'primeng/toast';
 import {
   TriStateCheckboxChangeEvent,
@@ -131,7 +131,7 @@ export class GridComponent implements OnInit, AfterViewInit {
   private currentSortField = '';
 
   private actualFilters: FilterTypeModel = {};
-
+  private filterConfig: FilteringConfig | null = null;
   preferenceToSave: Partial<PreferenceDataModel> = {};
 
   ColumnType = ColumnType;
@@ -158,6 +158,8 @@ export class GridComponent implements OnInit, AfterViewInit {
   @ContentChild('buttonsCustomTemplate')
   buttonsCustomTemplate!: TemplateRef<any>;
   @ContentChild('tdCustomTemplate') tdCustomTemplate!: TemplateRef<any>;
+  @ViewChild('exportBtn', { read: ElementRef })
+  exportBtnRef!: ElementRef<HTMLButtonElement>;
 
   @Input() columns!: ColumnDefinition[];
 
@@ -198,7 +200,7 @@ export class GridComponent implements OnInit, AfterViewInit {
   @Input() rows = this.defaultRowsPerPage;
   @Input() rowSize = '';
   @Input() tooltipMarginTopSize = -1.2;
-  @Input() rowsPerPageOptions = [10, 20, 30];
+  @Input() rowsPerPageOptions = [10, 20, 30, 50, 100];
   @Input() scrollable = true;
   @Input() selectable = false;
   @Input() selectableSticky = true;
@@ -215,8 +217,9 @@ export class GridComponent implements OnInit, AfterViewInit {
   @Input() shouldPersist = true;
   @Input() enableFileDownloadWithRowData = false;
   @Input() isDocumentsGrid = false;
+  @Input() isShowAddDocument = false;
+  @Input() isLoading = false;
   @Input({ required: true }) hasActiveFilters = false;
-
   @Output() gridConfigChangedEvent = new EventEmitter<GridConfig>();
   @Output() removeFilter = new EventEmitter<{
     fieldName: string;
@@ -252,6 +255,10 @@ export class GridComponent implements OnInit, AfterViewInit {
     return this.totalRecords === 0;
   }
 
+  getExportButtonElement(): HTMLElement | null {
+    return this.exportBtnRef?.nativeElement ?? null;
+  }
+
   @HostListener('window:resize', ['$event'])
   onResize(event: Event): void {
     const window = event.target as Window;
@@ -263,6 +270,7 @@ export class GridComponent implements OnInit, AfterViewInit {
     this.userSortedCols = structuredClone(this.columns);
     this.colsNo = String(this.columns.length);
     this.refreshVisibleColumns();
+    this.initializeFilterConfig();
   }
 
   ngAfterViewInit(): void {
@@ -300,7 +308,22 @@ export class GridComponent implements OnInit, AfterViewInit {
       ...event,
       paginationEnabled: this.paginator,
     };
-    const gridConfig = createGridConfig(ev);
+    let gridConfig = createGridConfig(ev);
+
+    const isInitialLoad =
+      !event.filters || Object.keys(event.filters).length === 0;
+
+    if (this.filterConfig && isInitialLoad) {
+      gridConfig = {
+        ...gridConfig,
+        filtering: {
+          ...gridConfig.filtering,
+          ...this.filterConfig,
+        },
+      };
+
+      this.filterConfig = null;
+    }
     this.gridConfigChangedEvent.emit(gridConfig);
 
     this.actualFilters = event.filters as FilterTypeModel;
@@ -783,5 +806,23 @@ export class GridComponent implements OnInit, AfterViewInit {
       this.localDisplayColsReorderButton = false;
       this.showSelectedCount = true;
     }
+  }
+
+  private initializeFilterConfig(): void {
+    this.filteringConfig$.pipe(take(1)).subscribe((config: FilteringConfig) => {
+      const hasValidFilters =
+        config &&
+        Object.entries(config).some(([key, filter]) => {
+          if (key === '') return false;
+
+          return Array.isArray(filter.value)
+            ? filter.value.length > 0
+            : filter.value !== null &&
+                filter.value !== undefined &&
+                filter.value !== '';
+        });
+
+      this.filterConfig = hasValidFilters ? config : null;
+    });
   }
 }

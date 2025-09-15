@@ -40,6 +40,7 @@
           <div class="action-buttons">
             @if (displayExportButton && localDisplayExportButton) {
               <button
+                #exportBtn
                 class="p-button-outlined grouping-button"
                 icon="pi pi-download"
                 pButton
@@ -585,89 +586,89 @@
                 </td>
               }
               @case (CellType.Actions) {
-                @if (!isGridEmpty) {
-                  <td
-                    alignFrozen="right"
-                    class="action-column"
-                    pFrozenColumn
-                    role="cell"
-                    [frozen]="col.sticky"
-                    [ngClass]="{ 'row-child': rowData.hasChild }"
-                    [style.max-width]="gridSizeConfig.minTdActionsWidth">
-                    <div
-                      [ngClass]="{
-                        'parent-cell': rowData[col.field],
-                        'empty-cell': !rowData[col.field],
-                      }">
-                      <shared-action
-                        [actions]="rowData.actions"
-                        (triggerFileAction)="
-                          onFileActionTrigger($event, rowData)
-                        ">
-                      </shared-action>
-                    </div>
-                    @if (rowData.hasChild) {
-                      @for (
-                        child of rowData.children;
-                        track child[childIdentifier]
-                      ) {
-                        <div class="child-cell dummy-cell">
-                          <shared-action
-                            [actions]="child.actions"
-                            (triggerFileAction)="
-                              onFileActionTrigger($event, child)
-                            ">
-                          </shared-action>
-                        </div>
-                      }
-                    }
-                  </td>
-                }
-              }
-              @case (CellType.EventActions) {
-                @if (!isGridEmpty) {
-                  <td
-                    alignFrozen="right"
-                    class="action-column"
-                    pFrozenColumn
-                    role="cell"
-                    [frozen]="col.sticky"
-                    [ngClass]="{
-                      'row-child': rowData.hasChild,
-                      sm:
-                        rowData.eventActions?.actions?.length &&
-                        rowData.actions?.length,
-                    }"
-                    [style.max-width]="gridSizeConfig.minTdActionsWidth">
-                    @if (rowData.eventActions) {
+                  @if (!isGridEmpty) {
+                    <td
+                      alignFrozen="right"
+                      class="action-column"
+                      pFrozenColumn
+                      role="cell"
+                      [frozen]="col.sticky"
+                      [ngClass]="{ 'row-child': rowData.hasChild }"
+                      [style.max-width]="gridSizeConfig.minTdActionsWidth">
                       <div
                         [ngClass]="{
                           'parent-cell': rowData[col.field],
                           'empty-cell': !rowData[col.field],
                         }">
-                        <shared-event-action
-                          [displayConfirmButton]="
-                            rowData.eventActions.displayConfirmButton
-                          "
-                          [displayConfirmedLabel]="
-                            rowData.eventActions.displayConfirmedLabel
-                          "
-                          [eventActions]="rowData.eventActions.actions"
-                          [id]="rowData.eventActions.id"
-                          (triggerEventAction)="onEventActionTrigger($event)">
-                        </shared-event-action>
+                        <shared-action
+                          [actions]="rowData.actions"
+                          (triggerFileAction)="
+                            onFileActionTrigger($event, rowData)
+                          ">
+                        </shared-action>
                       </div>
                       @if (rowData.hasChild) {
                         @for (
                           child of rowData.children;
                           track child[childIdentifier]
                         ) {
-                          <div class="child-cell dummy-cell"></div>
+                          <div class="child-cell dummy-cell">
+                            <shared-action
+                              [actions]="child.actions"
+                              (triggerFileAction)="
+                                onFileActionTrigger($event, child)
+                              ">
+                            </shared-action>
+                          </div>
                         }
                       }
-                    }
-                  </td>
+                    </td>
+                  }
                 }
+              @case (CellType.EventActions) {
+                  @if (!isGridEmpty) {
+                    <td
+                      alignFrozen="right"
+                      class="action-column"
+                      pFrozenColumn
+                      role="cell"
+                      [frozen]="col.sticky"
+                      [ngClass]="{
+                        'row-child': rowData.hasChild,
+                        sm:
+                          rowData.eventActions?.actions?.length &&
+                          rowData.actions?.length,
+                      }"
+                      [style.max-width]="gridSizeConfig.minTdActionsWidth">
+                      @if (rowData.eventActions) {
+                        <div
+                          [ngClass]="{
+                            'parent-cell': rowData[col.field],
+                            'empty-cell': !rowData[col.field],
+                          }">
+                            <shared-event-action
+                              [displayConfirmButton]="
+                                rowData.eventActions.displayConfirmButton
+                              "
+                              [displayConfirmedLabel]="
+                                rowData.eventActions.displayConfirmedLabel
+                              "
+                              [eventActions]="rowData.eventActions.actions"
+                              [id]="rowData.eventActions.id"
+                              (triggerEventAction)="onEventActionTrigger($event)">
+                            </shared-event-action>
+                        </div>
+                        @if (rowData.hasChild) {
+                          @for (
+                            child of rowData.children;
+                            track child[childIdentifier]
+                          ) {
+                            <div class="child-cell dummy-cell"></div>
+                          }
+                        }
+                      }
+                    </td>
+                  }
               }
               @case (CellType.TextWithIcon) {
                 <td pFrozenColumn role="cell" [frozen]="col.sticky">
@@ -682,11 +683,11 @@
                 </td>
               }
               @case (CellType.CustomTemplate) {
-                <td pFrozenColumn role="cell" [frozen]="col.sticky">
+                <td pFrozenColumn role="cell" [frozen]="col.sticky" [ngClass]="{ 'text-highlight-container': rowData?.iconTooltip?.displayIcon }">
                   <ng-container
                     *ngTemplateOutlet="
                       tdCustomTemplate;
-                      context: { datum: rowData }
+                      context: { datum: rowData , colVal:col }
                     "></ng-container>
                 </td>
               }
@@ -728,10 +729,7 @@
                   [style.max-width]="gridSizeConfig.minTdDefaultWidth">
                   <div
                     tooltipPosition="bottom"
-                    [innerHTML]="rowData[col.field]"
-                    [sharedTippyTooltip]="rowData[col.field]"
-                    [tippyAllowHTML]="true"
-                    [tooltipTheme]="TooltipTheme.LightMd"></div>
+                    [innerHTML]="rowData[col.field]"></div>
                 </td>
               }
               @default {
@@ -774,12 +772,16 @@
       <ng-template pTemplate="emptymessage">
         <tr class="grid-message" role="row">
           <td role="cell" [attr.colspan]="colsNo">
+            @if(!isLoading){
             <shared-empty-grid
-              [hasActiveFilters]="hasActiveFilters"
+            [hasActiveFilters]="hasActiveFilters"
               [isDocumentsGrid]="isDocumentsGrid"
               [isGridEmpty]="isGridEmpty"
+              [isShowAddDocument]="isShowAddDocument"
               (addDocuments)="onAddDocuments()">
             </shared-empty-grid>
+            }
+            
           </td>
         </tr>
       </ng-template>
