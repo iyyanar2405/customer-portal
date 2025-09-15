@@ -1,7 +1,7 @@
-@use '../../../../../../../../src/styles/pattern/colors' as colors;
-@use '../../../../../../../../src/styles/pattern/typography' as typography;
+@use 'pattern/colors' as colors;
+@use 'pattern/typography' as typography;
 @use 'pattern/mixture';
-@use '../../../../../../../../src/styles/pattern/utility' as typography;
+@use 'pattern/utility' as utility;
 
 .card {
   height: utility.get-rem(306);

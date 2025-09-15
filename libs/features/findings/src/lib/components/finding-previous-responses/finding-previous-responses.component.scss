@@ -1,8 +1,8 @@
-@use '../../../../../../../../src/styles/pattern/colors' as colors;
+@use 'pattern/colors' as colors;
 @use 'pattern/layout';
-@use '../../../../../../../../src/styles/pattern/mixture' as mixture;
-@use '../../../../../../../../src/styles/pattern/typography' as typography;
-@use '../../../../../../../../src/styles/pattern/utility' as typography;
+@use 'pattern/mixture' as mixture;
+@use 'pattern/typography' as typography;
+@use 'pattern/utility' as utility;
 
 :host {
   @extend %#{layout.$page-base-body-subhead-pattern};

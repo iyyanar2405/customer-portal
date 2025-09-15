@@ -1,6 +1,6 @@
 @use 'sass:color';
 
-@use '../../../../../../../../src/styles/pattern/colors' as colors;
+@use 'pattern/colors' as colors;
 @use '../../../../../../../../src/styles/variables' as variables;
 
 p-progressSpinner::ng-deep {

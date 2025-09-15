@@ -1,9 +1,9 @@
 @use '../../../../../../../../src/styles/variables' as variables;
-@use '../../../../../../../../src/styles/pattern/colors' as colors;
-@use '../../../../../../../../src/styles/pattern/mixture' as mixture;
+@use 'pattern/colors' as colors;
+@use 'pattern/mixture' as mixture;
 @use 'pattern/mixture';
-@use '../../../../../../../../src/styles/pattern/typography' as typography;
-@use '../../../../../../../../src/styles/pattern/utility' as typography;
+@use 'pattern/typography' as typography;
+@use 'pattern/utility' as utility;
 
 .container {
   position: fixed;
