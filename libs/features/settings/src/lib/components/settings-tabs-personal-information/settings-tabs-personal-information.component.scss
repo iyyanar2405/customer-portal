@@ -1,12 +1,9 @@
-@use 'pattern/colors';
-@use 'pattern/layout';
-@use 'pattern/mixins';
-@use 'pattern/typography';
-
-@use 'variables';
-@use 'mixins' as mixins2;
-@use 'shared-grid';
-@use 'pattern/utility';
+@use 'pattern/colors' as colors;
+@use 'pattern/layout' as layout;
+@use 'pattern/mixins' as mixins;
+@use 'pattern/typography' as typography;
+@use 'pattern/variables' as variables;
+@use 'pattern/utility'  as utility;
 
 :host {
   display: flex;

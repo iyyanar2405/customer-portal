@@ -1,7 +1,7 @@
-@use '../../../styles/pattern/colors';
-@use '../../../styles/pattern/mixins';
-@use '../../../styles/pattern/typography';
-@use '../../../styles/pattern/utility';
+@use 'pattern/colors' as colors;
+@use 'pattern/mixins' as mixins;
+@use 'pattern/typography' as typography;
+@use 'pattern/utility' as utility;
 
 :host {
     display: flex;
