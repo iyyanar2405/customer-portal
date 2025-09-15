@@ -1,4 +1,6 @@
+@use 'pattern/mixins' as mixins;
 @use 'pattern/mixture' as mixture;
+
 
 shared-grid {
   @include mixins.gutter-for(top, right, bottom, left);

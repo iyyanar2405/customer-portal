@@ -1,4 +1,6 @@
 @use 'pattern/mixture' as mixture;
+@use 'pattern/mixins' as mixins;
+
 
 shared-grid {
   background-color: transparent;
