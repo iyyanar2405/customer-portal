@@ -2,7 +2,7 @@
 @use 'pattern/typography' as typography;
 @use 'pattern/utility' as utility;
 
-@use '../../../../../../../../src/styles/variables' as variables;
+@use 'pattern/variables' as variables;
 
 .manage-permissions {
   &__info,
