@@ -1,6 +1,6 @@
 @use 'pattern/layout';
-@use 'pattern/mixture' as mixture;
-@use 'pattern/utility' as utility;
+@use 'pattern/mixins';
+@use 'pattern/utility';
 
 :host {
   @extend %#{layout.$page-base-body-section-filters-pattern};

@@ -1,8 +1,8 @@
 @use 'pattern/layout';
-@use 'pattern/mixture' as mixture;
-@use 'pattern/utility' as utility;
-@use 'pattern/typography' as typography;
-@use 'pattern/colors' as colors;
+@use 'pattern/mixins';
+@use 'pattern/utility';
+@use 'pattern/typography';
+@use 'pattern/colors';
 @use 'pattern/mixture';
 
 .charts {

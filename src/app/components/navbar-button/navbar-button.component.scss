@@ -1,10 +1,10 @@
 @use 'sass:color';
 
-@use '../../../styles/pattern/colors';
-@use '../../../styles/pattern/mixins';
-@use '../../../styles/pattern/typography';
+@use 'pattern/colors';
+@use 'pattern/mixins';
+@use 'pattern/typography';
 
-@use '../../../styles/pattern/utility';
+@use 'pattern/utility';
 
 .badge {
   @extend %#{typography.$text-xs-pattern};

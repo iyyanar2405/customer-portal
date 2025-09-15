@@ -1,8 +1,8 @@
-@use 'pattern/colors' as colors;
-@use 'pattern/mixture' as mixture;
+@use 'pattern/colors';
+@use 'pattern/mixins';
 @use 'pattern/mixture';
-@use 'pattern/typography' as typography;
-@use 'pattern/utility' as utility;
+@use 'pattern/typography';
+@use 'pattern/utility';
 
 :host {
   display: grid;
@@ -42,6 +42,22 @@
   flex-direction: column;
   gap: utility.get-rem(calc(3 * var(--dnv-gutter-base-unitless)));
   @include mixins.gutter-for(top, right, bottom, left);
+
+  .disclaimer-container {
+    margin-top: utility.get-rem(-10);
+    margin-bottom: utility.get-rem(-20);
+  }
+
+  .scheduleInfo {
+    font-size: var(--dnv-font-text-l);
+    margin-bottom: utility.get-rem(5);
+    font-weight: 700;
+  }
+
+  .disclaimer {
+    font-size: var(--dnv-font-text-l);
+    margin-bottom: utility.get-rem(5);
+  }
 }
 
 form {

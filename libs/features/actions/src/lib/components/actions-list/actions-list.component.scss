@@ -1,15 +1,15 @@
-@use 'pattern/mixture' as mixture;
+@use 'pattern/mixins';
 @use 'pattern/mixture';
-@use 'pattern/colors' as colors;
-@use 'pattern/typography' as typography;
-@use 'pattern/utility' as utility;
+@use 'pattern/colors';
+@use 'pattern/typography';
+@use 'pattern/utility';
 
 shared-grid ::ng-deep {
   @include mixins.gutter-for(top, right, bottom, left);
 
   .p-datatable-wrapper {
-    box-shadow: 0px calc(5 / var(--dnv-font-base-unitless) * 1rem)
-      calc(3 / var(--dnv-font-base-unitless) * 1rem)
+    box-shadow: 0px calc(5 / var(--dnv-font-base-unitless) * 1rem) 
+      calc(3 / var(--dnv-font-base-unitless) * 1rem) 
       calc(-4 / var(--dnv-font-base-unitless) * 1rem) rgba(15, 32, 75, 0.25);
 
     .p-datatable-thead {
@@ -29,13 +29,15 @@ shared-grid ::ng-deep {
         span {
           @extend %#{typography.$label-s-pattern};
           color: colors.get-color('Sandstone40');
+          font-size: var(--dnv-font-text-s);
+          font-weight: 700;
         }
       }
     }
 
     .p-datatable-tbody {
-      box-shadow: 0px utility.get-rem(56) utility.get-rem(3) 0px
-        rgba(15, 32, 75, 0.25);
+      box-shadow: 0px utility.get-rem(56) utility.get-rem(3) 0px 
+      rgba(15, 32, 75, 0.25);
       border-radius: 10px;
       border-top: 1px solid;
 
@@ -93,5 +95,13 @@ shared-grid ::ng-deep {
 
   .checkbox-text {
     display: contents;
+  }
+}
+
+::ng-deep{
+.p-dialog-header {
+  .p-dialog-title {
+      font-size: utility.get-rem(18);
+    }
   }
 }

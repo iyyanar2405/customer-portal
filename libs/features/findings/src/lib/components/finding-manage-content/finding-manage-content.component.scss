@@ -1,8 +1,8 @@
 @use 'pattern/layout';
-@use 'pattern/mixture' as mixture;
-@use 'pattern/utility' as utility;
+@use 'pattern/mixins';
+@use 'pattern/utility';
 
-@use '../../../../../../../../src/styles/variables' as variables;
+@use 'variables';
 
 :host {
   display: flex;
@@ -10,6 +10,7 @@
 }
 
 .manage-findings {
+  text-align: justify;
   @extend %#{layout.$page-base-body-section-grey-pattern};
 
   .wrapper {
@@ -54,14 +55,17 @@
 
   .clause {
     grid-column: 1/2;
+    margin-bottom: utility.get-rem(16);
   }
 
   .focus-area {
     grid-column: 2/2;
+    margin-bottom: utility.get-rem(16);
   }
 
   .description {
     grid-column: 1/-1;
+    margin-bottom: utility.get-rem(16);
   }
 }
 

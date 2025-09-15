@@ -1,23 +1,21 @@
-@use 'pattern/layout';
-@use 'pattern/mixins';
-@use 'pattern/utility';
-@use 'pattern/typography';
 @use 'pattern/colors';
+@use 'pattern/mixins';
 @use 'pattern/mixture';
+@use 'pattern/typography';
+
+@use 'pattern/utility';
 
 .charts {
-  padding-top: utility.get-rem(36);
-  padding-left: utility.get-rem(24);
-  width: 100%;
   grid-area: charts;
   display: grid;
-  gap: utility.get-rem(24);
+  gap: utility.get-rem(calc(3 * var(--dnv-gutter-base-unitless)));
   grid-template-columns: 40% 1fr;
   grid-template-rows: utility.get-rem(30) 70% 1fr;
   grid-template-areas:
     'h2 h2'
     'doughnut bar'
     '. bar';
+  @include mixins.gutter-for(top, right, bottom, left);
 
   @include mixins.respond-to(tablet) {
     grid-template-columns: 100%;
@@ -28,7 +26,7 @@
       'bar';
 
     .chart-bar {
-      margin-left: 0;
+      margin-left: -24px;
     }
   }
 }
@@ -37,7 +35,7 @@
   grid-area: doughnut;
   display: flex;
   flex-direction: column;
-  gap: utility.get-rem(8);
+  gap: utility.get-rem(var(--dnv-gutter-base-unitless));
   min-height: utility.get-rem(400);
 }
 
@@ -55,8 +53,8 @@ h2 {
   grid-area: bar;
   display: flex;
   flex-direction: column;
-  gap: utility.get-rem(8);
-  margin-left: 0;
+  gap: utility.get-rem(var(--dnv-gutter-base-unitless));
+
   h3 {
     padding-left: utility.get-rem(24);
   }

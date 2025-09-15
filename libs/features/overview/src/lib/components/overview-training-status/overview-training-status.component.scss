@@ -1,7 +1,7 @@
-@use 'pattern/colors' as colors;
-@use 'pattern/typography' as typography;
+@use 'pattern/colors';
+@use 'pattern/typography';
 @use 'pattern/mixture';
-@use 'pattern/utility' as utility;
+@use 'pattern/utility';
 
 .card {
   height: utility.get-rem(306);

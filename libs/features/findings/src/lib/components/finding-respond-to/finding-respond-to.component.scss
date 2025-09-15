@@ -1,7 +1,7 @@
-@use '../../../../../../../../src/styles/variables' as variables;
-@use 'pattern/mixture' as mixture;
-@use 'pattern/utility' as utility;
-@use 'pattern/typography' as typography;
+@use 'variables';
+@use 'pattern/mixins';
+@use 'pattern/utility';
+@use 'pattern/typography';
 
 ::ng-deep {
   .p-tooltip .p-tooltip-text {
@@ -21,6 +21,7 @@
   @include mixins.gutter-for(0.5, top, bottom);
 
 .wrapper {
+  text-align: justify;
   @include mixins.gutter-for(left, right);
 }
 
