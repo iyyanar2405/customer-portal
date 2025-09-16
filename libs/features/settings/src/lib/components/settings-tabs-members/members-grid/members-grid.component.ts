@@ -4,35 +4,52 @@ import {
   Component,
   input,
   OnDestroy,
+  OnInit,
 } from '@angular/core';
+import { Router } from '@angular/router';
 import { TranslocoModule, TranslocoService } from '@jsverse/transloco';
-import { ConfirmationService } from 'primeng/api';
+import { ofActionCompleted } from '@ngxs/store';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { filter, take, tap } from 'rxjs';
+import { combineLatest, filter, map, switchMap, take, tap } from 'rxjs';
 
 import {
-  SettingsCoBrowsingStoreService,  
-} from '@customer-portal/data-access/settings';
-import { BasePreferencesComponent } from '@customer-portal/preferences';
+  GlobalServiceMasterStoreService,
+  GlobalSiteMasterStoreService,
+} from '@customer-portal/data-access/global';
 import {
-  buttonStyleClass,
-  ColumnDefinition,
-  GridComponent,
-  GridConfig,
-  GridEventAction,
-  GridEventActionType,
+  ProfileLanguageStoreService,
+  ProfileStoreService,
+  SettingsCoBrowsingStoreService,
+  SettingsCompanyDetailsStoreService,
+} from '@customer-portal/data-access/settings';
+import { UpdateImpersonatedUser } from '@customer-portal/data-access/settings/state/actions';
+import { SettingsMembersStoreService } from '@customer-portal/data-access/settings/state/store-services';
+import { BasePreferencesComponent } from '@customer-portal/preferences/helpers';
+import { buttonStyleClass } from '@customer-portal/shared/components/custom-confirm-dialog';
+import { GridComponent } from '@customer-portal/shared/components/grid';
+import {
+  AppPagesEnum,
   modalBreakpoints,
   ObjectName,
   ObjectType,
   PageName,
-} from '@customer-portal/shared';
+} from '@customer-portal/shared/constants';
+import { getToastContentBySeverity } from '@customer-portal/shared/helpers/custom-toast';
+import {
+  ColumnDefinition,
+  GridConfig,
+  GridEventAction,
+  GridEventActionType,
+  ToastSeverity,
+} from '@customer-portal/shared/models';
+import { CoBrowsingSharedService } from '@customer-portal/shared/services/co-browsing';
 
 import { MEMBERS_LIST_COLUMNS } from '../../../constants';
 import {
   ManagePermissionsModalComponent,
   ManagePermissionsModalFooterComponent,
 } from '../manage-permissions-modal';
-import { SettingsMembersStoreService } from '@customer-portal/data-access/settings/state/store-services';
 
 @Component({
   selector: 'lib-members-grid',
@@ -43,9 +60,10 @@ import { SettingsMembersStoreService } from '@customer-portal/data-access/settin
 })
 export class MembersGridComponent
   extends BasePreferencesComponent
-  implements OnDestroy
+  implements OnInit, OnDestroy
 {
   public shouldPersist = input<boolean>(true);
+  public isDnvUser = input<boolean>(false);
 
   cols: ColumnDefinition[] = MEMBERS_LIST_COLUMNS;
   ref: DynamicDialogRef | undefined;
@@ -63,6 +81,14 @@ export class MembersGridComponent
     private dialogService: DialogService,
     private translocoService: TranslocoService,
     private confirmationService: ConfirmationService,
+    private profileLanguageStoreService: ProfileLanguageStoreService,
+    private profileStoreService: ProfileStoreService,
+    private globalServiceMasterStoreService: GlobalServiceMasterStoreService,
+    private globalSiteMasterStoreService: GlobalSiteMasterStoreService,
+    private settingsCompanyDetailsStoreService: SettingsCompanyDetailsStoreService,
+    private coBrowsingSharedService: CoBrowsingSharedService,
+    private router: Router,
+    private messageService: MessageService,
   ) {
     super();
 
@@ -71,6 +97,16 @@ export class MembersGridComponent
       ObjectName.Members,
       ObjectType.Grid,
     );
+  }
+
+  ngOnInit(): void {
+    this.disableActionsForDNVUser();
+  }
+
+  disableActionsForDNVUser(): void {
+    this.cols = this.isDnvUser()
+      ? this.cols.filter((col) => col.field !== 'eventActions')
+      : this.cols;
   }
 
   onGridConfigChanged(gridConfig: GridConfig): void {
@@ -89,10 +125,7 @@ export class MembersGridComponent
         this.confirmRemoveMember(id as string),
       [GridEventActionType.ManagePermissions]: () =>
         this.handleManagePermissions(id),
-      [GridEventActionType.ViewPortalAs]: () =>
-        this.settingsCoBrowsingStoreService.updateImpersonatedUser(
-          id as string,
-        ),
+      [GridEventActionType.ViewPortalAs]: () => this.viewPortalAs(id as string),
     };
 
     const handler = handlers[actionType];
@@ -103,38 +136,73 @@ export class MembersGridComponent
   }
 
   handleManagePermissions(id: string | number): void {
-    this.ref = this.dialogService.open(ManagePermissionsModalComponent, {
-      header: this.translocoService.translate(
-        'settings.membersTab.managePermissions',
-      ),
-      width: '50vw',
-      contentStyle: { overflow: 'auto', padding: '0' },
-      breakpoints: modalBreakpoints,
-      data: {
-        showBackBtn: false,
-        memberEmail: id,
-        isAdmin: false,
-      },
-      templates: {
-        footer: ManagePermissionsModalFooterComponent,
-      },
-    });
-    this.handleManagePermissionsCloseModal();
-  }
-
-  handleManagePermissionsCloseModal(): void {
-    this.ref?.onClose.pipe(take(1)).subscribe((data: boolean) => {
-      if (data) {
-        this.settingsMembersStoreService.submitManageMembersPermissions();
-      } else {
-        this.settingsMembersStoreService.discardMemberPermissionsDataAndCompanies();
-        this.settingsMembersStoreService.discardMemberPermissionsUserSelection();
-      }
-    });
+    this.dialogService
+      .open(ManagePermissionsModalComponent, {
+        header: this.translocoService.translate(
+          'settings.membersTab.managePermissions',
+        ),
+        width: '50vw',
+        contentStyle: { overflow: 'auto', padding: '0' },
+        breakpoints: modalBreakpoints,
+        data: {
+          showBackBtn: false,
+          memberEmail: id,
+          isAdmin: false,
+        },
+        templates: {
+          footer: ManagePermissionsModalFooterComponent,
+        },
+      })
+      .onClose.pipe(take(1))
+      .subscribe((data: boolean) => {
+        if (data) {
+          this.settingsMembersStoreService.submitManageMembersPermissions();
+        } else {
+          this.settingsMembersStoreService.discardMemberPermissionsDataAndCompanies();
+          this.settingsMembersStoreService.discardMemberPermissionsUserSelection();
+        }
+      });
   }
 
   ngOnDestroy(): void {
     this.settingsMembersStoreService.resetMembersListState();
+  }
+
+  private viewPortalAs(memberEmail: string) {
+    this.settingsCoBrowsingStoreService.updateImpersonatedUser(memberEmail);
+    this.profileStoreService.resetProfileLoadAndErrorState();
+    this.settingsCompanyDetailsStoreService.resetCompanyLoadAndErrorState();
+    this.globalSiteMasterStoreService.resetSiteMasterState();
+    this.globalServiceMasterStoreService.resetServiceMasterState();
+
+    this.actions$
+      .pipe(
+        ofActionCompleted(UpdateImpersonatedUser),
+        take(1),
+        switchMap(() => {
+          this.loadInitialData();
+
+          return this.checkLoadedStates().pipe(
+            switchMap(() => this.checkErrors()),
+            tap((success) => {
+              if (success) {
+                this.coBrowsingSharedService.setCoBrowsingUserEmail(
+                  memberEmail,
+                );
+                this.router.navigate([AppPagesEnum.Overview], {});
+              } else {
+                this.messageService.add(
+                  getToastContentBySeverity(ToastSeverity.InitializationError),
+                );
+                this.settingsCoBrowsingStoreService.updateImpersonatedUser(
+                  null,
+                );
+              }
+            }),
+          );
+        }),
+      )
+      .subscribe();
   }
 
   private confirmRemoveMember(memberEmail: string): void {
@@ -163,5 +231,47 @@ export class MembersGridComponent
         this.settingsMembersStoreService.removeMember(memberEmail);
       },
     });
+  }
+
+  private loadInitialData(): void {
+    this.profileStoreService.loadProfileData();
+    this.profileLanguageStoreService.loadProfileLanguage();
+    this.settingsCompanyDetailsStoreService.loadSettingsCompanyDetails();
+    this.globalSiteMasterStoreService.loadGlobalSiteMasterList();
+    this.globalServiceMasterStoreService.loadGlobalServiceMasterList();
+  }
+
+  private checkLoadedStates() {
+    const loadedStates$ = {
+      profileLoaded: this.profileStoreService.profileDataLoaded$,
+      languageLoaded:
+        this.profileLanguageStoreService.profileLanguageDataLoaded$,
+      companyLoaded: this.settingsCompanyDetailsStoreService.companyDataLoaded$,
+      siteLoaded: this.globalSiteMasterStoreService.siteMasterLoaded$,
+      serviceLoaded: this.globalServiceMasterStoreService.serviceMasterLoaded$,
+    };
+
+    return combineLatest(loadedStates$).pipe(
+      filter((states) => Object.values(states).every(Boolean)),
+      take(1),
+      map(() => true),
+    );
+  }
+
+  private checkErrors() {
+    const errorStates$ = {
+      profileError: this.profileStoreService.profileDataError$,
+      languageError: this.profileLanguageStoreService.profileDataLanguageError$,
+      companyError:
+        this.settingsCompanyDetailsStoreService.companyDetailsError$,
+      siteError: this.globalSiteMasterStoreService.siteMasterLoadingError$,
+      serviceError:
+        this.globalServiceMasterStoreService.serviceMasterLoadingError$,
+    };
+
+    return combineLatest(errorStates$).pipe(
+      take(1),
+      map((errors) => !Object.values(errors).some((err) => !!err)),
+    );
   }
 }

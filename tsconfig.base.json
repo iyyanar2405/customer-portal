@@ -77,24 +77,6 @@
       "@customer-portal/data-access/overview/*": [
         "libs/data-access/overview/src/*"
       ],
-      "@customer-portal/data-access/permissions": [
-        "libs/data-access/permissions/src/index.ts"
-      ],
-      "@customer-portal/data-access/permissions/*": [
-        "libs/data-access/permissions/src/*"
-      ],
-      "@customer-portal/data-access/preferences": [
-        "libs/data-access/preferences/src/index.ts"
-      ],
-      "@customer-portal/data-access/preferences/*": [
-        "libs/data-access/preferences/src/*"
-      ],
-      "@customer-portal/data-access/router": [
-        "libs/data-access/router/src/index.ts"
-      ],
-      "@customer-portal/data-access/router/*": [
-        "libs/data-access/router/src/*"
-      ],
       "@customer-portal/data-access/schedules": [
         "libs/data-access/schedules/src/index.ts"
       ],
@@ -153,11 +135,20 @@
       "@customer-portal/overview-shared": [
         "libs/data-access/overview-shared/src/index.ts"
       ],
+      "@customer-portal/overview-shared/*": [
+        "libs/data-access/overview-shared/src/*"
+      ],
       "@customer-portal/permissions": [
         "libs/data-access/permissions/src/index.ts"
       ],
+      "@customer-portal/permissions/*": [
+        "libs/data-access/permissions/src/*"
+      ],
       "@customer-portal/preferences": [
         "libs/data-access/preferences/src/index.ts"
+      ],
+      "@customer-portal/preferences/*": [
+        "libs/data-access/preferences/src/*"
       ],
       "@customer-portal/router": ["libs/data-access/router/src/index.ts"],
       "@customer-portal/router/*": ["libs/data-access/router/src/*"],

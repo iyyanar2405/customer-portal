@@ -1,3 +1,5 @@
+import { BaseApolloResponse } from "@customer-portal/shared";
+
 export interface FindingSiteDto {
   id: number;
   name: string;
@@ -46,4 +48,9 @@ interface GetFindingSiteResponse {
   data: Countries;
   children: CitiesList[];
   __typename?: string;
+}
+
+export interface FindingsSiteResponse 
+extends BaseApolloResponse<GetFindingSiteResponse[]> {
+  data: GetFindingSiteResponse[];
 }

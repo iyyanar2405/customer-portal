@@ -1,23 +1,21 @@
 import { BaseApolloResponse } from "@customer-portal/shared";
 
+export interface FindingGraphsFilterSitesDto{
+  data: FindingGraphsFilterSitesDataDto[];
+  isSuccess: boolean;
+}
+
 export interface FindingGraphsFilterSitesDataDto {
   id: number;
   label: string;
   children?: FindingGraphsFilterSitesDataDto[];
 }
 
-export interface FindingStatusByCategoryGraphData extends BaseApolloResponse<FindingStatusByCategoryGraphData> {
+export interface FindingStatusByCategoryGraphDto 
+extends BaseApolloResponse<FindingStatusByCategoryGraphData> {
   data: FindingStatusByCategoryGraphData;
 }
 
-
-export interface FindingStatusByCategoryGraphDto {
-  data: FindingStatusByCategoryGraphData;  
-  isSuccess: boolean;
-  message: string;  
-  errorcode: string;
-  __typename: string;
-}
 
 export interface FindingStatusByCategoryGraphData {
   stats: FindingStatusByCategoryStatistics[];

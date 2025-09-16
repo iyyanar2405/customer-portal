@@ -13,8 +13,7 @@ export interface AuditFindingListItemDto {
   findingNumber: string;
   findingsId: string;
   openDate: string;
-  services: string[];
-  serviceId: number;
+  services: number[];
   siteId: number;
   status: string;
   title: string;
