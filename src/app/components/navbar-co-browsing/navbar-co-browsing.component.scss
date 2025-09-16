@@ -25,7 +25,7 @@
 }
 
 p {
-    @extend %#{typography.$text-1-pattern};
+    @extend %#{typography.$text-l-pattern};
     color: colors.get-color('UiWhite');
 
     @include mixins.respond-to(phone) {
