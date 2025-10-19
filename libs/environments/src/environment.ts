@@ -6,7 +6,7 @@ export const environment: EnvironmentModel = {
   appInsights: {
     instrumentationKey: '015e1a5d-853a-46b3-ab22-aa4019ea842e',
   },
-  authApiUrl: 'https://scecp-auth.dnv.com/Auth',
+  authApiUrl: 'http://localhost:7136/api/authorize',
   baseUrl: 'https://portal.dev.dnv.com',
   certificateGraphqlHost:
     'https://testapi.dnv.com/ba-scecp-r2-certificateservice-dev',

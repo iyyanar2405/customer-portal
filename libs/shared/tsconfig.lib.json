@@ -1,11 +1,18 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../out-tsc/lib",
-    "types": []
+    "outDir": "../../dist/libs/shared",
+    "declaration": true,
+    "declarationMap": true,
+    "types": [],
+    "lib": ["es2020", "dom"]
   },
   "exclude": [
-    "**/*.spec.ts",
-    "**/__mocks__/**/*"
-  ]
+    "src/**/*.spec.ts",
+    "src/test-setup.ts",
+    "jest.config.ts",
+    "src/**/*.test.ts",
+    "src/**/__mocks__/**/*"
+  ],
+  "include": ["src/**/*.ts"]
 }

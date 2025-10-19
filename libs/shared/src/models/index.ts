@@ -26,6 +26,7 @@ export * from './auditor-member.model';
 export * from './select-tree.model';
 export * from './settings-members.model';
 export * from './auth-service.reponse';
+export * from './auth-login.model';
 export * from './response';
 export * from './servicenow-modal-event.modal';
 export * from './custom-tree-node.model';

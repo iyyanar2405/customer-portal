@@ -5,16 +5,15 @@
     "types": []
   },
   "files": [
-    "main.ts",
-    "polyfills.ts"
+    "main.ts"
   ],
   "include": [
-    "src/**/*.d.ts",
-    "src/**/*.ts"
+    "**/*.d.ts",
+    "**/*.ts"
   ],
   "exclude": [
-    "src/**/*.spec.ts",
-    "src/**/__mocks__/**/*",
-    "libs/**/__mocks__/**/*"
+    "**/*.spec.ts",
+    "**/__mocks__/**/*",
+    "../libs/**/__mocks__/**/*"
   ]
 }

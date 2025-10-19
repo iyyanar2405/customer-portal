@@ -1,7 +1,7 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../dist/libs/environments",
+    "outDir": "../../dist/libs/core",
     "declaration": true,
     "declarationMap": true,
     "types": [],

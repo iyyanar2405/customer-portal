@@ -1,4 +1,4 @@
-import { environment } from "../../../environments/src";
+import { environment } from '@customer-portal/environments';
 
 
 export enum ServiceNowFeature {

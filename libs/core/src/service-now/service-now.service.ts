@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 
-import { environment } from '../../../environments/src';
+import { environment } from '@customer-portal/environments';
 
 import { LoggingService } from '../app-insights/logging.service';
 import { ServiceNowClient, ServiceNowConfig } from './service-now.config';

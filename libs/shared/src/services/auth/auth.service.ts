@@ -5,7 +5,7 @@ import { Observable, of } from 'rxjs';
 import { environment } from '@customer-portal/environments';
 
 import { AuthTokenConstants } from '../../constants/auth-constants';
-import { AuthServiceResponse } from '../../models';
+import { AuthServiceResponse, LoginRequest, LoginResponse } from '../../models';
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +20,18 @@ export class AuthService {
     this.clearTokenData();
     this.setLogoutState(false);
     window.location.href = `${this.authApiUrl}/login?returnUrl=${encodeURIComponent(environment.baseUrl)}`;
+  }
+
+  loginWithCredentials(loginRequest: LoginRequest): Observable<LoginResponse> {
+    this.clearTokenData();
+    this.setLogoutState(false);
+    
+    return this.http.post<LoginResponse>(`${this.authApiUrl}/token`, loginRequest, {
+      headers: {
+        'Accept': 'text/plain',
+        'Content-Type': 'application/json'
+      }
+    });
   }
 
   logout(): Observable<string> {
@@ -38,14 +50,14 @@ export class AuthService {
   }
 
   getToken(): Observable<string> {
-    return this.http.get(`${this.authApiUrl}/GetAccessToken`, {
+    return this.http.get(`${this.authApiUrl}/token`, {
       responseType: 'text',
       withCredentials: true,
     });
   }
 
   getClientCredentialToken(): Observable<string> {
-    return this.http.get<string>(`${this.authApiUrl}/Status`);
+    return this.http.get<string>(`${this.authApiUrl}/IsAuthenticated`);
   }
 
   isUserAuthenticatedWithExpiryInfo(): Observable<AuthServiceResponse> {
@@ -57,7 +69,7 @@ export class AuthService {
     }
 
     return this.http.get<AuthServiceResponse>(
-      `${this.authApiUrl}/UserAuthenticatedwithExpiry`,
+      `${this.authApiUrl}/token`,
       {
         withCredentials: true,
       },
@@ -65,7 +77,7 @@ export class AuthService {
   }
 
   isUserValidated(): Observable<boolean> {
-    return this.http.get<boolean>(`${this.authApiUrl}/ValidateUser`);
+    return this.http.get<boolean>(`${this.authApiUrl}/IsAuthenticated`);
   }
 
   resetLogoutState(): void {
@@ -76,12 +88,28 @@ export class AuthService {
     localStorage.setItem(AuthTokenConstants.TOKEN_EXPIRY_KEY, expiresAt);
   }
 
+  storeLoginResponse(loginResponse: LoginResponse): void {
+    localStorage.setItem('access_token', loginResponse.access_token);
+    localStorage.setItem('token_type', loginResponse.token_type);
+    localStorage.setItem('refresh_token', loginResponse.refreshToken);
+    localStorage.setItem(AuthTokenConstants.TOKEN_EXPIRY_KEY, loginResponse.expires);
+    localStorage.setItem('token_issued', loginResponse.issued);
+  }
+
+  getStoredAccessToken(): string | null {
+    return localStorage.getItem('access_token');
+  }
+
   clearTokenData(): void {
     localStorage.removeItem(AuthTokenConstants.SHOW_MODAL_KEY);
     localStorage.removeItem(AuthTokenConstants.TOKEN_EXPIRY_KEY);
     localStorage.removeItem(AuthTokenConstants.LAST_ACTIVITY_KEY);
     localStorage.removeItem(AuthTokenConstants.TOKEN_DURATION_KEY);
     localStorage.removeItem(AuthTokenConstants.AUTH_LOGGING_OUT);
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('token_type');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('token_issued');
   }
 
   private setLogoutState(value: boolean): void {
