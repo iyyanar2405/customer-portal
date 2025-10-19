@@ -1,8 +1,13 @@
-import { Component, Injectable } from '@angular/core';
-import { AuthService , LoginRequest} from '@customer-portal/shared';
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AuthService, LoginRequest } from '@customer-portal/shared';
 
 @Component({
   selector: 'app-login',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   template: `
     <div class="login-container">
       <h2>Login</h2>
@@ -116,7 +121,10 @@ export class LoginComponent {
   loginError = '';
   loginSuccess = false;
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   onLogin(): void {
     this.isLogging = true;
@@ -133,8 +141,10 @@ export class LoginComponent {
         this.loginSuccess = true;
         this.isLogging = false;
         
-        // You can redirect to dashboard or main app here
-        // this.router.navigate(['/dashboard']);
+        // Redirect to dashboard after successful login
+        setTimeout(() => {
+          this.router.navigate(['/dashboard']);
+        }, 1000);
       },
       error: (error) => {
         console.error('Login failed:', error);

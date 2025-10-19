@@ -138,6 +138,9 @@
     },
     "serve": {
       "executor": "@nx/angular:dev-server",
+      "options": {
+        "proxyConfig": "proxy.conf.json"
+      },
       "configurations": {
         "local": {
           "buildTarget": "customer-portal:build:local"

@@ -26,7 +26,7 @@ export class AuthService {
     this.clearTokenData();
     this.setLogoutState(false);
     
-    return this.http.post<LoginResponse>(`${this.authApiUrl}/token`, loginRequest, {
+    return this.http.post<LoginResponse>('/api/authorize/token', loginRequest, {
       headers: {
         'Accept': 'text/plain',
         'Content-Type': 'application/json'

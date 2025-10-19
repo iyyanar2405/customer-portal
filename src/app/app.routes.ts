@@ -6,6 +6,14 @@ import { authGuard, RouteConfig } from '../../libs/shared/src';
 
 export const appRoutes: Route[] = [
   {
+    path: RouteConfig.Login.path,
+    loadComponent: () =>
+      import('./components/login/login.component').then(
+        (m) => m.LoginComponent,
+      ),
+    title: RouteConfig.Login.title,
+  },
+  {
     path: RouteConfig.Welcome.path,
     loadComponent: () =>
       import('./components/welcome/welcome.component').then(
@@ -31,10 +39,15 @@ export const appRoutes: Route[] = [
     title: RouteConfig.Error.title,
   },
   {
-    path: '',
+    path: 'dashboard',
     loadChildren: () =>
       import('./components/layout/layout.routes').then((r) => r.LAYOUT_ROUTES),
     canMatch: [authGuard],
+  },
+  {
+    path: '',
+    redirectTo: RouteConfig.Login.path,
+    pathMatch: 'full'
   },
   {
     path: '**',

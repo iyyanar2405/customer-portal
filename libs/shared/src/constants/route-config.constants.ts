@@ -75,6 +75,12 @@ export const RouteConfig = {
     i18nKey: 'welcome',
     pageViewRequest: 'welcome',
   },
+  Login: {
+    path: 'login',
+    title: 'Login',
+    i18nKey: 'login',
+    pageViewRequest: 'login',
+  },
   Logout: {
     path: 'logout',
     title: 'Logout',
