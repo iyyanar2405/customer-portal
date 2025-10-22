@@ -54,6 +54,7 @@ import {
   errorInterceptor,
   GlobalErrorHandler,
 } from './interceptors';
+import { apiInterceptor } from './interceptors/api.interceptor';
 import { TranslocoHttpLoader } from './transloco-http.loader';
 import { Language, LocaleService, registerLocales } from '../../libs/shared/src';
 import { appInitializer, loggingInitializer } from '../../libs/data-access/permissions/src';
@@ -96,6 +97,7 @@ export const appConfig: ApplicationConfig = {
     provideAppInitializer(loggingInitializer),
     provideHttpClient(
       withInterceptors([
+        apiInterceptor,
         customHeaderInterceptor,
         errorInterceptor,
         mySpinnerInterceptor,

@@ -29,6 +29,12 @@
   },
   "error": {
     "fail": {
+      "message": "An error occurred while processing your request. Please try again later.",
+      "title": "Operation Failed"
+    }
+  },
+  "error": {
+    "fail": {
       "message": "An error occurred. Please try again.",
       "title": "Error"
     }

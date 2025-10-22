@@ -28,9 +28,10 @@ export class AuthService {
     
     return this.http.post<LoginResponse>('/api/authorize/token', loginRequest, {
       headers: {
-        'Accept': 'text/plain',
+        'accept': 'text/plain',
         'Content-Type': 'application/json'
-      }
+      },
+      withCredentials: false  // Explicitly disable credentials to avoid CORS issues
     });
   }
 
@@ -39,9 +40,12 @@ export class AuthService {
     this.setLogoutState(true);
 
     return this.http.post<string>(
-      `${this.authApiUrl}/Logout`,
+      '/api/authorize/Logout',
       {},
-      { responseType: 'text' as 'json', withCredentials: true },
+      { 
+        responseType: 'text' as 'json',
+        withCredentials: false
+      },
     );
   }
 
@@ -50,14 +54,16 @@ export class AuthService {
   }
 
   getToken(): Observable<string> {
-    return this.http.get(`${this.authApiUrl}/token`, {
+    return this.http.get('/api/authorize/token', {
       responseType: 'text',
-      withCredentials: true,
+      withCredentials: false
     });
   }
 
   getClientCredentialToken(): Observable<string> {
-    return this.http.get<string>(`${this.authApiUrl}/IsAuthenticated`);
+    return this.http.get<string>('/api/authorize/IsAuthenticated', {
+      withCredentials: false
+    });
   }
 
   isUserAuthenticatedWithExpiryInfo(): Observable<AuthServiceResponse> {
@@ -68,16 +74,15 @@ export class AuthService {
       });
     }
 
-    return this.http.get<AuthServiceResponse>(
-      `${this.authApiUrl}/token`,
-      {
-        withCredentials: true,
-      },
-    );
+    return this.http.get<AuthServiceResponse>('/api/authorize/token', {
+      withCredentials: false
+    });
   }
 
   isUserValidated(): Observable<boolean> {
-    return this.http.get<boolean>(`${this.authApiUrl}/IsAuthenticated`);
+    return this.http.get<boolean>('/api/authorize/IsAuthenticated', {
+      withCredentials: false
+    });
   }
 
   resetLogoutState(): void {
