@@ -135,8 +135,9 @@ export class LoginComponent {
       next: (response) => {
         console.log('Login successful:', response);
         
-        // Store the login response
+        // Store the login response and credentials
         this.authService.storeLoginResponse(response);
+        this.authService.storeLoginCredentials(this.loginRequest);
         
         this.loginSuccess = true;
         this.isLogging = false;

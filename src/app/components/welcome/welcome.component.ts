@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { TranslocoDirective } from '@jsverse/transloco';
 
 import {
@@ -25,13 +26,16 @@ export class WelcomeComponent implements OnInit {
   isUserValidated?: boolean;
   sharedButtonType = SharedButtonType;
 
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly router: Router
+  ) {}
 
   ngOnInit(): void {
     this.isUserValidated = window.history.state?.isUserValidated;
   }
 
   onLoginClick(): void {
-    this.authService.login();
+    this.router.navigate(['/login']);
   }
 }

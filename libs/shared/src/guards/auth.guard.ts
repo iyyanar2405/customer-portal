@@ -1,17 +1,19 @@
-import { CanActivateFn } from '@angular/router';
+import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
 import { of } from 'rxjs';
 
-import { AuthTokenConstants } from '../constants/auth-constants';
+import { AuthService } from '../services/auth/auth.service';
 
 export const authGuard: CanActivateFn = () => {
-  const tokenExpiry = localStorage.getItem(AuthTokenConstants.TOKEN_EXPIRY_KEY);
-
-  if (!tokenExpiry) {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+  
+  const isAuthenticated = authService.isAuthenticated();
+  
+  if (!isAuthenticated) {
+    router.navigate(['/welcome']);
     return of(false);
   }
-
-  const expiryDate = new Date(tokenExpiry);
-  const currentDateUtc = new Date(Date.now());
-
-  return of(expiryDate > currentDateUtc);
+  
+  return of(true);
 };
