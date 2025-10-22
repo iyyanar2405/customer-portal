@@ -8,23 +8,23 @@ import { environment } from '@customer-portal/environments';
   providedIn: 'root',
 })
 export class LoggingService {
-  private appInsights: any;
+  // private appInsights: any;
   private userEmail: string | null = null;
   private veracityId: string | null = null;
   private initialized = false;
 
   async init() {
     if (this.initialized) return;
-    const { ApplicationInsights } = await import(
-      '@microsoft/applicationinsights-web'
-    );
-    this.appInsights = new ApplicationInsights({
-      config: {
-        instrumentationKey: environment.appInsights?.instrumentationKey,
-        enableAutoRouteTracking: true,
-      },
-    });
-    this.appInsights.loadAppInsights();
+    // const { ApplicationInsights } = await import(
+    //   '@microsoft/applicationinsights-web'
+    // );
+    // this.appInsights = new ApplicationInsights({
+    //   config: {
+    //     instrumentationKey: environment.appInsights?.instrumentationKey,
+    //     enableAutoRouteTracking: true,
+    //   },
+    // });
+    // this.appInsights.loadAppInsights();
     this.initialized = true;
   }
 
@@ -36,7 +36,7 @@ export class LoggingService {
         this.veracityId = veracityId;
       }
 
-      this.appInsights.setAuthenticatedUserContext(userEmail, veracityId, true);
+      // this.appInsights.setAuthenticatedUserContext(userEmail, veracityId, true);
     }
   }
 
@@ -52,11 +52,11 @@ export class LoggingService {
         veracityId: this.veracityId || 'unknown',
       };
 
-      this.appInsights.trackPageView({
-        name,
-        uri,
-        properties: enhancedProperties,
-      });
+      // this.appInsights.trackPageView({
+      //   name,
+      //   uri,
+      //   properties: enhancedProperties,
+      // });
     } catch (e) {
       console.error('Failed to log page view', e);
     }
@@ -70,7 +70,7 @@ export class LoggingService {
         veracityId: this.veracityId || 'unknown',
       };
 
-      this.appInsights.trackEvent({ name }, enhancedProperties);
+      // this.appInsights.trackEvent({ name }, enhancedProperties);
     } catch (e) {
       console.error('Failed to log event', e);
     }
@@ -88,7 +88,7 @@ export class LoggingService {
         veracityId: this.veracityId || 'unknown',
       };
 
-      this.appInsights.trackMetric({ name, average }, enhancedProperties);
+      // this.appInsights.trackMetric({ name, average }, enhancedProperties);
     } catch (e) {
       console.error('Failed to log metric', e);
     }
@@ -96,14 +96,14 @@ export class LoggingService {
 
   logException(exception: Error, severityLevel?: number): void {
     try {
-      this.appInsights.trackException({
-        exception,
-        severityLevel,
-        properties: {
-          userEmail: this.userEmail || 'anonymous',
-          veracityId: this.veracityId || 'unknown',
-        },
-      });
+      // this.appInsights.trackException({
+      //   exception,
+      //   severityLevel,
+      //   properties: {
+      //     userEmail: this.userEmail || 'anonymous',
+      //     veracityId: this.veracityId || 'unknown',
+      //   },
+      // });
     } catch (e) {
       console.error('Failed to log exception', e);
     }
@@ -117,7 +117,7 @@ export class LoggingService {
         veracityId: this.veracityId || 'unknown',
       };
 
-      this.appInsights.trackTrace({ message }, enhancedProperties);
+      // this.appInsights.trackTrace({ message }, enhancedProperties);
     } catch (e) {
       console.error('Failed to log trace', e);
     }
